@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>철크크 — 죽은 철학자들의 단톡방</title>
+<meta name="theme-color" content="#12141d">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -14,7 +17,7 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{background:var(--ink);color:var(--paper);font-family:var(--sans);height:100dvh;overflow:hidden}
-  .app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--ink);position:relative}
+  .app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--ink);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.5)}
 
   .list-head{padding:22px 20px 14px;border-bottom:1px solid var(--ink-line)}
   .list-head .eyebrow{font-size:10px;letter-spacing:.35em;color:var(--candle);margin-bottom:6px}
@@ -48,11 +51,12 @@
   .tab.on{color:var(--candle);font-weight:700}
   .cube-view{flex:1;overflow-y:auto;padding:16px 18px 8px}
   .cube-cap{font-size:11.5px;color:rgba(239,232,218,.45);margin-bottom:6px;line-height:1.7}
-  .row-cap{font-size:10.5px;letter-spacing:.16em;color:var(--candle);margin:14px 2px 7px}
+  .row-cap{font-size:10px;letter-spacing:.14em;color:var(--candle);margin:10px 2px 5px}
   .cube-info{margin-top:16px;padding:13px 2px 4px;border-top:1px solid var(--ink-line);font-size:12.5px;color:var(--paper-dim);line-height:1.75;min-height:96px}
   .cube-info b{color:var(--paper);font-size:14px}
   .trait{display:inline-block;background:rgba(239,232,218,.07);border-radius:8px;padding:2.5px 9px;margin:6px 4px 0 0;font-size:11px}
   .cube-pr{margin-top:10px;background:none;border:1px solid var(--candle);color:var(--candle);border-radius:10px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--sans)}
+  .backup-row{display:flex;gap:10px;margin-top:18px}
   .cube-foot{font-size:10.5px;color:rgba(239,232,218,.3);text-align:center;line-height:1.6;padding:18px 0 10px}
   .gcell .dot{top:7px;left:7px;right:auto;bottom:auto;width:12px;height:12px;border-width:2.5px}
   .splash{position:absolute;inset:0;z-index:50;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s}
@@ -107,24 +111,50 @@
   /* ===== 오버레이 공통 ===== */
   .overlay{position:absolute;inset:0;background:var(--ink);z-index:20;display:none;flex-direction:column}
   .overlay.on{display:flex}
-  .ov-head{padding:26px 22px 8px}
-  .ov-head h2{font-family:var(--serif);font-size:20px;font-weight:700;line-height:1.5;white-space:pre-line}
-  .ov-head p{font-size:12.5px;color:var(--paper-dim);margin-top:8px;line-height:1.7}
+  .ov-head{padding:18px 22px 4px}
+  .ov-head h2{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.45;white-space:pre-line}
+  .ov-head p{font-size:12px;color:var(--paper-dim);margin-top:6px;line-height:1.6}
   .ov-close{position:absolute;top:18px;right:12px;background:none;border:none;color:var(--paper-dim);font-size:17px;cursor:pointer;padding:10px;z-index:1}
   .ov-close:hover{color:var(--paper)}
-  .ov-foot{padding:12px 20px calc(18px + env(safe-area-inset-bottom))}
+  .ov-foot{padding:10px 20px calc(14px + env(safe-area-inset-bottom))}
+  .center-col{display:flex;flex-direction:column;justify-content:center;min-height:100%;padding:4px 6px}
+  .q-dots{display:flex;gap:8px;justify-content:center;margin:0 0 26px}
+  .q-dots i{width:7px;height:7px;border-radius:50%;background:rgba(239,232,218,.18)}
+  .q-dots i.on{background:var(--candle)}
+  .q-q{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.6;text-align:center;color:var(--paper);margin:0 6px 30px;white-space:pre-line}
+  .q-opt{display:block;width:100%;text-align:left;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-left:3px solid transparent;border-radius:14px;padding:15px 16px;margin-bottom:10px;color:var(--paper-dim);font-family:var(--sans);font-size:14.5px;line-height:1.55;cursor:pointer;transition:all .15s}
+  .q-opt:hover{border-color:var(--candle);border-left-color:var(--candle);color:var(--paper)}
+  .q-opt.sel{border-color:var(--candle);border-left-color:var(--candle);background:rgba(217,160,91,.12);color:var(--paper)}
+  .res-av{width:108px;height:108px;border-radius:38px;margin:0 auto;overflow:hidden;box-shadow:0 0 0 3px var(--candle),0 0 36px rgba(217,160,91,.35)}
+  .res-av svg{width:100%;height:100%;display:block}
+  .res-name{font-family:var(--serif);font-size:26px;font-weight:700;text-align:center;margin-top:20px;color:var(--paper)}
+  .res-line{font-size:13.5px;color:var(--paper-dim);text-align:center;margin-top:10px;line-height:1.75;padding:0 14px}
+  .res-cap{text-align:center;font-size:10.5px;letter-spacing:.16em;color:rgba(239,232,218,.4);margin:26px 0 10px}
+  .res-trio{display:flex;gap:12px;justify-content:center}
+  .res-trio .avatar{width:46px;height:46px;border-radius:17px}
+  .team{display:flex;align-items:center;gap:14px;width:100%;padding:15px 16px;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-left:3px solid transparent;border-radius:16px;margin-bottom:10px;cursor:pointer;text-align:left;color:var(--paper);font-family:var(--sans);transition:all .15s}
+  .team:hover{border-color:var(--candle);border-left-color:var(--candle);background:rgba(217,160,91,.07)}
+  .team .t-avs{display:flex;flex-shrink:0}
+  .team .t-avs .avatar{width:44px;height:44px;border-radius:16px;border:2.5px solid var(--ink);margin-left:-15px}
+  .team .t-avs .avatar:first-child{margin-left:0}
+  .team .t-name{font-family:var(--serif);font-size:16px;font-weight:700}
+  .team .t-desc{font-size:12px;color:var(--paper-dim);margin-top:4px;line-height:1.55}
+  .helper-row{display:flex;gap:8px;margin-top:12px}
+  .helper-btn{flex:1;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:12px;color:var(--paper-dim);font-family:var(--sans);font-size:12px;padding:10px 6px;cursor:pointer}
+  .helper-btn:hover{border-color:var(--candle);color:var(--candle)}
+  .ob-note{color:var(--candle);font-size:11.5px}
   .ov-go{width:100%;padding:15px;border:none;border-radius:14px;background:var(--candle);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;font-family:var(--sans)}
   .ov-go:disabled{opacity:.35}
 
   /* ===== 3x3 큐브 선택 ===== */
-  .grid-area{flex:1;overflow-y:auto;padding:16px 18px 6px}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .gcell{position:relative;border:2px solid transparent;border-radius:22px;padding:9px 6px 8px;background:rgba(239,232,218,.04);cursor:pointer;text-align:center}
-  .gcell .avatar{width:100%;height:auto;aspect-ratio:1;border-radius:17px;margin:0 auto}
-  .gcell .gname{font-size:12.5px;font-weight:700;margin-top:7px;color:var(--paper)}
+  .grid-area{flex:1;overflow-y:auto;padding:10px 18px 0}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .gcell{position:relative;border:2px solid transparent;border-radius:18px;padding:8px 4px 7px;background:rgba(239,232,218,.04);cursor:pointer;text-align:center}
+  .gcell .avatar{width:60px;height:60px;border-radius:20px;margin:0 auto}
+  .gcell .gname{font-size:12px;font-weight:700;margin-top:5px;color:var(--paper)}
   .gcell.on{border-color:var(--candle);background:rgba(217,160,91,.1)}
   .gcell.on::after{content:'✓';position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--candle);color:var(--ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-  .ginfo{min-height:74px;padding:13px 22px 0;font-size:12.5px;color:var(--paper-dim);line-height:1.7;border-top:1px solid var(--ink-line);margin-top:14px}
+  .ginfo{min-height:62px;padding:10px 22px 0;font-size:12px;color:var(--paper-dim);line-height:1.65;border-top:1px solid var(--ink-line);margin-top:10px}
   .ginfo b{color:var(--paper);font-size:13.5px}
   .ginfo .gi-sched{font-size:11px;opacity:.75;margin-top:3px}
 
@@ -153,6 +183,11 @@
     <div class="cube-cap">가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.</div>
     <div id="cubeRows"></div>
     <div class="cube-info" id="cubeInfo">철학자를 눌러 서로 비교해 보세요.</div>
+    <div class="backup-row">
+      <button class="action-btn" id="btnExport">💾 대화 백업</button>
+      <button class="action-btn" id="btnImport">📂 백업 불러오기</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+    </div>
     <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
   </div>
   <div class="tabbar">
@@ -410,19 +445,184 @@ async function load(){
   }catch(e){}
 }
 
-/* ================= 3x3 큐브 선택 화면 ================= */
-function showGrid({title,desc,pool,max,min,btn,onDone,onCancel}){
-  const sel=new Set();
+/* ================= 온보딩: 큐브 본체 + 테스트/조합은 참고 도구 ================= */
+const QUIZ=[
+ {q:'새벽 2시,\n잠이 안 올 때 나는',opts:[
+  ['생각이 꼬리에 꼬리를 문다',{kierkegaard:2,schopenhauer:1}],
+  ['눈 감으면 그냥 잔다. 의지로',{aurelius:2,kant:1}],
+  ['폰 켜고 아무거나 본다',{zhuangzi:2,epicurus:1}],
+  ['차라리 일어나서 내일 계획을 세운다',{kant:2,nietzsche:1}]]},
+ {q:'힘들 때\n정말 듣고 싶은 말은',opts:[
+  ['"네 잘못 아니야. 고생했어"',{epicurus:2,confucius:1}],
+  ['"그래서, 이제 뭐 할 건데?"',{nietzsche:2,aurelius:1}],
+  ['"원래 인생이 그래. 커피나 마시자"',{schopenhauer:2,zhuangzi:1}],
+  ['"그게 왜 힘들었는지 같이 짚어보자"',{socrates:2,kierkegaard:1}]]},
+ {q:'요즘 나를\n제일 지치게 하는 건',opts:[
+  ['사람. 관계. 눈치',{confucius:2,schopenhauer:1}],
+  ['앞날에 대한 불안',{kierkegaard:2,aurelius:1}],
+  ['자꾸 남과 비교하게 되는 나',{nietzsche:2,epicurus:1}],
+  ['내가 뭘 원하는지 모르겠다는 것',{socrates:2,zhuangzi:1}]]},
+ {q:'약속 없는 주말,\n나는',opts:[
+  ['밀린 일 정리하고 계획을 세운다',{kant:2,aurelius:1}],
+  ['눕는다. 하루 종일. 완벽하게',{zhuangzi:2,schopenhauer:1}],
+  ['맛있는 걸 해 먹거나 좋은 사람을 만난다',{epicurus:2,confucius:1}],
+  ['오래 걷는다. 걷다 보면 생각이 정리된다',{nietzsche:2,kierkegaard:1}]]},
+ {q:'세상에서 제일\n듣기 싫은 잔소리는',opts:[
+  ['"긍정적으로 생각해~"',{schopenhauer:2,kierkegaard:1}],
+  ['"남들도 다 그러고 살아"',{nietzsche:2,socrates:1}],
+  ['"계획 좀 세우고 살아라"',{zhuangzi:2,epicurus:1}],
+  ['"알아서 해" (무책임한 방임)',{kant:2,confucius:1}]]}
+];
+const MATCH={
+ socrates:'답을 주는 사람보다, 좋은 질문을 던져줄 사람이 필요한 시기네요.',
+ nietzsche:'지금 필요한 건 위로가 아니라, 등을 힘껏 밀어줄 손이에요.',
+ kant:'뒤엉킨 생각을 첫째, 둘째로 정리해줄 사람이 필요하겠어요.',
+ epicurus:'조언보다 먼저, 조건 없이 받아줄 사람이 필요한 때예요.',
+ zhuangzi:'너무 꽉 쥐고 있었네요. 힘 빼는 법을 아는 사람이 필요해요.',
+ schopenhauer:'억지 긍정에 지친 당신에겐, 솔직한 독설과 진짜 처방이 맞아요.',
+ confucius:'사람 사이에서 지친 당신에겐 관계의 지혜가 필요해요.',
+ aurelius:'흔들리는 멘탈을 잡아줄 단단한 목소리가 필요한 시기예요.',
+ kierkegaard:'그 불안은 없애야 할 게 아니라, 이해받아야 할 거예요.'};
+const TEAMS=[
+ {name:'균형팀',desc:'질문 → 격려 → 수용. 처음이라면 이 조합',m:['socrates','nietzsche','epicurus']},
+ {name:'온기팀',desc:'혼내는 사람이 한 명도 없습니다',m:['epicurus','confucius','zhuangzi']},
+ {name:'정신번쩍팀',desc:'핑계가 살아남지 못하는 조합',m:['nietzsche','kant','aurelius']},
+ {name:'새벽팀',desc:'잠 안 오는 밤을 아는 사람들',m:['kierkegaard','schopenhauer','epicurus']},
+ {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','socrates']}
+];
+const OB_ROWS=[['🔥 팩폭 라인','때리고 정리하는 줄'],['🤲 온기 라인','받아주고 묻는 줄'],['🌙 고요 라인','가라앉히는 줄']];
+
+function resetOv(){
+  const g=$('pkGrid'); g.className=''; g.innerHTML='';
+  $('pkInfo').style.display='none'; $('pkGo').style.display='none';
+  $('pkClose').style.display='none';
+}
+function backTo(fn){ const cl=$('pkClose'); cl.style.display=''; cl.onclick=fn; }
+function finishOnboard(ids){
+  $('picker').classList.remove('on');
+  state.friends=ids; save(); renderFriends();
+}
+function onboarding(){ mainOnboard([]); }
+
+/* --- 메인: 줄 이름이 붙은 큐브에서 직접 3명 확정 --- */
+function mainOnboard(pre,note){
+  resetOv();
+  $('pkTitle').textContent='함께할 세 명을\n골라 보세요';
+  $('pkDesc').textContent='줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.';
+  const sel=new Set((pre||[]).slice(0,3));
+  const g=$('pkGrid');
+  const info=$('pkInfo'); info.style.display='';
+  const baseInfo=(note?`<span class="ob-note">${note}</span><br>`:'')+'철학자를 눌러 소개를 확인해 보세요.';
+  info.innerHTML=baseInfo;
+  const go=$('pkGo'); go.style.display='';
+  const updateGo=()=>{ go.disabled=sel.size<1; go.textContent=sel.size?`${sel.size}명과 시작하기`:'철학자를 선택하세요'; };
+  for(let r=0;r<3;r++){
+    const cap=document.createElement('div'); cap.className='row-cap';
+    cap.textContent=OB_ROWS[r][0]+' · '+OB_ROWS[r][1];
+    g.appendChild(cap);
+    const row=document.createElement('div'); row.className='grid';
+    for(let c=0;c<3;c++){
+      const p=PHILOSOPHERS[r*3+c];
+      const b=document.createElement('button');
+      b.className='gcell'+(sel.has(p.id)?' on':'');
+      b.innerHTML=`<div class="avatar">${av(p.id)}</div><div class="gname">${p.name}</div>`;
+      b.onclick=()=>{
+        info.innerHTML=`<b>${p.name}</b> — ${p.desc}<div class="gi-sched">${schedText(p).replace(/\n/g,' · ')}</div>`;
+        if(sel.has(p.id)) sel.delete(p.id);
+        else{ if(sel.size>=3){ updateGo(); return; } sel.add(p.id); }
+        b.classList.toggle('on',sel.has(p.id));
+        updateGo();
+      };
+      row.appendChild(b);
+    }
+    g.appendChild(row);
+  }
+  const helpers=document.createElement('div'); helpers.className='helper-row';
+  const h1=document.createElement('button'); h1.className='helper-btn'; h1.textContent='🧭 테스트로 추천받기 (30초)';
+  h1.onclick=()=>startQuiz([...sel]);
+  const h2=document.createElement('button'); h2.className='helper-btn'; h2.textContent='✨ 추천 조합 보기';
+  h2.onclick=()=>showTeams([...sel]);
+  helpers.appendChild(h1); helpers.appendChild(h2);
+  g.appendChild(helpers);
+  updateGo();
+  go.onclick=()=>{ if(sel.size>=1) finishOnboard([...sel]); };
+  $('picker').classList.add('on');
+}
+
+/* --- 매칭 테스트: 결과는 큐브에 표시만 --- */
+function startQuiz(prevSel){
+  const scores={};
+  const step=i=>{
+    resetOv(); backTo(i===0?()=>mainOnboard(prevSel):()=>step(i-1));
+    $('pkTitle').textContent='나와 맞는 철학자 찾기';
+    $('pkDesc').textContent='';
+    const g=$('pkGrid'); g.className='center-col';
+    const dots=document.createElement('div'); dots.className='q-dots';
+    for(let d=0;d<QUIZ.length;d++){ const s=document.createElement('i'); if(d<=i)s.className='on'; dots.appendChild(s); }
+    const q=document.createElement('div'); q.className='q-q'; q.textContent=QUIZ[i].q;
+    g.appendChild(dots); g.appendChild(q);
+    QUIZ[i].opts.forEach(([t,sc])=>{
+      const b=document.createElement('button'); b.className='q-opt'; b.textContent=t;
+      b.onclick=()=>{
+        if(b.disabled) return;
+        b.classList.add('sel');
+        g.querySelectorAll('.q-opt').forEach(x=>x.disabled=true);
+        for(const k in sc) scores[k]=(scores[k]||0)+sc[k];
+        setTimeout(()=>{ i+1<QUIZ.length?step(i+1):showResult(); },260);
+      };
+      g.appendChild(b);
+    });
+  };
+  const showResult=()=>{
+    const rank=PHILOSOPHERS.map(p=>p.id).sort((a,b)=>(scores[b]||0)-(scores[a]||0)||Math.random()-.5);
+    const top=P(rank[0]), trio=rank.slice(0,3);
+    resetOv(); backTo(()=>mainOnboard(prevSel));
+    $('pkTitle').textContent='테스트 결과';
+    $('pkDesc').textContent='';
+    const g=$('pkGrid'); g.className='center-col';
+    g.innerHTML=`
+      <div class="res-av">${av(top.id)}</div>
+      <div class="res-name">${top.name}</div>
+      <div class="res-line">${MATCH[top.id]}</div>
+      <div class="res-cap">함께 추천하는 조합</div>
+      <div class="res-trio">${trio.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
+      <div class="res-line" style="margin-top:8px">${trio.map(id=>P(id).name).join(' · ')}</div>`;
+    const go=$('pkGo'); go.style.display=''; go.disabled=false;
+    go.textContent='큐브로 돌아가 확정하기';
+    go.onclick=()=>mainOnboard(trio,`🧭 테스트 추천이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`);
+  };
+  step(0);
+}
+
+/* --- 추천 조합: 선택하면 큐브에 표시만 --- */
+function showTeams(prevSel){
+  resetOv(); backTo(()=>mainOnboard(prevSel));
+  $('pkTitle').textContent='추천 조합';
+  $('pkDesc').textContent='골라도 확정이 아니에요. 큐브에서 최종 조정합니다.';
+  const g=$('pkGrid');
+  TEAMS.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='team';
+    b.innerHTML=`<div class="t-avs">${t.m.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
+      <div><div class="t-name">${t.name}</div><div class="t-desc">${t.desc}</div></div>`;
+    b.onclick=()=>mainOnboard([...t.m],`✨ '${t.name}' 조합이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`);
+    g.appendChild(b);
+  });
+}
+
+function showGrid({title,desc,pool,max,min,btn,onDone,onCancel,pre}){
+  const sel=new Set(pre||[]);
   $('pkTitle').textContent=title; $('pkDesc').textContent=desc;
-  const grid=$('pkGrid'); grid.innerHTML='';
+  const grid=$('pkGrid'); grid.className='grid'; grid.innerHTML='';
+  $('pkInfo').style.display=''; 
   const info=$('pkInfo'); info.innerHTML='철학자를 눌러 소개를 확인해 보세요.';
-  const go=$('pkGo');
+  const go=$('pkGo'); go.style.display='';
   const cl=$('pkClose');
   cl.style.display=onCancel?'':'none';
   cl.onclick=()=>{ $('picker').classList.remove('on'); if(onCancel) onCancel(); };
   pool.forEach(p=>{
     const b=document.createElement('button');
-    b.className='gcell';
+    b.className='gcell'+(sel.has(p.id)?' on':'');
     b.innerHTML=`<div class="avatar">${av(p.id)}</div><div class="gname">${p.name}</div>`;
     b.onclick=()=>{
       info.innerHTML=`<b>${p.name}</b> — ${p.desc}<div class="gi-sched">${schedText(p).replace(/\n/g,' · ')}</div>`;
@@ -437,15 +637,6 @@ function showGrid({title,desc,pool,max,min,btn,onDone,onCancel}){
   updateGo();
   go.onclick=()=>{ if(sel.size>=min){ $('picker').classList.remove('on'); onDone([...sel]); } };
   $('picker').classList.add('on');
-}
-function onboarding(){
-  showGrid({
-    title:'아홉 철학자 중\n세 명과 시작하세요',
-    desc:'눌러서 소개를 보고, 마음 가는 세 명을 고르세요. 나머지는 나중에 언제든 친구 추가할 수 있어요.',
-    pool:PHILOSOPHERS,max:3,min:1,
-    btn:n=>n?`${n}명과 시작하기`:'철학자를 선택하세요',
-    onDone:ids=>{ state.friends=ids; save(); renderFriends(); }
-  });
 }
 function addFriends(){
   const pool=PHILOSOPHERS.filter(p=>!state.friends.includes(p.id));
@@ -462,7 +653,7 @@ function makeGroup(){
   const pool=PHILOSOPHERS.filter(p=>state.friends.includes(p.id));
   if(pool.length<2) return;
   showGrid({
-    title:'단톡방 만들기',desc:'2~3명을 초대하세요. 서로 사상이 부딪히는 조합일수록 재밌습니다. 각자 당신과의 개인 대화를 기억한 채 들어옵니다.',
+    title:'단톡방 만들기',desc:'2~3명을 초대하세요. 서로 사상이 부딪히는 조합일수록 재밌습니다. 각자 당신과의 개인 대화를 기억한 채 들어옵니다. (깊은 대화를 위해 한 방은 최대 3명까지예요)',
     pool,max:3,min:2,
     btn:n=>n>=2?`${n}명과 방 만들기`:'2명 이상 선택',
     onDone:ids=>{
@@ -1049,6 +1240,34 @@ function showTab(t){
 $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
 
+/* ================= 대화 백업/복원 ================= */
+$('btnExport').onclick=()=>{
+  const payload={app:'cheolkk',ver:1,date:new Date().toISOString(),
+    friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks};
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+  const a=document.createElement('a');
+  const d=new Date(), ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  a.href=URL.createObjectURL(blob); a.download='cheolkk_backup_'+ymd+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+};
+$('btnImport').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(d.app!=='cheolkk'||!d.friends) throw 0;
+      if(!confirm('백업을 불러오면 지금 기기의 대화가 백업 시점의 내용으로 교체됩니다. 계속할까요?')) return;
+      state.friends=d.friends; state.chats=d.chats||{}; state.groups=d.groups||[]; state.nicks=d.nicks||{};
+      state.sched={};
+      save().then(()=>location.reload());
+    }catch(err){ alert('철크크 백업 파일이 아니거나 손상된 파일이에요.'); }
+  };
+  r.readAsText(f);
+  e.target.value='';
+};
+
 /* ================= 시작 ================= */
 (async()=>{
   $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
@@ -1059,6 +1278,9 @@ $('tabCube').onclick=()=>showTab('cube');
   const wait=Math.max(0,1100-(now()-t0));
   setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
 })();
+</script>
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>
 </body>
 </html>
