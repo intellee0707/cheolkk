@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.cheolkk.twa",
+    "sha256_cert_fingerprints": ["여기에_플레이콘솔의_SHA256_지문_붙여넣기"]
+  }
+}]
