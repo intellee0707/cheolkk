@@ -6,6 +6,7 @@
 <title>철크크 — 죽은 철학자들의 단톡방</title>
 <meta name="theme-color" content="#12141d">
 <link rel="manifest" href="/manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -172,25 +173,41 @@
   .pr-desc{font-size:13px;color:var(--paper-dim);margin-top:10px;line-height:1.7;max-width:280px}
   .pr-sched{font-size:11.5px;color:rgba(239,232,218,.45);margin-top:14px;line-height:1.7}
   .pr-foot{padding:12px 20px calc(22px + env(safe-area-inset-bottom))}
+
+  /* ===== 설정 ===== */
+  .gear{position:absolute;top:16px;right:10px;background:none;border:none;color:var(--paper-dim);font-size:19px;cursor:pointer;padding:10px;z-index:2}
+  .gear:hover{color:var(--candle)}
+  .st-body{flex:1;overflow-y:auto;padding:6px 20px calc(24px + env(safe-area-inset-bottom))}
+  .st-sec{font-size:11px;letter-spacing:.14em;color:rgba(239,232,218,.4);margin:20px 2px 8px}
+  .st-card{background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:16px;padding:15px 16px}
+  .st-acc-line{font-size:14.5px;font-weight:700;word-break:break-all}
+  .st-acc-sub{font-size:12px;color:var(--paper-dim);line-height:1.65;margin-top:5px}
+  .st-err{font-size:11.5px;color:#c25b4e;margin-top:6px;word-break:break-all}
+  .st-card .ov-go{margin-top:12px;padding:12px}
+  .st-choices{display:flex;gap:8px}
+  .st-choice{flex:1;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:12px;color:var(--paper-dim);font-family:var(--sans);font-size:13.5px;padding:12px;cursor:pointer}
+  .st-choice.on{border-color:var(--candle);color:var(--candle);font-weight:700;background:rgba(217,160,91,.1)}
+  .st-item{display:flex;align-items:center;gap:10px;width:100%;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:12px;color:var(--paper);font-family:var(--sans);font-size:13.5px;padding:13px 15px;cursor:pointer;margin-bottom:8px;text-align:left;text-decoration:none;box-sizing:border-box}
+  .st-item:hover{border-color:var(--candle)}
+  .st-item.danger:hover{border-color:#c25b4e;color:#c25b4e}
+  .st-item.dim{opacity:.45;cursor:default}
+  .st-item.dim:hover{border-color:var(--ink-line)}
+  .st-note{font-size:11px;color:rgba(239,232,218,.35);line-height:1.7;margin-top:14px}
 </style>
 </head>
 <body>
 <div class="app">
 
   <div class="list-head">
-    <div class="eyebrow">죽은 철학자들의 단톡방</div>
+    <div class="eyebrow" id="headEyebrow">죽은 철학자들의 단톡방</div>
     <h1>철크크</h1>
+    <button class="gear" id="btnSettings" aria-label="설정">⚙️</button>
   </div>
   <div class="friends" id="friends"></div>
   <div class="cube-view" id="cubeView" style="display:none">
     <div class="cube-cap">가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.</div>
     <div id="cubeRows"></div>
     <div class="cube-info" id="cubeInfo">철학자를 눌러 서로 비교해 보세요.</div>
-    <div class="backup-row">
-      <button class="action-btn" id="btnExport">💾 대화 백업</button>
-      <button class="action-btn" id="btnImport">📂 백업 불러오기</button>
-      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
-    </div>
     <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
   </div>
   <div class="tabbar">
@@ -234,6 +251,35 @@
     <div class="pr-foot"><button class="ov-go" id="prChat">채팅하기</button></div>
   </div>
 
+  <div class="overlay" id="settings">
+    <button class="ov-close" id="stClose" aria-label="닫기">✕</button>
+    <div class="ov-head"><h2 id="stTitle">설정</h2></div>
+    <div class="st-body">
+      <div class="st-sec" id="stSecAcc">계정</div>
+      <div class="st-card">
+        <div class="st-acc-line" id="stAccInfo"></div>
+        <div class="st-acc-sub" id="stSyncInfo"></div>
+        <div class="st-err" id="stSyncErr" style="display:none"></div>
+        <button class="ov-go" id="stLogin"></button>
+      </div>
+      <div class="st-sec">언어 · Language</div>
+      <div class="st-choices">
+        <button class="st-choice" id="langKo">한국어</button>
+        <button class="st-choice" id="langEn">English</button>
+      </div>
+      <div class="st-sec" id="stSecData">데이터</div>
+      <button class="st-item" id="stExport"></button>
+      <button class="st-item" id="stImport"></button>
+      <button class="st-item danger" id="stReset"></button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+      <div class="st-sec" id="stSecInfo">정보</div>
+      <a class="st-item" id="stPrivacy" href="/privacy.html" target="_blank" rel="noopener"></a>
+      <div class="st-item dim" id="stPush"></div>
+      <div class="st-note" id="stDisclaimer"></div>
+      <div class="st-note" id="stVersion" style="text-align:center;margin-top:18px"></div>
+    </div>
+  </div>
+
   <div class="splash" id="splash">
     <div class="sp-grid" id="spGrid"></div>
     <div class="sp-eyebrow">죽은 철학자들의 단톡방</div>
@@ -243,6 +289,12 @@
 </div>
 
 <script>
+/* ================= 언어 설정 ================= */
+const LANG=(()=>{try{const s=localStorage.getItem('cheolkk-lang');if(s==='ko'||s==='en')return s;}catch(e){}try{return ((navigator.language||'ko').toLowerCase().indexOf('ko')===0)?'ko':'en';}catch(e){}return 'ko';})();
+const LANG_RULE=LANG==='en'
+ ?'지시문은 한국어지만, 너의 모든 출력(답장 텍스트)은 반드시 자연스러운 영어로 써라. 영어권 사람들이 메신저에서 쓰는 캐주얼한 채팅체로, 캐릭터의 말투를 영어로 살려서. 한국어 출력 금지.'
+ :'한국어. 카카오톡 대화처럼 쓴다.';
+
 /* ================= 프로필 사진 (SVG) ================= */
 function av(id){
   const F='#f0e6d3', I='#1d1f28';
@@ -339,11 +391,132 @@ const PHILOSOPHERS=[
 ];
 const P=id=>PHILOSOPHERS.find(x=>x.id===id);
 const ALIAS={socrates:['소크라테스','소크'],nietzsche:['니체'],kant:['칸트'],epicurus:['에피쿠로스','에피'],zhuangzi:['장자'],schopenhauer:['쇼펜하우어','쇼펜'],confucius:['공자'],aurelius:['아우렐리우스','마르쿠스'],kierkegaard:['키르케고르','키르케']};
+const ALIAS_EN={socrates:['socrates'],nietzsche:['nietzsche'],kant:['kant'],epicurus:['epicurus','epi'],zhuangzi:['zhuangzi'],schopenhauer:['schopenhauer','schopen'],confucius:['confucius'],aurelius:['aurelius','marcus'],kierkegaard:['kierkegaard']};
+for(const k in ALIAS_EN) ALIAS[k]=[...ALIAS[k],...ALIAS_EN[k]];
+
+/* ================= 다국어 (KO/EN) ================= */
+const EN_PH={
+ nietzsche:{name:'Nietzsche',starter:"I can't stop caring what people think of me",
+  desc:'Brings a hammer instead of comfort. Fastest replies here — often before you even finish typing.',
+  st:{def:['Overcome yourself!!','Staring into the abyss rn','Conquered myself again today'],sleep:['Even the Übermensch sleeps','Dancing in my dreams'],walk:['The mountains call!! 🏔','Fresh air!! My thoughts are boiling!!']}},
+ schopenhauer:{name:'Schopenhauer',starter:'Why is life like this',
+  desc:'Reads you in one second, leaves you on read forever, then drops real advice after the insults. His poodle > people.',
+  st:{def:['Read it. Replying is my choice','Lower your expectations. That is the tip','My poodle is better than humans'],sleep:['(Sleeping. Dreams are suffering anyway)','Wake me and I bite'],write:['Writing. Do not talk to me','Drafting insults about Hegel'],flute:['The flute, unlike humans, never betrays']}},
+ kant:{name:'Kant',starter:"I can't choose between two options",
+  desc:'Sorts your tangled worries into First and Second like a strict teacher. Never replies during his walk. Ever.',
+  st:{def:['Routine never betrays you',"Today's plan: same as yesterday",'Order is beautiful'],sleep:['Bedtime is 10 PM sharp','Sleep is also a duty'],walk:['On my walk. Back at 4:30','(Away) The walk cannot be skipped']}},
+ epicurus:{name:'Epicurus',starter:'Today felt way too long',
+  desc:'Your unconditional friend in the garden. The only one who never scolds or interrogates — he just stays beside you.',
+  st:{def:["Today's bread: a success 🍞",'Come by the garden','Collecting small joys'],sleep:['Good dreams come from simple dinners',"Off to sleep, for tomorrow's bread"],bread:['Baking bread 🍞 one moment','Waiting for the dough to rise']}},
+ socrates:{name:'Socrates',starter:'What even is happiness?',
+  desc:'A sly old man who gives questions instead of answers. The longer you talk, the more your assumptions crumble.',
+  st:{def:['I know that I know nothing','Ambushing strangers at the market again','One question, if I may'],sleep:['Even old men must sleep','Does snoring require examination too']}},
+ confucius:{name:'Confucius',starter:'My family is stressing me out',
+  desc:'The neighborhood elder for family, work, and everything between people. Sounds like nagging — annoyingly, it is all correct.',
+  st:{def:['To learn and to practice — is that not a joy','Among three walkers there is always my teacher',"Today's lesson: still lacking"],sleep:['Early to bed, clear morning','A gentleman keeps his sleep'],teach:['In class with my students','Yan Hui said something brilliant again']}},
+ zhuangzi:{name:'Zhuangzi',starter:'Life feels so boring lately',
+  desc:'Starts with a random fable and somehow hits the bullseye. Replies are slow — he naps a lot.',
+  st:{def:['Am I the butterfly, or is the butterfly me','Did nothing today. Perfect','Do you know the joy of fish~'],sleep:['See you in my dream','Sleeping is my job'],nap:['Naps are the Way','(Currently becoming a butterfly)']}},
+ kierkegaard:{name:'Kierkegaard',starter:"I'm too anxious to sleep",
+  desc:'A literary soul who understands 3 AM anxiety. Awake all night, asleep all morning. Every reply is long-considered.',
+  st:{def:['…','Anxiety is the dizziness of freedom','Avoiding the crowd again today'],sleep:['(No one may wake me before 1 PM)','At last, I can sleep…'],cafe:['Corner seat, watching people','My coffee went cold without my noticing…']}},
+ aurelius:{name:'Aurelius',starter:'My mind keeps shaking',
+  desc:'A man of few words who keeps only what you can control. A Roman emperor, once. His replies are short. Very short.',
+  st:{def:['Focus on what you control','Told myself again this morning','No complaints'],sleep:['Up before sunrise','Camp nights are short'],roll:['Roll call','Patrolling the camp']}}
+};
+const AWAY_EN={walk:'Walk',write:'Writing',flute:'Flute',bread:'Baking',teach:'Class',nap:'Nap',cafe:'Café',roll:'Roll call'};
+if(LANG==='en'){
+  PHILOSOPHERS.forEach(p=>{const e=EN_PH[p.id];if(e){p.name=e.name;p.desc=e.desc;p.starter=e.starter;p.st=e.st;}p.aways.forEach(w=>{if(AWAY_EN[w.k])w.t=AWAY_EN[w.k];});});
+}
+
+const T=LANG==='en'?{
+ docTitle:'CheolKK — Group Chat of Dead Philosophers',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
+ tabChat:'💬 Chats',tabCube:'▦ Cube',inputPh:'Type a message',leave:'Leave',
+ nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
+ cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
+ cubeDefault:'Tap philosophers to compare them.',
+ cubeFoot:'A conversation tool borrowing from philosophy — not counseling or therapy.<br>If things feel heavy, please reach out to a professional.',
+ tapIntro:'Tap a philosopher to see their intro.',
+ obTitle:'Pick three\nto start with',obDesc:'Each row has its own temperament. You can meet the other six anytime.',
+ startWith:n=>`Start with ${n}`,pickOne:'Pick a philosopher',pickPlease:'Pick someone',pick2:'Pick at least 2',
+ helperQuiz:'🧭 Take the 30-sec match test',helperTeams:'✨ See suggested trios',
+ quizTitle:'Find your philosopher',quizResult:'Your result',recCombo:'Suggested trio',backToCube:'Back to the cube to confirm',
+ quizNote:'🧭 Test picks are marked. Feel free to change them.',
+ teamsTitle:'Suggested trios',teamsDesc:'Nothing is final — you confirm on the cube.',
+ teamNote:n=>`✨ The '${n}' trio is marked. Feel free to change it.`,
+ addTitle:'Add philosophers',addDesc:'Choose who to add.',addBtn:n=>`Add ${n}`,
+ groupTitle:'New group chat',groupDesc:'Invite 2–3. The more their ideas clash, the better. Each arrives remembering your private chats. (Max 3 per room, for deeper talk)',
+ groupBtn:n=>`Create with ${n}`,dupRoom:'A room with the same members already exists. Taking you there.',
+ secGroups:'Group chats',startConv:'Start the conversation',btnAdd:'＋ Add philosophers',btnGroup:'👥 New group chat',
+ nMembers:n=>`${n} members`,roomNamePrompt:'Room name (leave empty for member names)',
+ leaveConfirm:'Leave this group chat? The room and its messages will be deleted.',
+ nickPrompt:n=>`Give ${n} a nickname (empty = original name)`,
+ emptyDM:n=>`Say your first hello to ${n}`,emptyGroup:'Throw in a worry.<br>Watch the answers collide.',
+ chipsDM:["I've been struggling with something","Can I ask you something?"],chipsGroup:['Can I drop a worry here?','Debate this topic:'],
+ busyFallback:"Hold on — I'll get back to you.",lostReply:'…(the reply got lost on the way. Say something again.)',
+ trFast:'⚡ Instant replies',trMid:'💬 Normal pace',trSlow:'🐢 Slow & easy',trGhost:'👀 Leaves you on read',trVanish:'🫥 Sometimes vanishes',trBusy:'📅 Schedule first',trCut:'✂️ Interrupts you',trListen:'🙇 Hears you out',
+ profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
+ importConfirm:"Restoring will replace this device's conversations with the backup. Continue?",badBackup:'Not a CheolKK backup file, or the file is damaged.',
+ stTitle:'Settings',secAcc:'Account',secData:'Data',secInfo:'About',
+ accGuest:'Not signed in',
+ syncOff:'Sign in to back up your conversations to your account and continue on any device.',
+ syncOn:'Your conversations are auto-saved to this account.',
+ syncedAt:t=>`Synced · ${fmtT(t)}`,syncErr:'Sync error',
+ login:'Sign in with Google',logout:'Sign out',
+ logoutConfirm:'Sign out? Conversations stay on this device; only syncing stops.',
+ loginFail:'Could not open the sign-in window.',noSb:'Could not load the sync module. Check your connection and refresh.',
+ exportBtn:'💾 Save backup file',importBtn:'📂 Restore from backup',resetBtn:'🗑 Reset all data',
+ resetConfirm:'Delete ALL conversations and settings? If signed in, account data is deleted too. This cannot be undone.',
+ privacyLink:'🔒 Privacy Policy',pushSoon:'🔔 Push notifications — coming soon',
+ disclaimer:'CheolKK conversations are generated by AI. It is a conversation tool borrowing from philosophy — not counseling or therapy. On the free tier, inputs may be used by the AI provider (Google) to improve its services.',
+ version:'CheolKK v7 · Sign-in & Sync · 한/EN'
+}:{
+ docTitle:'철크크 — 죽은 철학자들의 단톡방',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
+ tabChat:'💬 채팅',tabCube:'▦ 큐브',inputPh:'메시지 보내기',leave:'나가기',
+ nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
+ cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
+ cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
+ cubeFoot:'철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.',
+ tapIntro:'철학자를 눌러 소개를 확인해 보세요.',
+ obTitle:'함께할 세 명을\n골라 보세요',obDesc:'줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.',
+ startWith:n=>`${n}명과 시작하기`,pickOne:'철학자를 선택하세요',pickPlease:'선택하세요',pick2:'2명 이상 선택',
+ helperQuiz:'🧭 테스트로 추천받기 (30초)',helperTeams:'✨ 추천 조합 보기',
+ quizTitle:'나와 맞는 철학자 찾기',quizResult:'테스트 결과',recCombo:'함께 추천하는 조합',backToCube:'큐브로 돌아가 확정하기',
+ quizNote:'🧭 테스트 추천이 표시되어 있어요. 자유롭게 바꿔도 됩니다.',
+ teamsTitle:'추천 조합',teamsDesc:'골라도 확정이 아니에요. 큐브에서 최종 조정합니다.',
+ teamNote:n=>`✨ '${n}' 조합이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`,
+ addTitle:'철학자 친구 추가',addDesc:'추가할 철학자를 선택하세요.',addBtn:n=>`${n}명 추가`,
+ groupTitle:'단톡방 만들기',groupDesc:'2~3명을 초대하세요. 서로 사상이 부딪히는 조합일수록 재밌습니다. 각자 당신과의 개인 대화를 기억한 채 들어옵니다. (깊은 대화를 위해 한 방은 최대 3명까지예요)',
+ groupBtn:n=>`${n}명과 방 만들기`,dupRoom:'같은 멤버의 단톡방이 이미 있어요. 그 방으로 이동합니다.',
+ secGroups:'단톡방',startConv:'대화를 시작해 보세요',btnAdd:'＋ 철학자 추가',btnGroup:'👥 단톡방 만들기',
+ nMembers:n=>`${n}명`,roomNamePrompt:'단톡방 이름 설정 (비우면 멤버 이름으로)',
+ leaveConfirm:'이 단톡방을 나갈까요? 방과 대화 내용이 사라집니다.',
+ nickPrompt:n=>`${n}의 별명을 지어주세요 (비우면 원래 이름)`,
+ emptyDM:n=>`${n}에게 처음으로 말을 걸어 보세요`,emptyGroup:'고민을 던져 보세요.<br>서로 다른 답이 충돌할 겁니다.',
+ chipsDM:['요즘 고민이 있어','궁금한 게 있는데'],chipsGroup:['고민 하나 던져도 돼?','이 주제로 토론해봐:'],
+ busyFallback:'잠깐, 이따 답할게.',lostReply:'…(답장이 길을 잃었습니다. 다시 말을 걸어 주세요.)',
+ trFast:'⚡ 즉답형',trMid:'💬 답장 보통',trSlow:'🐢 느긋한 답장',trGhost:'👀 읽씹 장인',trVanish:'🫥 가끔 잠수',trBusy:'📅 일과 우선',trCut:'✂️ 말 끊고 들어옴',trListen:'🙇 끝까지 듣는 편',
+ profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
+ importConfirm:'백업을 불러오면 지금 기기의 대화가 백업 시점의 내용으로 교체됩니다. 계속할까요?',badBackup:'철크크 백업 파일이 아니거나 손상된 파일이에요.',
+ stTitle:'설정',secAcc:'계정',secData:'데이터',secInfo:'정보',
+ accGuest:'로그인하지 않음',
+ syncOff:'로그인하면 대화가 계정에 안전하게 백업되고, 다른 기기에서도 이어서 대화할 수 있어요.',
+ syncOn:'이 계정에 대화가 자동 저장되고 있어요.',
+ syncedAt:t=>`동기화됨 · ${fmtT(t)}`,syncErr:'동기화 오류',
+ login:'Google로 로그인',logout:'로그아웃',
+ logoutConfirm:'로그아웃할까요? 이 기기의 대화는 그대로 남고, 동기화만 중단됩니다.',
+ loginFail:'로그인 창을 여는 데 실패했어요.',noSb:'연결 모듈을 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침 해보세요.',
+ exportBtn:'💾 대화 백업 파일 저장',importBtn:'📂 백업 불러오기',resetBtn:'🗑 모든 데이터 초기화',
+ resetConfirm:'정말 모든 대화와 설정을 삭제할까요? 로그인 중이라면 계정에 저장된 데이터도 함께 삭제됩니다. 되돌릴 수 없어요.',
+ privacyLink:'🔒 개인정보처리방침',pushSoon:'🔔 푸시 알림 — 준비 중',
+ disclaimer:'철크크의 대화는 AI가 생성합니다. 철학적 사유를 빌린 대화 도구일 뿐, 심리 상담·치료가 아닙니다. 무료 이용 시 입력 내용이 AI 제공사(Google)의 품질 개선에 사용될 수 있습니다.',
+ version:'철크크 v7 · 로그인·동기화 · 한/영'
+};
 
 const COMMON=`
 
 [메신저 공통 규칙 — 캐릭터보다 우선]
-- 한국어. 카카오톡 대화처럼 쓴다. 답장은 짧은 말풍선 1~3개, 말풍선 사이는 "|||"로 구분. 각 말풍선은 한두 문장(대개 80자 이내).
+- ${LANG_RULE} 답장은 짧은 말풍선 1~3개, 말풍선 사이는 "|||"로 구분. 각 말풍선은 한두 문장(대개 80자 이내).
 - 상대가 메시지를 여러 개 연달아 보냈다면 전체를 하나의 맥락으로 읽고 한 번에 답하라.
 - 대화 기록이 없거나 짧다면, 모르는 사람이 먼저 말을 걸어온 상황이다. 캐릭터답게 반응하되 과하게 반기지 마라. 낯섦이 자연스럽다.
 - 답장이 엇갈릴 수 있다(네가 쓰는 사이 상대의 새 메시지 도착). 다음 답장에서 자연스럽게 이어받아라.
@@ -375,14 +548,17 @@ const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const now=()=>Date.now();
 const zzz=ms=>new Promise(r=>setTimeout(r,ms));
+const LOCALE=LANG==='en'?'en-US':'ko-KR';
 const fmtT=t=>{
   const d=new Date(t), today=new Date();
-  const time=d.toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'});
-  return d.toDateString()===today.toDateString()?time:d.toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})+' '+time;
+  const time=d.toLocaleTimeString(LOCALE,{hour:'numeric',minute:'2-digit'});
+  return d.toDateString()===today.toDateString()?time:d.toLocaleDateString(LOCALE,{month:'numeric',day:'numeric'})+' '+time;
 };
 const fmtMin=min=>{
   min=((min%1440)+1440)%1440;
-  const h=Math.floor(min/60),m=min%60,ap=h<12?'오전':'오후',h12=h%12===0?12:h%12;
+  const h=Math.floor(min/60),m=min%60,h12=h%12===0?12:h%12;
+  if(LANG==='en'){const ap=h<12?'AM':'PM';return `${h12}${m?':'+String(m).padStart(2,'0'):''} ${ap}`;}
+  const ap=h<12?'오전':'오후';
   return `${ap} ${h12}시${m?` ${m}분`:''}`;
 };
 const escapeH=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -401,7 +577,7 @@ function statusText(p){
   return arr[idx];
 }
 function schedText(p){
-  let s=`활동 시간 · ${fmtMin(p.sleep[1])} ~ ${fmtMin(p.sleep[0])}`;
+  let s=`${T.activeTime} · ${fmtMin(p.sleep[1])} ~ ${fmtMin(p.sleep[0])}`;
   p.aways.forEach(w=>{ s+=`\n${w.t} · ${fmtMin(w.s)} ~ ${fmtMin(w.e)}`; });
   return s;
 }
@@ -418,7 +594,7 @@ function nextEvent(p,t){
   const dur=(s,e)=>(((e-s)%1440)+1440)%1440||1440;
   const cands=p.aways.map(w=>{const st=nextAt(t,w.s);return {t:w.t,start:st,end:st+dur(w.s,w.e)*60000};});
   const ss=nextAt(t,p.sleep[0]);
-  cands.push({t:'취침',start:ss,end:ss+dur(p.sleep[0],p.sleep[1])*60000});
+  cands.push({t:T.sleepEvt,start:ss,end:ss+dur(p.sleep[0],p.sleep[1])*60000});
   cands.sort((a,b)=>a.start-b.start);
   return cands[0];
 }
@@ -434,6 +610,7 @@ async function save(){
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
   }catch(e){}
+  queueCloudPush();
 }
 async function load(){
   try{
@@ -449,7 +626,7 @@ async function load(){
 }
 
 /* ================= 온보딩: 큐브 본체 + 테스트/조합은 참고 도구 ================= */
-const QUIZ=[
+const QUIZ_KO=[
  {q:'새벽 2시,\n잠이 안 올 때 나는',opts:[
   ['생각이 꼬리에 꼬리를 문다',{kierkegaard:2,schopenhauer:1}],
   ['눈 감으면 그냥 잔다. 의지로',{aurelius:2,kant:1}],
@@ -476,7 +653,7 @@ const QUIZ=[
   ['"계획 좀 세우고 살아라"',{zhuangzi:2,epicurus:1}],
   ['"알아서 해" (무책임한 방임)',{kant:2,confucius:1}]]}
 ];
-const MATCH={
+const MATCH_KO={
  socrates:'답을 주는 사람보다, 좋은 질문을 던져줄 사람이 필요한 시기네요.',
  nietzsche:'지금 필요한 건 위로가 아니라, 등을 힘껏 밀어줄 손이에요.',
  kant:'뒤엉킨 생각을 첫째, 둘째로 정리해줄 사람이 필요하겠어요.',
@@ -486,14 +663,65 @@ const MATCH={
  confucius:'사람 사이에서 지친 당신에겐 관계의 지혜가 필요해요.',
  aurelius:'흔들리는 멘탈을 잡아줄 단단한 목소리가 필요한 시기예요.',
  kierkegaard:'그 불안은 없애야 할 게 아니라, 이해받아야 할 거예요.'};
-const TEAMS=[
+const TEAMS_KO=[
  {name:'균형팀',desc:'질문 → 격려 → 수용. 처음이라면 이 조합',m:['socrates','nietzsche','epicurus']},
  {name:'온기팀',desc:'혼내는 사람이 한 명도 없습니다',m:['epicurus','confucius','zhuangzi']},
  {name:'정신번쩍팀',desc:'핑계가 살아남지 못하는 조합',m:['nietzsche','kant','aurelius']},
  {name:'새벽팀',desc:'잠 안 오는 밤을 아는 사람들',m:['kierkegaard','schopenhauer','epicurus']},
  {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','socrates']}
 ];
-const OB_ROWS=[['🔥 팩폭 라인','때리고 정리하는 줄'],['🤲 온기 라인','받아주고 묻는 줄'],['🌙 고요 라인','가라앉히는 줄']];
+const OB_ROWS_KO=[['🔥 팩폭 라인','때리고 정리하는 줄'],['🤲 온기 라인','받아주고 묻는 줄'],['🌙 고요 라인','가라앉히는 줄']];
+
+/* --- EN 온보딩 데이터 --- */
+const QUIZ_EN=[
+ {q:"At 2 AM,\nwhen I can't sleep, I",opts:[
+  ['My thoughts spiral, one after another',{kierkegaard:2,schopenhauer:1}],
+  ['Close my eyes and sleep. By willpower',{aurelius:2,kant:1}],
+  ['Grab my phone and scroll anything',{zhuangzi:2,epicurus:1}],
+  ["Get up and plan tomorrow instead",{kant:2,nietzsche:1}]]},
+ {q:"When I'm struggling,\nwhat I really want to hear is",opts:[
+  ['"It\'s not your fault. You did your best"',{epicurus:2,confucius:1}],
+  ['"So — what are you going to do about it?"',{nietzsche:2,aurelius:1}],
+  ['"That\'s just life. Let\'s grab a coffee"',{schopenhauer:2,zhuangzi:1}],
+  ['"Let\'s figure out why that hurt so much"',{socrates:2,kierkegaard:1}]]},
+ {q:'What drains me\nthe most these days is',opts:[
+  ['People. Relationships. Reading the room',{confucius:2,schopenhauer:1}],
+  ['Anxiety about the future',{kierkegaard:2,aurelius:1}],
+  ['Constantly comparing myself to others',{nietzsche:2,epicurus:1}],
+  ["Not knowing what I actually want",{socrates:2,zhuangzi:1}]]},
+ {q:'A weekend with no plans.\nI…',opts:[
+  ['Catch up on tasks and make a plan',{kant:2,aurelius:1}],
+  ['Lie down. All day. Perfectly',{zhuangzi:2,schopenhauer:1}],
+  ['Cook something nice or meet good people',{epicurus:2,confucius:1}],
+  ['Take a long walk until my head clears',{nietzsche:2,kierkegaard:1}]]},
+ {q:'The advice I hate\nhearing the most is',opts:[
+  ['"Just think positive~"',{schopenhauer:2,kierkegaard:1}],
+  ['"Everyone else lives like that too"',{nietzsche:2,socrates:1}],
+  ['"You need to plan your life"',{zhuangzi:2,epicurus:1}],
+  ['"Whatever, do what you want" (careless)',{kant:2,confucius:1}]]}
+];
+const MATCH_EN={
+ socrates:"What you need isn't answers — it's someone who asks the right questions.",
+ nietzsche:"You don't need comfort right now. You need a hand shoving you forward.",
+ kant:'You need someone to sort your tangled thoughts into First and Second.',
+ epicurus:'Before any advice, you need someone who simply accepts you.',
+ zhuangzi:"You've been gripping too tight. You need someone who knows how to let go.",
+ schopenhauer:'Tired of forced positivity? Honest venom with a real prescription suits you.',
+ confucius:'Worn out by people? You need the wisdom of relationships.',
+ aurelius:'You need a steady voice to anchor a shaking mind.',
+ kierkegaard:"That anxiety doesn't need to be erased — it needs to be understood."};
+const TEAMS_EN=[
+ {name:'Balance',desc:'Question → push → accept. Start here if unsure',m:['socrates','nietzsche','epicurus']},
+ {name:'Warmth',desc:'Not a single person here will scold you',m:['epicurus','confucius','zhuangzi']},
+ {name:'Wake-up call',desc:'Where excuses go to die',m:['nietzsche','kant','aurelius']},
+ {name:'Late night',desc:'People who know sleepless nights',m:['kierkegaard','schopenhauer','epicurus']},
+ {name:'Relationships',desc:'For when family, work and people wear you out',m:['confucius','schopenhauer','socrates']}
+];
+const OB_ROWS_EN=[['🔥 Tough love','hits & sorts you out'],['🤲 Warmth','accepts & asks'],['🌙 Calm','settles you down']];
+const QUIZ=LANG==='en'?QUIZ_EN:QUIZ_KO;
+const MATCH=LANG==='en'?MATCH_EN:MATCH_KO;
+const TEAMS=LANG==='en'?TEAMS_EN:TEAMS_KO;
+const OB_ROWS=LANG==='en'?OB_ROWS_EN:OB_ROWS_KO;
 
 function resetOv(){
   const g=$('pkGrid'); g.className=''; g.innerHTML='';
@@ -510,15 +738,15 @@ function onboarding(){ mainOnboard([]); }
 /* --- 메인: 줄 이름이 붙은 큐브에서 직접 3명 확정 --- */
 function mainOnboard(pre,note){
   resetOv();
-  $('pkTitle').textContent='함께할 세 명을\n골라 보세요';
-  $('pkDesc').textContent='줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.';
+  $('pkTitle').textContent=T.obTitle;
+  $('pkDesc').textContent=T.obDesc;
   const sel=new Set((pre||[]).slice(0,3));
   const g=$('pkGrid');
   const info=$('pkInfo'); info.style.display='';
-  const baseInfo=(note?`<span class="ob-note">${note}</span><br>`:'')+'철학자를 눌러 소개를 확인해 보세요.';
+  const baseInfo=(note?`<span class="ob-note">${note}</span><br>`:'')+T.tapIntro;
   info.innerHTML=baseInfo;
   const go=$('pkGo'); go.style.display='';
-  const updateGo=()=>{ go.disabled=sel.size<1; go.textContent=sel.size?`${sel.size}명과 시작하기`:'철학자를 선택하세요'; };
+  const updateGo=()=>{ go.disabled=sel.size<1; go.textContent=sel.size?T.startWith(sel.size):T.pickOne; };
   for(let r=0;r<3;r++){
     const cap=document.createElement('div'); cap.className='row-cap';
     cap.textContent=OB_ROWS[r][0]+' · '+OB_ROWS[r][1];
@@ -541,9 +769,9 @@ function mainOnboard(pre,note){
     g.appendChild(row);
   }
   const helpers=document.createElement('div'); helpers.className='helper-row';
-  const h1=document.createElement('button'); h1.className='helper-btn'; h1.textContent='🧭 테스트로 추천받기 (30초)';
+  const h1=document.createElement('button'); h1.className='helper-btn'; h1.textContent=T.helperQuiz;
   h1.onclick=()=>startQuiz([...sel]);
-  const h2=document.createElement('button'); h2.className='helper-btn'; h2.textContent='✨ 추천 조합 보기';
+  const h2=document.createElement('button'); h2.className='helper-btn'; h2.textContent=T.helperTeams;
   h2.onclick=()=>showTeams([...sel]);
   helpers.appendChild(h1); helpers.appendChild(h2);
   g.appendChild(helpers);
@@ -557,7 +785,7 @@ function startQuiz(prevSel){
   const scores={};
   const step=i=>{
     resetOv(); backTo(i===0?()=>mainOnboard(prevSel):()=>step(i-1));
-    $('pkTitle').textContent='나와 맞는 철학자 찾기';
+    $('pkTitle').textContent=T.quizTitle;
     $('pkDesc').textContent='';
     const g=$('pkGrid'); g.className='center-col';
     const dots=document.createElement('div'); dots.className='q-dots';
@@ -580,19 +808,19 @@ function startQuiz(prevSel){
     const rank=PHILOSOPHERS.map(p=>p.id).sort((a,b)=>(scores[b]||0)-(scores[a]||0)||Math.random()-.5);
     const top=P(rank[0]), trio=rank.slice(0,3);
     resetOv(); backTo(()=>mainOnboard(prevSel));
-    $('pkTitle').textContent='테스트 결과';
+    $('pkTitle').textContent=T.quizResult;
     $('pkDesc').textContent='';
     const g=$('pkGrid'); g.className='center-col';
     g.innerHTML=`
       <div class="res-av">${av(top.id)}</div>
       <div class="res-name">${top.name}</div>
       <div class="res-line">${MATCH[top.id]}</div>
-      <div class="res-cap">함께 추천하는 조합</div>
+      <div class="res-cap">${T.recCombo}</div>
       <div class="res-trio">${trio.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
       <div class="res-line" style="margin-top:8px">${trio.map(id=>P(id).name).join(' · ')}</div>`;
     const go=$('pkGo'); go.style.display=''; go.disabled=false;
-    go.textContent='큐브로 돌아가 확정하기';
-    go.onclick=()=>mainOnboard(trio,`🧭 테스트 추천이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`);
+    go.textContent=T.backToCube;
+    go.onclick=()=>mainOnboard(trio,T.quizNote);
   };
   step(0);
 }
@@ -600,15 +828,15 @@ function startQuiz(prevSel){
 /* --- 추천 조합: 선택하면 큐브에 표시만 --- */
 function showTeams(prevSel){
   resetOv(); backTo(()=>mainOnboard(prevSel));
-  $('pkTitle').textContent='추천 조합';
-  $('pkDesc').textContent='골라도 확정이 아니에요. 큐브에서 최종 조정합니다.';
+  $('pkTitle').textContent=T.teamsTitle;
+  $('pkDesc').textContent=T.teamsDesc;
   const g=$('pkGrid');
   TEAMS.forEach(t=>{
     const b=document.createElement('button');
     b.className='team';
     b.innerHTML=`<div class="t-avs">${t.m.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
       <div><div class="t-name">${t.name}</div><div class="t-desc">${t.desc}</div></div>`;
-    b.onclick=()=>mainOnboard([...t.m],`✨ '${t.name}' 조합이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`);
+    b.onclick=()=>mainOnboard([...t.m],T.teamNote(t.name));
     g.appendChild(b);
   });
 }
@@ -618,7 +846,7 @@ function showGrid({title,desc,pool,max,min,btn,onDone,onCancel,pre}){
   $('pkTitle').textContent=title; $('pkDesc').textContent=desc;
   const grid=$('pkGrid'); grid.className='grid'; grid.innerHTML='';
   $('pkInfo').style.display=''; 
-  const info=$('pkInfo'); info.innerHTML='철학자를 눌러 소개를 확인해 보세요.';
+  const info=$('pkInfo'); info.innerHTML=T.tapIntro;
   const go=$('pkGo'); go.style.display='';
   const cl=$('pkClose');
   cl.style.display=onCancel?'':'none';
@@ -645,9 +873,9 @@ function addFriends(){
   const pool=PHILOSOPHERS.filter(p=>!state.friends.includes(p.id));
   if(!pool.length) return;
   showGrid({
-    title:'철학자 친구 추가',desc:'추가할 철학자를 선택하세요.',
+    title:T.addTitle,desc:T.addDesc,
     pool,max:pool.length,min:1,
-    btn:n=>n?`${n}명 추가`:'선택하세요',
+    btn:n=>n?T.addBtn(n):T.pickPlease,
     onDone:ids=>{ state.friends.push(...ids); save(); renderFriends(); },
     onCancel:()=>{}
   });
@@ -656,12 +884,12 @@ function makeGroup(){
   const pool=PHILOSOPHERS.filter(p=>state.friends.includes(p.id));
   if(pool.length<2) return;
   showGrid({
-    title:'단톡방 만들기',desc:'2~3명을 초대하세요. 서로 사상이 부딪히는 조합일수록 재밌습니다. 각자 당신과의 개인 대화를 기억한 채 들어옵니다. (깊은 대화를 위해 한 방은 최대 3명까지예요)',
+    title:T.groupTitle,desc:T.groupDesc,
     pool,max:3,min:2,
-    btn:n=>n>=2?`${n}명과 방 만들기`:'2명 이상 선택',
+    btn:n=>n>=2?T.groupBtn(n):T.pick2,
     onDone:ids=>{
       const dup=state.groups.find(g=>g.members.length===ids.length&&ids.every(i=>g.members.includes(i)));
-      if(dup){ alert('같은 멤버의 단톡방이 이미 있어요. 그 방으로 이동합니다.'); openChat('g:'+dup.id); return; }
+      if(dup){ alert(T.dupRoom); openChat('g:'+dup.id); return; }
       const g={id:'g'+now(),members:ids,msgs:[]};
       state.groups.push(g); save(); renderFriends(); openChat('g:'+g.id);
     },
@@ -686,7 +914,7 @@ function openProfile(pid,from){
 $('prClose').onclick=()=>$('profile').classList.remove('on');
 $('prNick').onclick=()=>{
   const pid=$('prChat').dataset.pid, p=P(pid);
-  const n=prompt(`${p.name}의 별명을 지어주세요 (비우면 원래 이름)`, state.nicks[pid]||'');
+  const n=prompt(T.nickPrompt(p.name), state.nicks[pid]||'');
   if(n===null) return;
   if(n.trim()) state.nicks[pid]=n.trim(); else delete state.nicks[pid];
   $('prName').textContent=dispName(p);
@@ -716,13 +944,13 @@ function renderFriends(){
   });
 
   if(state.groups.length){
-    const s=document.createElement('div'); s.className='sec'; s.textContent='단톡방'; el.appendChild(s);
+    const s=document.createElement('div'); s.className='sec'; s.textContent=T.secGroups; el.appendChild(s);
     state.groups.forEach(g=>{
       const last=g.msgs[g.msgs.length-1], key='g:'+g.id;
       const names=g.name||g.members.map(id=>dispName(P(id))).join(', ');
       mkRow(`<div class="g-avatar"><div class="avatar">${av(g.members[0])}</div><div class="avatar">${av(g.members[1])}</div></div>
         <div class="f-mid"><div class="f-name">${names}</div>
-          ${last?`<div class="f-preview">${escapeH((last.content.split('|||').pop()||'').slice(0,34))}</div>`:'<div class="f-status">대화를 시작해 보세요</div>'}</div>
+          ${last?`<div class="f-preview">${escapeH((last.content.split('|||').pop()||'').slice(0,34))}</div>`:('<div class="f-status">'+T.startConv+'</div>')}</div>
         <div class="f-right">${last?`<div class="f-time">${fmtT(last.t)}</div>`:''}
           ${state.unread[key]?`<div class="badge">${state.unread[key]}</div>`:''}</div>`,
         ()=>openChat(key));
@@ -731,8 +959,8 @@ function renderFriends(){
 
   const row=document.createElement('div'); row.className='action-row';
   const canAdd=state.friends.length<PHILOSOPHERS.length;
-  row.innerHTML=`${canAdd?'<button class="action-btn" id="btnAdd">＋ 철학자 추가</button>':''}
-    ${state.friends.length>=2?'<button class="action-btn" id="btnGroup">👥 단톡방 만들기</button>':''}`;
+  row.innerHTML=`${canAdd?('<button class="action-btn" id="btnAdd">'+T.btnAdd+'</button>'):''}
+    ${state.friends.length>=2?('<button class="action-btn" id="btnGroup">'+T.btnGroup+'</button>'):''}`;
   el.appendChild(row);
   const a=$('btnAdd'); if(a) a.onclick=addFriends;
   const gbt=$('btnGroup'); if(gbt) gbt.onclick=makeGroup;
@@ -760,10 +988,10 @@ function openChat(key){
     $('chatAvatar').innerHTML=av(g.members[0]);
     $('chatDot').style.display='none';
     $('chatName').textContent=g.name||g.members.map(id=>dispName(P(id))).join(', ');
-    $('chatStatus').textContent=`${g.members.length+1}명`;
+    $('chatStatus').textContent=T.nMembers(g.members.length+1);
     $('chatAvWrap').onclick=null;
     $('chatTitle').onclick=()=>{
-      const n=prompt('단톡방 이름 설정 (비우면 멤버 이름으로)', g.name||'');
+      const n=prompt(T.roomNamePrompt, g.name||'');
       if(n===null) return;
       g.name=n.trim()||null;
       $('chatName').textContent=g.name||g.members.map(id=>dispName(P(id))).join(', ');
@@ -780,7 +1008,7 @@ function openChat(key){
 $('leaveBtn').onclick=()=>{
   if(curKind()!=='g') return;
   const gid=curId();
-  if(!confirm('이 단톡방을 나갈까요? 방과 대화 내용이 사라집니다.')) return;
+  if(!confirm(T.leaveConfirm)) return;
   bumpToken('g:'+gid);
   state.groups=state.groups.filter(g=>g.id!==gid);
   delete state.unread['g:'+gid];
@@ -801,7 +1029,7 @@ function renderMsgs(){
   const el=$('msgs'); el.innerHTML='';
   if(curKind()==='d'){
     const pid=curId(), h=state.chats[pid]||[];
-    if(!h.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(pid)}</div>${P(pid).name}에게 처음으로 말을 걸어 보세요</div>`; return; }
+    if(!h.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(pid)}</div>${T.emptyDM(dispName(P(pid)))}</div>`; return; }
     h.forEach(m=>{
       if(m.role==='user') addMsg(el,'me',[m.content],m.t,{read:m.read});
       else addMsg(el,'them',m.content.split('|||'),m.t,{pid});
@@ -809,7 +1037,7 @@ function renderMsgs(){
   }else{
     const g=getGroup(curId());
     if(!g){ return; }
-    if(!g.msgs.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(g.members[0])}</div>고민을 던져 보세요.<br>서로 다른 답이 충돌할 겁니다.</div>`; return; }
+    if(!g.msgs.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(g.members[0])}</div>${T.emptyGroup}</div>`; return; }
     let lastWho=null;
     g.msgs.forEach(m=>{
       if(m.who==='me') addMsg(el,'me',[m.content],m.t,{read:true,reads:m.reads,gt:m.t});
@@ -839,9 +1067,9 @@ function renderChips(){
   let chips=[];
   if(curKind()==='d'){
     const p=P(curId());
-    chips=['요즘 고민이 있어','궁금한 게 있는데',p.starter];
+    chips=[...T.chipsDM,p.starter];
   }else{
-    chips=['고민 하나 던져도 돼?','이 주제로 토론해봐:'];
+    chips=T.chipsGroup.slice();
   }
   chips.filter(Boolean).forEach(c=>{
     const b=document.createElement('button');
@@ -949,7 +1177,7 @@ function dmFlowStart(pid,key,tok){
       showTyping(key,pid);
       let bt;
       try{ bt=await dmAPI(p,busyNote); }
-      catch(e){ bt='잠깐, 이따 답할게.'; }
+      catch(e){ bt=T.busyFallback; }
       if(tok!==state.token[key])return;
       hideTyping();
       pushDM(p,bt.split('|||')[0].trim(),now(),key);
@@ -971,7 +1199,7 @@ function dmDeliver(pid,key,tok,replyAt){
     showTyping(key,pid);
     let text;
     try{ text=await dmAPI(p); }
-    catch(e){ if(tok===state.token[key]){hideTyping();state.stage[key]='idle';pushDM(p,'…(답장이 길을 잃었습니다. 다시 말을 걸어 주세요.)',now(),key);} return; }
+    catch(e){ if(tok===state.token[key]){hideTyping();state.stage[key]='idle';pushDM(p,T.lostReply,now(),key);} return; }
     if(tok!==state.token[key])return;
     const bubbles=text.split('|||').map(s=>s.trim()).filter(Boolean);
     hideTyping();
@@ -1012,7 +1240,8 @@ function pushDM(p,text,t,key){
 /* ================= 단톡방 답장 ================= */
 async function groupFlow(g,key,tok,extraOnly){
   const lastMe=[...g.msgs].reverse().find(m=>m.who==='me');
-  const mentioned=lastMe?g.members.filter(id=>[...ALIAS[id],state.nicks[id]||''].filter(Boolean).some(a=>lastMe.content.includes(a))):[];
+  const lcMsg=lastMe?lastMe.content.toLowerCase():'';
+  const mentioned=lastMe?g.members.filter(id=>[...ALIAS[id],state.nicks[id]||'',P(id).name].filter(Boolean).some(a=>lcMsg.includes(String(a).toLowerCase()))):[];
   const mAct=mentioned.filter(id=>presence(P(id),now()).active).map(P);
   const mAway=mentioned.filter(id=>!presence(P(id),now()).active).map(P);
   let members=g.members.map(P).filter(p=>presence(p,now()).active&&!mentioned.includes(p.id));
@@ -1220,18 +1449,18 @@ async function catchUp(){
 }
 
 /* ================= 큐브 탭 ================= */
-const ROW_CAPS=['🔥 팩폭 라인 — 때리고 정리하는 줄','🤲 온기 라인 — 받아주고 묻는 줄','🌙 고요 라인 — 가라앉히는 줄'];
-const COL_CAPS=['삶의 태도','내면 성찰','규율과 도리'];
+const ROW_CAPS=LANG==='en'?['🔥 Tough-love row — hits & sorts you out','🤲 Warmth row — accepts & asks','🌙 Calm row — settles you down']:['🔥 팩폭 라인 — 때리고 정리하는 줄','🤲 온기 라인 — 받아주고 묻는 줄','🌙 고요 라인 — 가라앉히는 줄'];
+const COL_CAPS=LANG==='en'?['Way of living','Inner reflection','Duty & order']:['삶의 태도','내면 성찰','규율과 도리'];
 function traits(p){
   const out=[];
   const mid=(p.reply[0]+p.reply[1])/2;
-  out.push(mid<6000?'⚡ 즉답형':mid<15000?'💬 답장 보통':'🐢 느긋한 답장');
+  out.push(mid<6000?T.trFast:mid<15000?T.trMid:T.trSlow);
   const q=p.quirks||{};
-  if(q.ghost>=.2) out.push('👀 읽씹 장인');
-  if(q.ignore>=.1) out.push('🫥 가끔 잠수');
-  if(q.busy>=.1) out.push('📅 일과 우선');
-  if(p.patience<.4) out.push('✂️ 말 끊고 들어옴');
-  else if(p.patience>.9) out.push('🙇 끝까지 듣는 편');
+  if(q.ghost>=.2) out.push(T.trGhost);
+  if(q.ignore>=.1) out.push(T.trVanish);
+  if(q.busy>=.1) out.push(T.trBusy);
+  if(p.patience<.4) out.push(T.trCut);
+  else if(p.patience>.9) out.push(T.trListen);
   return out;
 }
 function renderCube(){
@@ -1247,7 +1476,7 @@ function renderCube(){
       b.innerHTML=`<span class="dot${pr.active?'':' off'}"></span><div class="avatar">${av(p.id)}</div><div class="gname">${dispName(p)}</div>`;
       b.onclick=()=>{
         const tags=traits(p).map(t=>`<span class="trait">${t}</span>`).join('');
-        $('cubeInfo').innerHTML=`<b>${dispName(p)}</b> · ${ROW_CAPS[r].split(' — ')[0]} × ${COL_CAPS[c]}<br>${p.desc}<br>${tags}<span class="trait">🕐 ${schedText(p).split('\n')[0].replace('활동 시간 · ','활동 ')}</span><br><button class="cube-pr" onclick="openProfile('${p.id}')">프로필 · 채팅하기</button>`;
+        $('cubeInfo').innerHTML=`<b>${dispName(p)}</b> · ${ROW_CAPS[r].split(' — ')[0]} × ${COL_CAPS[c]}<br>${p.desc}<br>${tags}<span class="trait">🕐 ${schedText(p).split('\n')[0].replace(T.activeTime+' · ',T.activeShort+' ')}</span><br><button class="cube-pr" onclick="openProfile('${p.id}')">${T.profileChat}</button>`;
       };
       grid.appendChild(b);
     }
@@ -1265,7 +1494,7 @@ $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
 
 /* ================= 대화 백업/복원 ================= */
-$('btnExport').onclick=()=>{
+$('stExport').onclick=()=>{
   const payload={app:'cheolkk',ver:1,date:new Date().toISOString(),
     friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks};
   const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
@@ -1274,7 +1503,7 @@ $('btnExport').onclick=()=>{
   a.href=URL.createObjectURL(blob); a.download='cheolkk_backup_'+ymd+'.json';
   a.click(); URL.revokeObjectURL(a.href);
 };
-$('btnImport').onclick=()=>$('importFile').click();
+$('stImport').onclick=()=>$('importFile').click();
 $('importFile').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
@@ -1282,20 +1511,137 @@ $('importFile').onchange=e=>{
     try{
       const d=JSON.parse(r.result);
       if(d.app!=='cheolkk'||!d.friends) throw 0;
-      if(!confirm('백업을 불러오면 지금 기기의 대화가 백업 시점의 내용으로 교체됩니다. 계속할까요?')) return;
+      if(!confirm(T.importConfirm)) return;
       state.friends=d.friends; state.chats=d.chats||{}; state.groups=d.groups||[]; state.nicks=d.nicks||{};
       state.sched={};
       save().then(()=>location.reload());
-    }catch(err){ alert('철크크 백업 파일이 아니거나 손상된 파일이에요.'); }
+    }catch(err){ alert(T.badBackup); }
   };
   r.readAsText(f);
   e.target.value='';
 };
 
+/* ================= 계정 · 동기화 (Supabase) ================= */
+let sb=null,sbUser=null,authReady=false,syncTimer=null;
+const syncState={err:'',last:0};
+try{ if(window.supabase) sb=window.supabase.createClient('https://kbkypprqxiqitdrombbg.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtia3lwcHJxeGlxaXRkcm9tYmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDYyODIsImV4cCI6MjEwMDIyMjI4Mn0.9TNNbA_s-tWwLQc-6rNqsOXCKLlKLzDgbh4kPWWZHG4'); }catch(e){}
+function dataScore(d){let n=0;try{Object.values((d&&d.chats)||{}).forEach(a=>n+=(a||[]).length);((d&&d.groups)||[]).forEach(g=>n+=((g&&g.msgs)||[]).length);}catch(e){}return n;}
+async function initialSync(){
+  if(!sb||!sbUser||window.storage) return;
+  try{
+    const {data:row,error}=await sb.from('user_data').select('data').eq('user_id',sbUser.id).maybeSingle();
+    if(error) throw error;
+    const cloud=row&&row.data?row.data:null;
+    let local=null;
+    try{ const raw=localStorage.getItem('philo-messenger-v6'); local=raw?JSON.parse(raw):null; }catch(e){}
+    if(cloud&&dataScore(cloud)>=dataScore(local)){
+      try{ localStorage.setItem('philo-messenger-v6',JSON.stringify(cloud)); }catch(e){}
+    }else if(local){
+      const {error:e2}=await sb.from('user_data').upsert({user_id:sbUser.id,data:local,updated_at:new Date().toISOString()});
+      if(e2) throw e2;
+    }
+    syncState.err=''; syncState.last=now();
+  }catch(e){ syncState.err=(e&&e.message)||String(e); }
+}
+async function cloudPush(){
+  if(!sb||!sbUser) return;
+  try{
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks},updated_at:new Date().toISOString()});
+    if(error) throw error;
+    syncState.err=''; syncState.last=now();
+  }catch(e){ syncState.err=(e&&e.message)||String(e); }
+  if($('settings').classList.contains('on')) renderSettingsAccount();
+}
+function queueCloudPush(){ if(!sb||!sbUser) return; clearTimeout(syncTimer); syncTimer=setTimeout(cloudPush,2500); }
+async function initAuth(){
+  if(!sb) return;
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    sbUser=(session&&session.user)||null;
+    if(sbUser) await initialSync();
+  }catch(e){ syncState.err=(e&&e.message)||String(e); }
+  authReady=true;
+  try{
+    sb.auth.onAuthStateChange((ev,session)=>{
+      const u=(session&&session.user)||null;
+      const wasNull=!sbUser;
+      sbUser=u;
+      if(u&&wasNull&&ev==='SIGNED_IN'&&authReady){ initialSync().then(()=>location.reload()); }
+      else if($('settings').classList.contains('on')) renderSettingsAccount();
+    });
+  }catch(e){}
+}
+
+/* ================= 설정 화면 ================= */
+function applyLangUI(){
+  document.documentElement.lang=LANG;
+  document.title=T.docTitle;
+  $('headEyebrow').textContent=T.eyebrow;
+  document.querySelector('.list-head h1').textContent=T.brand;
+  document.querySelector('.sp-eyebrow').textContent=T.eyebrow;
+  document.querySelector('.sp-title').textContent=T.brand;
+  $('tabChat').textContent=T.tabChat; $('tabCube').textContent=T.tabCube;
+  document.querySelector('.cube-cap').textContent=T.cubeCap;
+  $('cubeInfo').textContent=T.cubeDefault;
+  document.querySelector('.cube-foot').innerHTML=T.cubeFoot;
+  $('input').placeholder=T.inputPh;
+  $('leaveBtn').textContent=T.leave;
+  $('prNick').textContent=T.nickBtn;
+  $('prChat').textContent=T.chatBtn;
+  $('pkInfo').textContent=T.tapIntro;
+  $('stTitle').textContent=T.stTitle;
+  $('stSecAcc').textContent=T.secAcc;
+  $('stSecData').textContent=T.secData;
+  $('stSecInfo').textContent=T.secInfo;
+  $('stExport').textContent=T.exportBtn;
+  $('stImport').textContent=T.importBtn;
+  $('stReset').textContent=T.resetBtn;
+  $('stPrivacy').textContent=T.privacyLink;
+  $('stPush').textContent=T.pushSoon;
+  $('stDisclaimer').innerHTML=T.disclaimer;
+  $('stVersion').textContent=T.version;
+  $('langKo').classList.toggle('on',LANG==='ko');
+  $('langEn').classList.toggle('on',LANG==='en');
+}
+function renderSettingsAccount(){
+  const info=$('stAccInfo'), sub=$('stSyncInfo'), err=$('stSyncErr'), btn=$('stLogin');
+  if(!sb){ info.textContent=T.accGuest; sub.textContent=T.noSb; btn.style.display='none'; return; }
+  btn.style.display='';
+  if(sbUser){ info.textContent=sbUser.email||sbUser.id; sub.textContent=syncState.last?T.syncedAt(syncState.last):T.syncOn; btn.textContent=T.logout; }
+  else{ info.textContent=T.accGuest; sub.textContent=T.syncOff; btn.textContent=T.login; }
+  if(syncState.err){ err.style.display=''; err.textContent=T.syncErr+': '+syncState.err; }
+  else err.style.display='none';
+}
+$('btnSettings').onclick=()=>{ renderSettingsAccount(); $('settings').classList.add('on'); };
+$('stClose').onclick=()=>$('settings').classList.remove('on');
+$('langKo').onclick=()=>setLang('ko');
+$('langEn').onclick=()=>setLang('en');
+function setLang(l){ if(l===LANG) return; try{ localStorage.setItem('cheolkk-lang',l); }catch(e){} location.reload(); }
+$('stLogin').onclick=async()=>{
+  if(!sb) return;
+  if(sbUser){
+    if(!confirm(T.logoutConfirm)) return;
+    try{ await sb.auth.signOut(); }catch(e){}
+    sbUser=null; renderSettingsAccount();
+  }else{
+    try{ await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}}); }
+    catch(e){ alert(T.loginFail); }
+  }
+};
+$('stReset').onclick=async()=>{
+  if(!confirm(T.resetConfirm)) return;
+  try{ if(window.storage) await window.storage.delete('philo-messenger-v6'); }catch(e){}
+  try{ localStorage.removeItem('philo-messenger-v6'); }catch(e){}
+  if(sb&&sbUser){ try{ await sb.from('user_data').delete().eq('user_id',sbUser.id); }catch(e){} }
+  location.reload();
+};
+
 /* ================= 시작 ================= */
 (async()=>{
+  applyLangUI();
   $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
   const t0=now();
+  await initAuth();
   await load();
   if(!state.friends){ onboarding(); }
   else{ renderFriends(); catchUp(); }
