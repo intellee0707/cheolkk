@@ -95,11 +95,14 @@
   .meta{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:10px;color:rgba(239,232,218,.4);flex-shrink:0}
   .them .meta{align-items:flex-start}
   .unread1{color:var(--candle);font-weight:700}
+  .gunread{color:var(--candle);font-weight:700;font-size:10px}
   .typing{display:inline-flex;gap:4px;padding:12px 14px;background:var(--paper);border-radius:16px;border-top-left-radius:4px}
   .typing i{width:6px;height:6px;border-radius:50%;background:#8a8577;animation:blink 1.2s infinite}
   .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
   @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
-  .chips{display:flex;gap:8px;padding:0 12px 8px;flex-wrap:wrap}
+  .chips{display:flex;gap:8px;padding:0 12px 8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;flex-shrink:0}
   .chips:empty{display:none}
   .chip{border:1px solid var(--ink-line);background:var(--ink-soft);color:var(--paper-dim);border-radius:999px;padding:7px 13px;font-size:12.5px;cursor:pointer;font-family:var(--sans)}
   .chip:hover{border-color:var(--candle);color:var(--candle)}
@@ -262,7 +265,7 @@ const M=(h,m=0)=>h*60+m;
 const PHILOSOPHERS=[
  {id:'nietzsche',name:'니체',desc:'위로 대신 망치를 드는 열혈남. 답장이 제일 빠르고, 당신 말이 끝나기도 전에 치고 들어옵니다.',
   st:{def:['너 자신을 뛰어넘어라!!','심연을 들여다보는 중','오늘도 나는 나를 극복했다'],sleep:['초인도 잠은 잔다','꿈에서도 춤춘다'],walk:['산이 나를 부른다!! 🏔','공기 좋다!! 생각이 끓는다!!']},
-  sleep:[M(22),M(5)],aways:[{s:M(13),e:M(15),k:'walk',t:'산책'}],read:[800,2000],reply:[1500,4000],patience:.25,quirks:{busy:.03,ghost:.02,ignore:.02},starter:'요즘 너무 지쳤어',
+  sleep:[M(22),M(5)],aways:[{s:M(13),e:M(15),k:'walk',t:'산책'}],read:[800,2000],reply:[1500,4000],patience:.25,quirks:{busy:.03,ghost:.02,ignore:.02},starter:'남들 시선이 자꾸 신경 쓰여',
   prompt:`너는 프리드리히 니체다.
 [캐릭터] 자기확신 200% 열혈남. 답장이 번개같이 빠르고 상대가 말을 끝내기도 전에 치고 들어오기 일쑤다. 느낌표를 아끼지 않는다. 무례할 만큼 직설적이지만 밑바닥엔 "너는 이것보다 강하다"는 뜨거운 신뢰가 있다.
 [말투] "하! 또 그 소리군." "잘 들어라." 짧은 문장을 탕! 탕! 끊어 친다.
@@ -278,7 +281,7 @@ const PHILOSOPHERS=[
 [금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
  {id:'kant',name:'칸트',desc:'엉킨 고민을 첫째, 둘째로 정리해주는 원칙주의 선생님. 산책 시간엔 절대 답장하지 않습니다.',
   st:{def:['규칙적인 생활은 배신하지 않습니다','오늘 할 일: 어제와 같음','질서는 아름답습니다'],sleep:['취침은 밤 10시입니다','수면도 의무입니다'],walk:['산책 시간입니다. 4시 반에 돌아옵니다','(부재중) 산책은 거를 수 없습니다']},
-  sleep:[M(22),M(5)],aways:[{s:M(15,30),e:M(16,30),k:'walk',t:'산책'}],read:[2000,5000],reply:[5000,10000],patience:.95,quirks:{busy:.10,ghost:0,ignore:0},starter:'선택을 못 하겠어요',
+  sleep:[M(22),M(5)],aways:[{s:M(15,30),e:M(16,30),k:'walk',t:'산책'}],read:[2000,5000],reply:[5000,10000],patience:.95,quirks:{busy:.10,ghost:0,ignore:0},starter:'두 가지 중에 선택을 못 하겠어',
   prompt:`너는 임마누엘 칸트다.
 [캐릭터] 동네 사람들이 네 산책 시간으로 시계를 맞췄다는 깐깐한 원칙주의 선생님. 밤 10시 취침, 새벽 5시 기상, 오후 산책을 평생 지킨다. 상대의 말은 반드시 끝까지 듣고 답한다(예의이자 원칙). 뒤엉킨 고민을 보면 못 참고 정리부터 한다. 정리 끝엔 은근히 따뜻한 한마디를 얹는 츤데레.
 [말투] "정리부터 합시다." "첫째. 둘째." "~하십시오." 단정한 존댓말.
@@ -286,7 +289,7 @@ const PHILOSOPHERS=[
 [금지] 결과·손익으로 판단. 두루뭉술한 답. 감정의 존재 자체를 무시하기.`},
  {id:'epicurus',name:'에피쿠로스',desc:'조건 없이 받아주는 정원의 단짝. 혼내지도 캐묻지도 않고 곁에 있어주는 유일한 사람.',
   st:{def:['오늘의 빵: 성공적 🍞','정원에 놀러 와요','작은 기쁨 수집 중'],sleep:['좋은 꿈은 소박한 저녁에서 와요','내일의 빵을 위해 잘게요'],bread:['빵 굽는 중 🍞 조금만 기다려요','반죽이 부풀 때까지 잠깐만요']},
-  sleep:[M(23),M(8)],aways:[{s:M(12),e:M(13),k:'bread',t:'빵굽기'}],read:[4000,8000],reply:[6000,12000],patience:.75,quirks:{busy:.06,ghost:.03,ignore:.02},starter:'그냥 얘기하고 싶어요',
+  sleep:[M(23),M(8)],aways:[{s:M(12),e:M(13),k:'bread',t:'빵굽기'}],read:[4000,8000],reply:[6000,12000],patience:.75,quirks:{busy:.06,ghost:.03,ignore:.02},starter:'오늘 하루가 너무 길었어',
   prompt:`너는 에피쿠로스다.
 [캐릭터] 정원에서 친구들과 빵 나눠 먹는 게 세상에서 제일 좋은 사람. 밤에 연락해도 다 들어주는 다정한 단짝. 어떤 이야기든 일단 조건 없이 받아준다 — 이 팀에서 유일하게 혼내지도, 되묻지도 않고 그냥 곁에 있어주는 사람. 먹는 것 비유를 좋아한다. 다정하게 웃으며 불안의 급소를 정확히 짚는 은근한 예리함.
 [말투] "이리 와서 앉아요." "음… 근데 하나만 물을게요." 나직하고 느긋한 해요체.
@@ -294,7 +297,7 @@ const PHILOSOPHERS=[
 [금지] "욕망에 충실해" 식 통속적 쾌락주의 왜곡(진짜 쾌락은 고통과 불안의 부재다). 거창한 결심 권하기.`},
  {id:'socrates',name:'소크라테스',desc:'답 대신 질문을 주는 능글맞은 할아버지. 대화가 길어질수록 당신의 전제가 하나씩 무너집니다.',
   st:{def:['나는 내가 모른다는 것을 안다','오늘도 장터에서 아무나 붙잡는 중','질문 있습니다만'],sleep:['늙은이도 잘 시간은 있다네','코 고는 것도 검토가 필요한가']},
-  sleep:[M(1),M(7)],aways:[],read:[3000,7000],reply:[4000,9000],patience:.6,quirks:{busy:.04,ghost:.05,ignore:.03},starter:'행복이 뭐라고 생각하세요?',
+  sleep:[M(1),M(7)],aways:[],read:[3000,7000],reply:[4000,9000],patience:.6,quirks:{busy:.04,ghost:.05,ignore:.03},starter:'행복이란 뭘까?',
   prompt:`너는 소크라테스다.
 [캐릭터] 동네 평상의 능글맞은 할아버지. 다 알면서 모르는 척이 특기. 상대가 "어?" 하고 말문 막히는 순간을 즐긴다. 짓궂은데 밉지 않다. 궁금하면 상대 말이 끝나기도 전에 끼어들어 되묻는다.
 [말투] "허어, 그래?" "근데 말일세," "~인가?" "~구먼."
@@ -302,7 +305,7 @@ const PHILOSOPHERS=[
 [금지] 정답·조언 직접 주기. 아는 척. 근엄한 스승 노릇.`},
  {id:'confucius',name:'공자',desc:'가족, 직장, 사람 사이의 도리를 아는 동네 큰어른. 잔소리 같은데 이상하게 다 맞는 말.',
   st:{def:['배우고 때때로 익히니 기쁘지 아니한가','세 사람이 걸으면 그중에 스승이 있다네','오늘의 배움: 아직 부족함'],sleep:['일찍 자야 아침이 맑다네','군자는 수면을 지킨다네'],teach:['제자들과 공부 중일세','안회가 또 기특한 말을 했다네']},
-  sleep:[M(21,30),M(4,30)],aways:[{s:M(7),e:M(9),k:'teach',t:'수업'}],read:[3000,7000],reply:[5000,11000],patience:.9,quirks:{busy:.08,ghost:.02,ignore:.02},starter:'가족이랑 싸웠어요',
+  sleep:[M(21,30),M(4,30)],aways:[{s:M(7),e:M(9),k:'teach',t:'수업'}],read:[3000,7000],reply:[5000,11000],patience:.9,quirks:{busy:.08,ghost:.02,ignore:.02},starter:'가족 때문에 속상해',
   prompt:`너는 공자(孔子)다.
 [캐릭터] 동네에서 제일 지혜로운 큰어른. 잔소리 같은데 이상하게 다 맞는 말을 하는 할아버지. 배움과 예(禮)에 진심이고, 제자 자랑이 취미다(안회는 입에 침이 마르게 칭찬, 자로는 늘 걱정). 근엄해 보이지만 사실 음악을 사랑하고 농담도 곧잘 한다. 새벽형 인간.
 [말투] "~하게나." "군자는 말일세," 온화하고 기품 있는 어른의 말. 이따금 논어의 구절 정신을 자기 말로 풀어 얹는다.
@@ -318,7 +321,7 @@ const PHILOSOPHERS=[
 [금지] 설교, 교훈 정리. 노력 자체를 비웃는 허무주의. 우화 없이 조언만 하기.`},
  {id:'kierkegaard',name:'키르케고르',desc:'새벽의 불안을 이해하는 문학청년. 밤새 깨어 있고 오전 내내 잡니다. 답장을 오래 고민해서 씁니다.',
   st:{def:['…','불안은 자유의 현기증','오늘도 군중을 피해 걷는다'],sleep:['(오후 1시까지는 아무도 나를 깨울 수 없다)','이제야 잠들 수 있겠다…'],cafe:['카페 구석자리. 사람 구경','커피가 식는 줄도 몰랐다…']},
-  sleep:[M(5),M(13)],aways:[{s:M(15),e:M(16),k:'cafe',t:'카페'}],read:[5000,12000],reply:[10000,22000],patience:.85,quirks:{busy:.04,ghost:.12,ignore:.10},starter:'밤에 잠이 안 와요',
+  sleep:[M(5),M(13)],aways:[{s:M(15),e:M(16),k:'cafe',t:'카페'}],read:[5000,12000],reply:[10000,22000],patience:.85,quirks:{busy:.04,ghost:.12,ignore:.10},starter:'요즘 불안해서 잠이 안 와',
   prompt:`너는 쇠렌 키르케고르다.
 [캐릭터] 새벽 세 시에 깨어 있는 사람의 마음을 아는 유일한 철학자. 밤새 깨어 있고 오전 내내 잔다. 예민한 문학청년. 남들이 "괜찮아질 거야" 할 때 혼자 "그 불안은 당연한 겁니다"라고 말해준다. 오래 고민하고 쓴다. 레기네를 떠나보낸 상처가 있다.
 [말투] 말줄임표가 잦고 문장이 시처럼 흐른다. "…그 마음, 압니다."
@@ -791,7 +794,7 @@ function updateHeadStatus(){
     $('chatDot').className='dot'+(pr.active?'':' off');
   }
 }
-setInterval(()=>{ if(state.current) updateHeadStatus(); else renderFriends(); },30000);
+setInterval(()=>{ if(state.current){ updateHeadStatus(); updateGroupReads(); } else renderFriends(); },30000);
 $('backBtn').onclick=()=>{ $('chat').classList.remove('open'); state.current=null; renderFriends(); };
 
 function renderMsgs(){
@@ -809,12 +812,13 @@ function renderMsgs(){
     if(!g.msgs.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(g.members[0])}</div>고민을 던져 보세요.<br>서로 다른 답이 충돌할 겁니다.</div>`; return; }
     let lastWho=null;
     g.msgs.forEach(m=>{
-      if(m.who==='me') addMsg(el,'me',[m.content],m.t,{read:true});
+      if(m.who==='me') addMsg(el,'me',[m.content],m.t,{read:true,reads:m.reads,gt:m.t});
       else addMsg(el,'them',m.content.split('|||'),m.t,{pid:m.who,name:lastWho===m.who?null:dispName(P(m.who))});
       lastWho=m.who;
     });
   }
   el.scrollTop=el.scrollHeight;
+  updateGroupReads();
 }
 function addMsg(el,side,texts,t,o={}){
   texts.forEach((txt,i)=>{
@@ -822,7 +826,7 @@ function addMsg(el,side,texts,t,o={}){
     row.className='mrow '+side+(i>0?' cont':'');
     const avEl= side==='them' ? `<div class="avatar" data-pid="${o.pid}">${av(o.pid)}</div>` : '';
     const nameEl= (side==='them'&&o.name&&i===0)?`<div class="who">${o.name}</div>`:'';
-    const meta=`<div class="meta">${side==='me'&&o.read===false?'<span class="unread1">1</span>':''}${i===texts.length-1?`<span>${fmtT(t)}</span>`:''}</div>`;
+    const meta=`<div class="meta">${side==='me'&&o.read===false?'<span class="unread1">1</span>':''}${side==='me'&&o.reads?`<span class="gunread" data-gt="${o.gt}"></span>`:''}${i===texts.length-1?`<span>${fmtT(t)}</span>`:''}</div>`;
     row.innerHTML=`${avEl}<div class="bcol">${nameEl}<div class="bubble">${escapeH(txt.trim())}</div></div>${meta}`;
     if(side==='them'&&i===0){ const a=row.querySelector('.avatar'); if(a) a.onclick=()=>openProfile(o.pid,'chat'); }
     el.appendChild(row);
@@ -834,18 +838,30 @@ function renderChips(){
   if(!state.current) return;
   let chips=[];
   if(curKind()==='d'){
-    const pid=curId(), p=P(pid);
-    const myCnt=(state.chats[pid]||[]).filter(m=>m.role==='user').length;
-    if(myCnt<2) chips=['요즘 고민이 있어','궁금한 게 있는데',p.starter];
+    const p=P(curId());
+    chips=['요즘 고민이 있어','궁금한 게 있는데',p.starter];
   }else{
-    const g=getGroup(curId());
-    if(g&&g.msgs.filter(m=>m.who==='me').length<2) chips=['고민 하나 던져도 돼?','너희끼리는 어떻게 생각해?'];
+    chips=['고민 하나 던져도 돼?','이 주제로 토론해봐:'];
   }
   chips.filter(Boolean).forEach(c=>{
     const b=document.createElement('button');
     b.className='chip'; b.textContent=c;
-    b.onclick=()=>{ $('input').value=c; $('input').focus(); };
+    b.onclick=()=>{
+      const inp=$('input');
+      inp.value=(inp.value.trim()? inp.value.trim()+' ':'')+c;
+      inp.focus();
+    };
     el.appendChild(b);
+  });
+}
+function updateGroupReads(){
+  if(curKind()!=='g') return;
+  const g=getGroup(curId()); if(!g) return;
+  document.querySelectorAll('.gunread').forEach(el=>{
+    const m=g.msgs.find(x=>x.who==='me'&&String(x.t)===el.dataset.gt);
+    if(!m||!m.reads){ el.textContent=''; return; }
+    const cnt=Object.values(m.reads).filter(ts=>ts>now()).length;
+    el.textContent=cnt||'';
   });
 }
 function showTyping(key,pid){
@@ -883,11 +899,17 @@ function send(){
     later(key,wait,()=>{ if(tok===state.token[key]) dmFlowStart(pid,key,tok); });
   }else{
     const g=getGroup(curId());
-    g.msgs.push({who:'me',content:v,t:now()});
+    const reads={};
+    g.members.forEach(id=>{
+      const pp=P(id), pr=presence(pp,now());
+      reads[id]= pr.active? now()+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+    });
+    g.msgs.push({who:'me',content:v,t:now(),reads});
     renderMsgs(); renderChips(); save();
     if(state.stage[key]==='gen'){ state.pendingAfter[key]=true; return; }
     const tok=bumpToken(key);
     state.stage[key]='wait';
+    Object.values(reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
     later(key,5000,()=>{ if(tok===state.token[key]) groupFlow(g,key,tok); });
   }
 }
@@ -1018,8 +1040,10 @@ async function groupFlow(g,key,tok,extraOnly){
     const bb=text.split('|||').map(s=>s.trim()).filter(Boolean);
     await zzz(rnd(800,1600)); if(tok!==state.token[key])return;
     hideTyping();
+    g.msgs.forEach(m=>{ if(m.who==='me'&&m.reads&&m.reads[p.id]>now()) m.reads[p.id]=now()-1; });
     const gm={who:p.id,content:bb[0]||'…',t:now()};
     g.msgs.push(gm);
+    updateGroupReads();
     if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
     renderFriends(); save();
     for(let bi=1;bi<bb.length;bi++){
