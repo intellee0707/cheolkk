@@ -625,10 +625,24 @@ const fmtMin=min=>{
 const escapeH=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const inWin=(m,s,e)=> s<=e ? (m>=s&&m<e) : (m>=s||m<e);
 
+/* 성격별 시간 엄수도 (1=칼같이 정확) — 낮을수록 일과가 매일 ±수 분씩 밀림 */
+const PUNCT={kant:1,aurelius:.95,confucius:.8,schopenhauer:.7,nietzsche:.6,epicurus:.4,socrates:.35,kierkegaard:.3,zhuangzi:.1};
+function dayJitterMin(p,salt){
+  const punc=PUNCT[p.id]!==undefined?PUNCT[p.id]:.5;
+  const amp=(1-punc)*16; if(amp<1) return 0;
+  const day=Math.floor(Date.now()/86400000);
+  let h=0; const s=p.id+'|'+salt+'|'+day;
+  for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+  return Math.round((((h%2000)/1000)-1)*amp);
+}
+const JMIN=(m,j)=>(((m+j)%1440)+1440)%1440;
+function effSleep(p){ return [JMIN(p.sleep[0],dayJitterMin(p,'s0')),JMIN(p.sleep[1],dayJitterMin(p,'s1'))]; }
+function effAways(p){ return p.aways.map((w,i)=>({s:JMIN(w.s,dayJitterMin(p,'a'+i+'s')),e:JMIN(w.e,dayJitterMin(p,'a'+i+'e')),k:w.k,t:w.t})); }
 function presence(p,t){
   const d=new Date(t), m=d.getHours()*60+d.getMinutes();
-  if(inWin(m,p.sleep[0],p.sleep[1])) return {active:false,key:'sleep',back:nextAt(t,p.sleep[1])};
-  for(const w of p.aways) if(inWin(m,w.s,w.e)) return {active:false,key:w.k,back:nextAt(t,w.e)};
+  const sl=effSleep(p);
+  if(inWin(m,sl[0],sl[1])) return {active:false,key:'sleep',back:nextAt(t,sl[1]),since:prevAt(t,sl[0]),label:T.sleepEvt};
+  for(const w of effAways(p)) if(inWin(m,w.s,w.e)) return {active:false,key:w.k,back:nextAt(t,w.e),since:prevAt(t,w.s),label:w.t};
   return {active:true,key:'def'};
 }
 function statusText(p){
@@ -647,15 +661,21 @@ function nextAt(t,min){
   while(d.getTime()<=t) d.setDate(d.getDate()+1);
   return d.getTime();
 }
+function prevAt(t,min){
+  const d=new Date(t); d.setHours(Math.floor(min/60),min%60,0,0);
+  while(d.getTime()>t) d.setDate(d.getDate()-1);
+  return d.getTime();
+}
 const bond=p=>{const n=(state.chats[p.id]||[]).filter(m=>m.role==='user').length;return n>=25?2:n>=8?1:0;};
 const bondLine=p=>{const b=bond(p);return b===2?'\n[관계: 상담자와는 이제 오랜 친구다. 격식을 내려놓고, 가끔 지난 대화를 회상하거나 애정 어린 잔소리를 해도 좋다.]':b===1?'\n[관계: 상담자와 꽤 친해졌다. 처음의 서먹함은 빼고 조금 더 편하고 스스럼없이 대하라.]':'';};
 const nickLine=p=>state.nicks&&state.nicks[p.id]?`\n[상담자가 너를 '${state.nicks[p.id]}'(이)라고 부르기로 했다. 그 호칭을 자연스럽게 받아들여라.]`:'';
 const dispName=p=>(state.nicks&&state.nicks[p.id])||p.name;
 function nextEvent(p,t){
   const dur=(s,e)=>(((e-s)%1440)+1440)%1440||1440;
-  const cands=p.aways.map(w=>{const st=nextAt(t,w.s);return {t:w.t,start:st,end:st+dur(w.s,w.e)*60000};});
-  const ss=nextAt(t,p.sleep[0]);
-  cands.push({t:T.sleepEvt,start:ss,end:ss+dur(p.sleep[0],p.sleep[1])*60000});
+  const cands=effAways(p).map(w=>{const st=nextAt(t,w.s);return {t:w.t,start:st,end:st+dur(w.s,w.e)*60000};});
+  const sl=effSleep(p);
+  const ss=nextAt(t,sl[0]);
+  cands.push({t:T.sleepEvt,start:ss,end:ss+dur(sl[0],sl[1])*60000});
   cands.sort((a,b)=>a.start-b.start);
   return cands[0];
 }
@@ -666,7 +686,7 @@ const selfLine=p=>{
 };
 
 async function save(){
-  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks});
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0});
   try{
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
@@ -682,7 +702,7 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; }
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; }
   }catch(e){}
 }
 
@@ -1297,7 +1317,7 @@ function send(){
       const pp=P(id), pr=presence(pp,tNow);
       const lastM=[...g.msgs].reverse().find(m=>m.who===id);
       const hot=pr.active&&lastM&&(tNow-lastM.t<4*60000);
-      reads[id]= hot? tNow+rnd(500,2500) : pr.active? tNow+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+      reads[id]= hot? tNow+rnd(300,1200) : pr.active? tNow+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
     });
     g.msgs.push({who:'me',content:v,t:now(),reads});
     renderMsgs(); renderChips(); save();
@@ -1311,10 +1331,18 @@ function send(){
 
 /* ================= 개인방 답장 ================= */
 function dmFlowStart(pid,key,tok){
-  const p=P(pid), t=now(), pr=presence(p,t), q=p.quirks||{};
+  const p=P(pid), t=now(); let pr=presence(p,t); const q=p.quirks||{};
   const histH=state.chats[pid]||[];
   const lastA=[...histH].reverse().find(m=>m.role==='assistant');
-  const hot=!!(pr.active&&lastA&&(t-lastA.t<4*60000)); // 방금까지 대화 중이면 폰을 보고 있는 상태
+  const hotBase=!!(lastA&&(t-lastA.t<4*60000));
+  const punc=PUNCT[pid]!==undefined?PUNCT[pid]:.5;
+  let note='';
+  // 대화가 한창인데 일정이 막 시작됐다면, 느긋한 성격은 잠깐 미룬다 (수면 제외)
+  if(!pr.active&&hotBase&&pr.key!=='sleep'&&pr.since&&(t-pr.since<15*60000)&&Math.random()>punc){
+    note=`(원래 지금은 '${pr.label}' 시간인데, 대화가 이어지는 중이라 조금 미루고 있다. 그런 티를 살짝 내도 좋다.)`;
+    pr={active:true,key:'def'};
+  }
+  const hot=!!(pr.active&&hotBase); // 방금까지 대화 중이면 폰을 보고 있는 상태
   let mode='normal';
   if(pr.active&&!(hot&&Math.random()<.85)){
     const r=Math.random();
@@ -1326,7 +1354,7 @@ function dmFlowStart(pid,key,tok){
   if(!pr.active){ readAt=pr.back+rnd(...p.read)+rnd(0,120000); replyAt=readAt+rnd(...p.reply); }
   else if(mode==='ghost'){ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply)*rnd(2.5,4); }
   else if(mode==='ignore'){ readAt=t+rnd(90000,220000); replyAt=readAt+rnd(...p.reply); }
-  else if(hot){ readAt=t+rnd(500,2200); replyAt=readAt+rnd(...p.reply)*0.55; }
+  else if(hot){ readAt=t+rnd(300,900); replyAt=readAt+rnd(...p.reply)*0.55; }
   else{ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply); }
 
   if(mode==='busy'){
@@ -1361,9 +1389,19 @@ function dmFlowStart(pid,key,tok){
     });
     return;
   }
+  // 대화 중 + 곧 일정이면 미리 예고 (성격 따라 아쉬워하거나 미룰까 고민)
+  if(pr.active&&hot&&!note){
+    const up=nextEvent(p,t);
+    if(up&&up.start>t&&up.start-t<12*60000){
+      const mins=Math.max(1,Math.round((up.start-t)/60000));
+      note=(Math.random()<punc)
+        ?`(참고: 약 ${mins}분 뒤에 '${up.t}' 일정이 있다. 대화 중이니 이번 답장에서 자연스럽게 곧 가봐야 한다는 언질을 짧게 섞어라.)`
+        :`(참고: 약 ${mins}분 뒤에 '${up.t}' 일정이 있다. 아쉬워하거나 미룰까 고민하는 티를 짧게 내도 좋다.)`;
+    }
+  }
   state.sched[pid]={readAt,replyAt}; save();
   later(key,Math.max(0,readAt-now()),()=>{ if(tok===state.token[key]) markRead(pid,now()); });
-  dmDeliver(pid,key,tok,replyAt);
+  dmDeliver(pid,key,tok,replyAt,note||undefined);
 }
 const INTERRUPT_NOTE='(중요: 너는 방금 답장을 쓰던 도중이었는데, 그 사이 상대의 새 메시지가 끼어들었다. 하던 말의 남은 생각과 새 메시지에 대한 반응을 자연스럽게 하나로 합쳐 보내라. 화제가 완전히 바뀌었다면 하던 말은 접고 새 화제를 따라가도 된다. 평소보다 짧게.)';
 const AFTERSEND_NOTE='(네 직전 답장이 끝나기 전에 상대의 새 메시지가 이미 도착해 있었다. 이제 그 메시지에 자연스럽게 이어서 반응하라. 짧게.)';
@@ -1445,7 +1483,7 @@ function mkReadsFor(g,senderId){
     const pp=P(id), pr=presence(pp,tn);
     const lastM=[...g.msgs].reverse().find(m=>m.who===id);
     const hot=pr.active&&lastM&&(tn-lastM.t<4*60000);
-    reads[id]= hot? tn+rnd(400,2200) : pr.active? tn+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+    reads[id]= hot? tn+rnd(300,1200) : pr.active? tn+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
   });
   return reads;
 }
@@ -1472,6 +1510,11 @@ async function groupFlow(g,key,tok,extraOnly){
     else if(mAct.includes(p)) extra='(상담자가 방금 너를 지목해서 불렀다. 네가 답할 차례다.)';
     else if(ri>0) extra='(방금 다른 철학자가 이미 발언했다. 상담자에게 새 질문을 던지지 말고, 직전 발언에 반응하거나 네 관점을 짧게 얹어라.)';
     extra+=absentNote;
+    const upN=nextEvent(p,now()), prN=presence(p,now());
+    if(prN.active&&upN&&upN.start>now()&&upN.start-now()<12*60000&&Math.random()<0.6){
+      const minsN=Math.max(1,Math.round((upN.start-now())/60000));
+      extra+=` (참고: 약 ${minsN}분 뒤 '${upN.t}' 일정이 있다. 자연스럽게 곧 가봐야 한다는 언질을 짧게 섞어도 좋다.)`;
+    }
     await zzz(rnd(2000,5000)); if(tok!==state.token[key])return;
     showTyping(key,p.id);
     const tShown=now();
@@ -1609,58 +1652,73 @@ async function catchUp(){
       later(key,rnd(2000,5000),()=>{ if(tok===state.token[key]) groupFlow(g,key,tok); });
     }
   }
-  // 선제 이벤트: 로드당 최대 1건만 (동시다발 방지) — 선톡 / 기존 방 토론 / 새 방 초대 중 추첨
+  // ===== 선제 이벤트 =====
+  // 발동 기준: ①이용이 뜸할 때만(내 마지막 메시지 후 5시간+) ②이벤트끼리 최소 8시간 간격 ③한 번에 1건
+  // 내용 기준: 80%는 일상 안부·시시콜콜, 20%만 철학 화두 / 새 방 개설은 갈 곳이 정말 없을 때만
   const dormantGroups=state.groups.filter(g=>{
     const last=g.msgs[g.msgs.length-1];
-    if(last&&last.who==='me') return false;                       // 답장 대기 중인 방 제외
-    if(last&&now()-last.t<3*3600*1000) return false;              // 최근 대화한 방 제외
+    if(last&&last.who==='me') return false;
+    if(last&&now()-last.t<3*3600*1000) return false;
     return g.members.filter(id=>presence(P(id),now()).active).length>=2;
   });
-  const opts=[];
-  if(followCandidates.length) opts.push('dm');
-  if(dormantGroups.length) opts.push('debate');
-  if(state.friends.length>=2 && state.groups.length<4) opts.push('invite');
-  if(opts.length && Math.random()<0.7){
-    const ev=opts[Math.floor(Math.random()*opts.length)];
-    if(ev==='dm'){
-      const p=followCandidates[Math.floor(Math.random()*followCandidates.length)];
-      const philosophical=Math.random()<0.45;
-      const extra=philosophical
-        ?'(오랜만에 네가 먼저 연락한다. 안부 대신, 너다운 철학적 화두나 사고실험 하나를 일상의 언어로 슬며시 던져 보라. 가르치려 들지 말고 호기심을 자극하는 톤으로. 말풍선 1~2개.)'
-        :'(오랜 시간이 지났다. 네가 먼저 짧게 안부 겸 후속 메시지를 보내라. 지난 대화의 구체적 내용을 언급하며, 캐릭터답게. 말풍선 1~2개.)';
-      try{ const text=await dmAPI(p,extra); pushDM(p,text,now(),'d:'+p.id); }catch(e){}
-    }else if(ev==='debate'){
-      const g=dormantGroups[Math.floor(Math.random()*dormantGroups.length)];
-      const key='g:'+g.id;
-      const act=g.members.filter(id=>presence(P(id),now()).active).sort(()=>Math.random()-.5);
-      const a=P(act[0]), b=P(act[1]);
-      try{
-        const t1=await groupAPI(g,a,'(대화가 뜸한 이 방에서 네가 먼저 새로운 철학적 화두를 꺼내 판을 깔아라. 지난 대화와 달라도 좋다. 말풍선 1~2개.)');
-        g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
-        state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
-        const t2=await groupAPI(g,b,'(직전 화두에 네 입장에서 반응하고, 상담자의 생각도 짧게 물어라. 말풍선 1~2개.)');
-        g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
-        state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
-        renderFriends();
-      }catch(e){}
-    }else if(ev==='invite'){
-      const act=state.friends.filter(id=>presence(P(id),now()).active&&(state.chats[id]||[]).length>=2);
-      if(act.length>=2){
-        const pick=act.sort(()=>Math.random()-.5).slice(0,2);
-        const dup=state.groups.find(g=>g.members.length===2&&pick.every(i=>g.members.includes(i)));
-        if(!dup){
-          const g={id:'g'+now(),members:pick,msgs:[]};
-          state.groups.push(g);
-          const key='g:'+g.id, a=P(pick[0]), b=P(pick[1]);
-          try{
-            const t1=await groupAPI(g,a,`(네가 방금 이 단톡방을 만들어 상담자와 ${b.name}를 초대했다. 요즘 생각하던 철학적 화두 하나를 가볍게 던지며 판을 깔아라. 말풍선 1~2개.)`);
-            g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
-            state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
-            const t2=await groupAPI(g,b,'(방금 초대받았다. 직전 화두에 네 입장에서 반응하고, 상담자는 어떻게 생각하는지 짧게 물어라. 말풍선 1~2개.)');
-            g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
-            state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
-            renderFriends();
-          }catch(e){ state.groups=state.groups.filter(x=>x.id!==g.id); }
+  const lastMine=(()=>{ let m=0;
+    Object.values(state.chats).forEach(a=>(a||[]).forEach(x=>{ if(x.role==='user'&&x.t>m) m=x.t; }));
+    state.groups.forEach(g=>g.msgs.forEach(x=>{ if(x.who==='me'&&x.t>m) m=x.t; }));
+    return m; })();
+  const quiet=!lastMine||now()-lastMine>5*3600*1000;
+  const cooled=!state.lastEvent||now()-state.lastEvent>8*3600*1000;
+  if(quiet&&cooled&&Math.random()<0.65){
+    const opts=[];
+    if(followCandidates.length) opts.push('dm','dm','dm');
+    if(dormantGroups.length) opts.push('debate','debate');
+    if(!followCandidates.length&&!dormantGroups.length&&state.friends.length>=2&&state.groups.length<2) opts.push('invite');
+    if(opts.length){
+      state.lastEvent=now();
+      const ev=opts[Math.floor(Math.random()*opts.length)];
+      const casual=Math.random()<0.8;
+      if(ev==='dm'){
+        const p=followCandidates[Math.floor(Math.random()*followCandidates.length)];
+        const extra=casual
+          ?'(오랜만에 네가 먼저 짧게 연락한다. 철학 얘기 금지 — 그냥 친구처럼: 안부를 묻거나, 지난 대화에서 그 일이 어떻게 됐는지 궁금해하거나, 네 소소한 일상(오늘 본 것, 먹은 것 등)을 시시콜콜 전해라. 말풍선 1~2개.)'
+          :'(오랜만에 네가 먼저 연락한다. 너다운 화두나 사고실험 하나를 일상의 언어로 슬며시 던져 보라. 가르치려 들지 말고 호기심을 자극하는 톤으로. 말풍선 1~2개.)';
+        try{ const text=await dmAPI(p,extra); pushDM(p,text,now(),'d:'+p.id); }catch(e){}
+      }else if(ev==='debate'){
+        const g=dormantGroups[Math.floor(Math.random()*dormantGroups.length)];
+        const key='g:'+g.id;
+        const act=g.members.filter(id=>presence(P(id),now()).active).sort(()=>Math.random()-.5);
+        const a=P(act[0]), b=P(act[1]);
+        try{
+          const t1=await groupAPI(g,a,casual
+            ?'(대화가 뜸한 이 방에서 네가 먼저 가볍게 입을 뗀다. 철학 화두 금지 — 다른 철학자에게 시시콜콜한 안부나 근황을 묻거나, 실없는 일상 티키타카를 시작해라. 상담자가 부담 없이 끼어들 수 있는 편한 분위기로. 말풍선 1~2개.)'
+            :'(대화가 뜸한 이 방에서 네가 먼저 새로운 철학적 화두를 꺼내 판을 깔아라. 지난 대화와 달라도 좋다. 말풍선 1~2개.)');
+          g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
+          state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
+          const t2=await groupAPI(g,b,casual
+            ?'(직전 말에 친구처럼 가볍게 반응하고, 이어서 상담자에게도 짧게 안부를 물어라. 말풍선 1~2개.)'
+            :'(직전 화두에 네 입장에서 반응하고, 상담자의 생각도 짧게 물어라. 말풍선 1~2개.)');
+          g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
+          state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
+          renderFriends();
+        }catch(e){}
+      }else if(ev==='invite'){
+        const act=state.friends.filter(id=>presence(P(id),now()).active&&(state.chats[id]||[]).length>=2);
+        if(act.length>=2){
+          const pick=act.sort(()=>Math.random()-.5).slice(0,2);
+          const dup=state.groups.find(g=>pick.every(i=>g.members.includes(i))); // 두 명이 같이 있는 방이 이미 있으면 새로 만들지 않는다
+          if(!dup){
+            const g={id:'g'+now(),members:pick,msgs:[]};
+            state.groups.push(g);
+            const key='g:'+g.id, a=P(pick[0]), b=P(pick[1]);
+            try{
+              const t1=await groupAPI(g,a,`(네가 방금 이 단톡방을 만들어 상담자와 ${b.name}를 초대했다. 거창한 이유는 없다 — 그냥 같이 수다 떨고 싶어서다. 철학 화두 말고, 가볍게 안부부터 물어라. 말풍선 1~2개.)`);
+              g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
+              state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
+              const t2=await groupAPI(g,b,'(방금 초대받았다. 친구처럼 가볍게 등장 인사를 하고 직전 말에 반응해라. 말풍선 1개.)');
+              g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
+              state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
+              renderFriends();
+            }catch(e){ state.groups=state.groups.filter(x=>x.id!==g.id); }
+          }
         }
       }
     }
@@ -1800,7 +1858,8 @@ function urlB64ToU8(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replac
 async function getPushSub(){
   try{
     if(!('serviceWorker' in navigator)||!('PushManager' in window)) return null;
-    const reg=await navigator.serviceWorker.ready;
+    const reg=await navigator.serviceWorker.getRegistration();
+    if(!reg) return null;
     return await reg.pushManager.getSubscription();
   }catch(e){ return null; }
 }
@@ -1824,7 +1883,11 @@ async function togglePush(){
       if(!sb||!sbUser){ alert(T.pushNeedLogin); return; }
       const perm=await Notification.requestPermission();
       if(perm!=='granted'){ alert(T.pushDenied); return; }
-      const reg=await navigator.serviceWorker.ready;
+      let reg=await navigator.serviceWorker.getRegistration();
+      if(!reg){ try{ reg=await navigator.serviceWorker.register('/sw.js'); }catch(e){} }
+      const readyReg=await Promise.race([navigator.serviceWorker.ready,zzz(8000).then(()=>null)]);
+      reg=readyReg||reg;
+      if(!reg){ alert(T.pushErr+': service worker — sw.js 파일이 업로드됐는지 확인해 주세요.'); return; }
       const ns=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});
       const {error}=await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG});
       if(error){ try{ await ns.unsubscribe(); }catch(e){} throw error; }
@@ -1903,6 +1966,7 @@ $('stReset').onclick=async()=>{
 /* ================= 시작 ================= */
 (async()=>{
   applyLangUI();
+  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(e){} }
   $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
   const t0=now();
   await initAuth();
