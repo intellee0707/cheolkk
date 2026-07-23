@@ -85,7 +85,7 @@
   .mrow{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
   .mrow.me{flex-direction:row-reverse}
   .mrow .avatar{width:34px;height:34px;border-radius:13px;align-self:flex-start;cursor:pointer}
-  .mrow.cont .avatar{visibility:hidden}
+  .mrow.cont .avwrap{visibility:hidden}
   .mrow.cont{margin-top:2px}
   .bcol{display:flex;flex-direction:column;max-width:72%}
   .who{font-size:10.5px;color:var(--paper-dim);margin:0 0 3px 2px}
@@ -202,6 +202,22 @@
 
   /* ===== 단톡방 시스템 메시지 ===== */
   .sysmsg{text-align:center;font-size:11px;color:rgba(239,232,218,.4);margin:10px 0}
+
+  /* ===== 채팅방 메뉴 ===== */
+  .cmenu-btn{margin-left:auto;background:none;border:none;color:var(--paper-dim);font-size:21px;cursor:pointer;padding:4px 12px;line-height:1}
+  .cmenu-btn:hover{color:var(--paper)}
+  .cmenu{position:absolute;top:56px;right:10px;background:var(--ink-soft);border:1px solid var(--ink-line);border-radius:14px;z-index:30;display:none;min-width:158px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .cmenu.on{display:block}
+  .cmenu button{display:block;width:100%;text-align:left;padding:13px 17px;background:none;border:none;color:var(--paper);font-family:var(--sans);font-size:13.5px;cursor:pointer}
+  .cmenu button:hover{background:rgba(239,232,218,.06)}
+  .cmenu .danger{color:#c25b4e}
+
+  /* ===== 메시지 아바타 활동 점 ===== */
+  .mrow .dot{width:10px;height:10px;border-width:2px;right:-2px;bottom:-2px}
+
+  /* ===== 시계 현재 시각 공 ===== */
+  .tl-ball{animation:tlpulse 2.4s ease-in-out infinite}
+  @keyframes tlpulse{0%,100%{opacity:1}50%{opacity:.45}}
 </style>
 </head>
 <body>
@@ -229,8 +245,12 @@
       <button class="back" id="backBtn" aria-label="뒤로">‹</button>
       <div class="avwrap" id="chatAvWrap"><div class="avatar" id="chatAvatar"></div><span class="dot" id="chatDot" style="display:none"></span></div>
       <div id="chatTitle" style="cursor:pointer"><div class="c-name" id="chatName"></div><div class="c-status" id="chatStatus"></div></div>
-      <button class="leave" id="manageBtn" style="display:none">👥</button>
-      <button class="leave" id="leaveBtn" style="margin-left:8px">나가기</button>
+      <button class="cmenu-btn" id="chatMenuBtn" style="display:none" aria-label="메뉴">⋮</button>
+    </div>
+    <div class="cmenu" id="chatMenu">
+      <button id="cmManage"></button>
+      <button id="cmRename"></button>
+      <button class="danger" id="cmLeave"></button>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="chips" id="chips"></div>
@@ -285,7 +305,7 @@
       <input type="file" id="importFile" accept=".json,application/json" style="display:none">
       <div class="st-sec" id="stSecInfo">정보</div>
       <a class="st-item" id="stPrivacy" href="/privacy.html" target="_blank" rel="noopener"></a>
-      <div class="st-item dim" id="stPush"></div>
+      <button class="st-item" id="stPush"></button>
       <div class="st-note" id="stDisclaimer"></div>
       <div class="st-note" id="stVersion" style="text-align:center;margin-top:18px"></div>
     </div>
@@ -451,7 +471,7 @@ if(LANG==='en'){
 
 const T=LANG==='en'?{
  docTitle:'CheolKK — Group Chat of Dead Philosophers',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
- tabChat:'💬 Chats',tabCube:'▦ Cube',inputPh:'Type a message',leave:'Leave',
+ tabChat:'Chats',tabCube:'Philosophers',inputPh:'Type a message',leave:'Leave',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
  cubeDefault:'Tap philosophers to compare them.',
@@ -460,9 +480,9 @@ const T=LANG==='en'?{
  obTitle:'Pick three\nto start with',obDesc:'Each row has its own temperament. You can meet the other six anytime.',
  startWith:n=>`Start with ${n}`,pickOne:'Pick a philosopher',pickPlease:'Pick someone',pick2:'Pick at least 2',
  helperQuiz:'🧭 Take the 30-sec match test',helperTeams:'✨ See suggested trios',
- quizTitle:'Find your philosopher',quizResult:'Your result',recCombo:'Suggested trio',backToCube:'Back to the cube to confirm',
+ quizTitle:'Find your philosopher',quizResult:'Your result',recCombo:'Suggested trio',backToCube:'Back to selection to confirm',
  quizNote:'🧭 Test picks are marked. Feel free to change them.',
- teamsTitle:'Suggested trios',teamsDesc:'Nothing is final — you confirm on the cube.',
+ teamsTitle:'Suggested trios',teamsDesc:'Nothing is final — you adjust on the selection screen.',
  teamNote:n=>`✨ The '${n}' trio is marked. Feel free to change it.`,
  addTitle:'Add philosophers',addDesc:'Choose who to add.',addBtn:n=>`Add ${n}`,
  groupTitle:'New group chat',groupDesc:'Invite 2–3. The more their ideas clash, the better. Each arrives remembering your private chats. (Max 3 per room, for deeper talk)',
@@ -476,7 +496,13 @@ const T=LANG==='en'?{
  busyFallback:"Hold on — I'll get back to you.",lostReply:'…(the reply got lost on the way. Say something again.)',
  trFast:'⚡ Instant replies',trMid:'💬 Normal pace',trSlow:'🐢 Slow & easy',trGhost:'👀 Leaves you on read',trVanish:'🫥 Sometimes vanishes',trBusy:'📅 Schedule first',trCut:'✂️ Interrupts you',trListen:'🙇 Hears you out',
  profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
- gActive:n=>`${n} active now`, manageTitle:'Manage members',manageDesc:'Adjust who is in this room (2–3 people). Deselect to remove, select to add.',manageBtn:n=>`Keep these ${n}`,sysJoined:n=>`${n} joined the room`,sysLeft:n=>`${n} left the room`,lgActive:'Active',lgAway:'Away',lgSleep:'Sleep',
+ gActive:n=>`${n} active now`,
+ menuManage:'Manage members',menuRename:'Rename room',menuLeave:'Leave room',
+ resetConfirm2:'Final check — really delete everything? This cannot be undone.',lgNow:'Now',
+ pushOn:'🔔 Turn on push notifications',pushOff:'🔕 Turn off push notifications',pushUnsupported:'🔔 Push is not supported in this browser',
+ pushNeedLogin:'Sign in first (Settings → Account) to use push notifications.',pushDenied:'Notifications are blocked. Please allow them in your browser settings.',
+ pushEnabled:'Push is on! Philosophers can now reach you first.',pushErr:'Push setup error',
+ manageTitle:'Manage members',manageDesc:'Adjust who is in this room (2–3 people). Deselect to remove, select to add.',manageBtn:n=>`Keep these ${n}`,sysJoined:n=>`${n} joined the room`,sysLeft:n=>`${n} left the room`,lgActive:'Active',lgAway:'Away',lgSleep:'Sleep',
  importConfirm:"Restoring will replace this device's conversations with the backup. Continue?",badBackup:'Not a CheolKK backup file, or the file is damaged.',
  stTitle:'Settings',secAcc:'Account',secData:'Data',secInfo:'About',
  accGuest:'Not signed in',
@@ -493,7 +519,7 @@ const T=LANG==='en'?{
  version:'CheolKK v7 · Sign-in & Sync · 한/EN'
 }:{
  docTitle:'철크크 — 죽은 철학자들의 단톡방',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
- tabChat:'💬 채팅',tabCube:'▦ 큐브',inputPh:'메시지 보내기',leave:'나가기',
+ tabChat:'채팅',tabCube:'철학자',inputPh:'메시지 보내기',leave:'나가기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
  cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
@@ -502,9 +528,9 @@ const T=LANG==='en'?{
  obTitle:'함께할 세 명을\n골라 보세요',obDesc:'줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.',
  startWith:n=>`${n}명과 시작하기`,pickOne:'철학자를 선택하세요',pickPlease:'선택하세요',pick2:'2명 이상 선택',
  helperQuiz:'🧭 테스트로 추천받기 (30초)',helperTeams:'✨ 추천 조합 보기',
- quizTitle:'나와 맞는 철학자 찾기',quizResult:'테스트 결과',recCombo:'함께 추천하는 조합',backToCube:'큐브로 돌아가 확정하기',
+ quizTitle:'나와 맞는 철학자 찾기',quizResult:'테스트 결과',recCombo:'함께 추천하는 조합',backToCube:'선택 화면으로 돌아가 확정하기',
  quizNote:'🧭 테스트 추천이 표시되어 있어요. 자유롭게 바꿔도 됩니다.',
- teamsTitle:'추천 조합',teamsDesc:'골라도 확정이 아니에요. 큐브에서 최종 조정합니다.',
+ teamsTitle:'추천 조합',teamsDesc:'골라도 확정이 아니에요. 선택 화면에서 최종 조정합니다.',
  teamNote:n=>`✨ '${n}' 조합이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`,
  addTitle:'철학자 친구 추가',addDesc:'추가할 철학자를 선택하세요.',addBtn:n=>`${n}명 추가`,
  groupTitle:'단톡방 만들기',groupDesc:'2~3명을 초대하세요. 서로 사상이 부딪히는 조합일수록 재밌습니다. 각자 당신과의 개인 대화를 기억한 채 들어옵니다. (깊은 대화를 위해 한 방은 최대 3명까지예요)',
@@ -518,7 +544,13 @@ const T=LANG==='en'?{
  busyFallback:'잠깐, 이따 답할게.',lostReply:'…(답장이 길을 잃었습니다. 다시 말을 걸어 주세요.)',
  trFast:'⚡ 즉답형',trMid:'💬 답장 보통',trSlow:'🐢 느긋한 답장',trGhost:'👀 읽씹 장인',trVanish:'🫥 가끔 잠수',trBusy:'📅 일과 우선',trCut:'✂️ 말 끊고 들어옴',trListen:'🙇 끝까지 듣는 편',
  profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
- gActive:n=>`${n}명 활동 중`, manageTitle:'단톡방 멤버 관리',manageDesc:'이 방의 멤버를 조정하세요 (2~3명). 해제하면 내보내고, 선택하면 초대합니다.',manageBtn:n=>`이 ${n}명으로 확정`,sysJoined:n=>`${n}님이 들어왔습니다`,sysLeft:n=>`${n}님이 나갔습니다`,lgActive:'활동',lgAway:'자리비움',lgSleep:'수면',
+ gActive:n=>`${n}명 활동 중`,
+ menuManage:'멤버 관리',menuRename:'방 이름 바꾸기',menuLeave:'단톡방 나가기',
+ resetConfirm2:'마지막 확인입니다. 정말로 전부 삭제할까요? 되돌릴 수 없어요.',lgNow:'현재 시각',
+ pushOn:'🔔 푸시 알림 켜기',pushOff:'🔕 푸시 알림 끄기',pushUnsupported:'🔔 이 브라우저는 푸시를 지원하지 않아요',
+ pushNeedLogin:'푸시 알림은 로그인 후 사용할 수 있어요. 설정에서 먼저 로그인해 주세요.',pushDenied:'알림 권한이 차단되어 있어요. 브라우저 설정에서 허용해 주세요.',
+ pushEnabled:'푸시 알림이 켜졌어요! 이제 철학자들이 먼저 연락할 수 있어요.',pushErr:'푸시 설정 오류',
+ manageTitle:'단톡방 멤버 관리',manageDesc:'이 방의 멤버를 조정하세요 (2~3명). 해제하면 내보내고, 선택하면 초대합니다.',manageBtn:n=>`이 ${n}명으로 확정`,sysJoined:n=>`${n}님이 들어왔습니다`,sysLeft:n=>`${n}님이 나갔습니다`,lgActive:'활동',lgAway:'자리비움',lgSleep:'수면',
  importConfirm:'백업을 불러오면 지금 기기의 대화가 백업 시점의 내용으로 교체됩니다. 계속할까요?',badBackup:'철크크 백업 파일이 아니거나 손상된 파일이에요.',
  stTitle:'설정',secAcc:'계정',secData:'데이터',secInfo:'정보',
  accGuest:'로그인하지 않음',
@@ -947,7 +979,7 @@ function openGroupManage(gid){
           showTyping(key,np.id);
           const tShown=now();
           try{
-            const txt=await groupAPI(g,np,'(방금 이 단톡방에 초대되어 들어왔다. 캐릭터답게 짧은 등장 인사를 하고, 최근 대화 흐름이 보이면 슬쩍 한마디 얹어라. 말풍선 1개.)');
+            const txt=await groupAPI(g,np,'(방금 이 단톡방에 처음 초대되었다. 이전 대화 내용, 예전 멤버, 누가 나갔는지 전혀 알지 못한다 — 그런 것을 아는 척하거나 언급하는 것 절대 금지. 캐릭터답게 짧은 첫인사만 해라. 말풍선 1개.)',true);
             if(tok!==state.token[key]) return;
             await zzz(Math.max(0,typeDelay(txt.split('|||')[0])-(now()-tShown)));
             if(tok!==state.token[key]) return;
@@ -990,11 +1022,14 @@ function timelineHTML(p){
     const [x1,y1]=pt(h*60,R+8),[x2,y2]=pt(h*60,R+11);
     ticks+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(239,232,218,.25)" stroke-width="1"/>`;
   }
+  const d0=new Date(), nowMin=d0.getHours()*60+d0.getMinutes();
+  const [bx,by]=pt(nowMin,R);
+  const ball=`<circle class="tl-ball" cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="4.6" fill="#efe8da" stroke="#12141d" stroke-width="1.6"/>`;
   return `<svg viewBox="0 0 120 120" class="tl-clock" role="img">
     <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#4f7d63" stroke-width="${W}"/>
-    ${segs}${ticks}${nums}
+    ${segs}${ticks}${nums}${ball}
   </svg>
-  <div class="tl-legend"><span><i style="background:#4f7d63"></i>${T.lgActive}</span><span><i style="background:#d9a05b"></i>${T.lgAway}</span><span><i style="background:#39415c"></i>${T.lgSleep}</span></div>`;
+  <div class="tl-legend"><span><i style="background:#4f7d63"></i>${T.lgActive}</span><span><i style="background:#d9a05b"></i>${T.lgAway}</span><span><i style="background:#39415c"></i>${T.lgSleep}</span><span><i style="background:#efe8da;border-radius:50%"></i>${T.lgNow}</span></div>`;
 }
 let profileFrom=null;
 function openProfile(pid,from){
@@ -1102,15 +1137,16 @@ function openChat(key){
       renderFriends(); save();
     };
   }
-  $('leaveBtn').style.display = key[0]==='g' ? '' : 'none';
-  $('manageBtn').style.display = key[0]==='g' ? '' : 'none';
+  $('chatMenuBtn').style.display = key[0]==='g' ? '' : 'none';
+  $('chatMenu').classList.remove('on');
   renderMsgs();
   renderChips();
   $('chat').classList.add('open');
   renderFriends();
   setTimeout(()=>$('input').focus(),300);
 }
-$('leaveBtn').onclick=()=>{
+$('cmLeave').onclick=()=>{
+  $('chatMenu').classList.remove('on');
   if(curKind()!=='g') return;
   const gid=curId();
   if(!confirm(T.leaveConfirm)) return;
@@ -1120,7 +1156,22 @@ $('leaveBtn').onclick=()=>{
   $('chat').classList.remove('open'); state.current=null;
   renderFriends(); save();
 };
-$('manageBtn').onclick=()=>{ if(curKind()==='g') openGroupManage(curId()); };
+$('chatMenuBtn').onclick=e=>{ e.stopPropagation(); $('chatMenu').classList.toggle('on'); };
+$('cmManage').onclick=()=>{ $('chatMenu').classList.remove('on'); if(curKind()==='g') openGroupManage(curId()); };
+$('cmRename').onclick=()=>{
+  $('chatMenu').classList.remove('on');
+  if(curKind()!=='g') return;
+  const g=getGroup(curId()); if(!g) return;
+  const n=prompt(T.roomNamePrompt, g.name||'');
+  if(n===null) return;
+  g.name=n.trim()||null;
+  $('chatName').textContent=g.name||g.members.map(id=>dispName(P(id))).join(', ');
+  renderFriends(); save();
+};
+document.addEventListener('click',e=>{
+  const mn=$('chatMenu');
+  if(mn&&mn.classList.contains('on')&&!(e.target.closest&&(e.target.closest('#chatMenu')||e.target.closest('#chatMenuBtn')))) mn.classList.remove('on');
+});
 function updateHeadStatus(){
   if(curKind()==='d'){
     const p=P(curId()), pr=presence(p,now());
@@ -1132,7 +1183,7 @@ function updateHeadStatus(){
   }
 }
 setInterval(()=>{ if(state.current){ updateHeadStatus(); updateGroupReads(); } else renderFriends(); },30000);
-$('backBtn').onclick=()=>{ $('chat').classList.remove('open'); state.current=null; renderFriends(); };
+$('backBtn').onclick=()=>{ $('chatMenu').classList.remove('on'); $('chat').classList.remove('open'); state.current=null; renderFriends(); };
 
 function renderMsgs(){
   const el=$('msgs'); el.innerHTML='';
@@ -1162,7 +1213,7 @@ function addMsg(el,side,texts,t,o={}){
   texts.forEach((txt,i)=>{
     const row=document.createElement('div');
     row.className='mrow '+side+(i>0?' cont':'');
-    const avEl= side==='them' ? `<div class="avatar" data-pid="${o.pid}">${av(o.pid)}</div>` : '';
+    const avEl= side==='them' ? `<div class="avwrap"><div class="avatar" data-pid="${o.pid}">${av(o.pid)}</div><span class="dot${presence(P(o.pid),now()).active?'':' off'}"></span></div>` : '';
     const nameEl= (side==='them'&&o.name&&i===0)?`<div class="who">${o.name}</div>`:'';
     const meta=`<div class="meta">${side==='me'&&o.read===false?'<span class="unread1">1</span>':''}${o.reads?`<span class="gunread" data-gt="${o.gt}"></span>`:''}${i===texts.length-1?`<span>${fmtT(t)}</span>`:''}</div>`;
     row.innerHTML=`${avEl}<div class="bcol">${nameEl}<div class="bubble">${escapeH(txt.trim())}</div></div>${meta}`;
@@ -1468,10 +1519,11 @@ async function callClaude(system,messages){
   return data.text.trim();
 }
 const dmAPI=(p,extra)=>callClaude(p.prompt+COMMON+selfLine(p)+bondLine(p)+nickLine(p)+groupMemoryForDM(p.id), buildDM(p.id,extra));
-function groupAPI(g,p,extra){
+function groupAPI(g,p,extra,noHist){
   const others=g.members.filter(id=>id!==p.id).map(id=>P(id).name).join(', ');
   const sys=p.prompt+COMMON+GROUP_RULES+`\n[이 단톡방의 다른 철학자]: ${others}`+selfLine(p)+bondLine(p)+nickLine(p)+dmMemoryForGroup(p.id);
-  const user=`[단톡방 대화]\n${groupTranscript(g,20)||'(아직 아무 말 없음)'}\n\n(이제 '${p.name}' 너의 차례다. 너는 ${p.name} 본인으로만 말하고, 다른 철학자의 대사를 대신 쓰지 마라.${extra?' '+extra:''})`;
+  const hist=noHist?'(너는 방금 입장해서 이전 대화 내용을 볼 수 없다)':(groupTranscript(g,20)||'(아직 아무 말 없음)');
+  const user=`[단톡방 대화]\n${hist}\n\n(이제 '${p.name}' 너의 차례다. 너는 ${p.name} 본인으로만 말하고, 다른 철학자의 대사를 대신 쓰지 마라.${extra?' '+extra:''})`;
   return callClaude(sys,[{role:'user',content:user}]);
 }
 
@@ -1700,6 +1752,48 @@ async function initAuth(){
   }catch(e){}
 }
 
+/* ================= 푸시 알림 ================= */
+const VAPID_PUBLIC='BMhdB0ke6w-J7SttyTCHZBxKZxzXOcmfISPpFSfo_fj6auPvConJzZMkRZbKGNFuVS8HXNHVIvqLmi7dsOU1-oM';
+const ICON_CHAT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 11.5c0 4.14-4.03 7.5-9 7.5-1.02 0-2-.14-2.91-.4L4 20l1.2-3.6C3.83 15.09 3 13.37 3 11.5 3 7.36 7.03 4 12 4s9 3.36 9 7.5z"/></svg>';
+const ICON_GRID='<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="vertical-align:-1.5px;margin-right:6px"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>';
+function urlB64ToU8(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(s);const a=new Uint8Array(r.length);for(let i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a;}
+async function getPushSub(){
+  try{
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)) return null;
+    const reg=await navigator.serviceWorker.ready;
+    return await reg.pushManager.getSubscription();
+  }catch(e){ return null; }
+}
+async function renderPushRow(){
+  const b=$('stPush'); if(!b) return;
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    b.textContent=T.pushUnsupported; b.classList.add('dim'); b.onclick=null; return;
+  }
+  b.classList.remove('dim');
+  const sub=await getPushSub();
+  b.textContent=sub?T.pushOff:T.pushOn;
+  b.onclick=togglePush;
+}
+async function togglePush(){
+  try{
+    const sub=await getPushSub();
+    if(sub){
+      if(sb){ try{ await sb.from('push_subscriptions').delete().eq('endpoint',sub.endpoint); }catch(e){} }
+      await sub.unsubscribe();
+    }else{
+      if(!sb||!sbUser){ alert(T.pushNeedLogin); return; }
+      const perm=await Notification.requestPermission();
+      if(perm!=='granted'){ alert(T.pushDenied); return; }
+      const reg=await navigator.serviceWorker.ready;
+      const ns=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});
+      const {error}=await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG});
+      if(error){ try{ await ns.unsubscribe(); }catch(e){} throw error; }
+      alert(T.pushEnabled);
+    }
+  }catch(e){ alert(T.pushErr+': '+((e&&e.message)||e)); }
+  renderPushRow();
+}
+
 /* ================= 설정 화면 ================= */
 function applyLangUI(){
   document.documentElement.lang=LANG;
@@ -1708,12 +1802,14 @@ function applyLangUI(){
   document.querySelector('.list-head h1').textContent=T.brand;
   document.querySelector('.sp-eyebrow').textContent=T.eyebrow;
   document.querySelector('.sp-title').textContent=T.brand;
-  $('tabChat').textContent=T.tabChat; $('tabCube').textContent=T.tabCube;
+  $('tabChat').innerHTML=ICON_CHAT+T.tabChat; $('tabCube').innerHTML=ICON_GRID+T.tabCube;
   document.querySelector('.cube-cap').textContent=T.cubeCap;
   $('cubeInfo').textContent=T.cubeDefault;
   document.querySelector('.cube-foot').innerHTML=T.cubeFoot;
   $('input').placeholder=T.inputPh;
-  $('leaveBtn').textContent=T.leave;
+  $('cmManage').textContent=T.menuManage;
+  $('cmRename').textContent=T.menuRename;
+  $('cmLeave').textContent=T.menuLeave;
   $('prNick').textContent=T.nickBtn;
   $('prChat').textContent=T.chatBtn;
   $('pkInfo').textContent=T.tapIntro;
@@ -1725,7 +1821,6 @@ function applyLangUI(){
   $('stImport').textContent=T.importBtn;
   $('stReset').textContent=T.resetBtn;
   $('stPrivacy').textContent=T.privacyLink;
-  $('stPush').textContent=T.pushSoon;
   $('stDisclaimer').innerHTML=T.disclaimer;
   $('stVersion').textContent=T.version;
   $('langKo').classList.toggle('on',LANG==='ko');
@@ -1740,7 +1835,7 @@ function renderSettingsAccount(){
   if(syncState.err){ err.style.display=''; err.textContent=T.syncErr+': '+syncState.err; }
   else err.style.display='none';
 }
-$('btnSettings').onclick=()=>{ renderSettingsAccount(); $('settings').classList.add('on'); };
+$('btnSettings').onclick=()=>{ renderSettingsAccount(); renderPushRow(); $('settings').classList.add('on'); };
 $('stClose').onclick=()=>$('settings').classList.remove('on');
 $('langKo').onclick=()=>setLang('ko');
 $('langEn').onclick=()=>setLang('en');
@@ -1758,6 +1853,7 @@ $('stLogin').onclick=async()=>{
 };
 $('stReset').onclick=async()=>{
   if(!confirm(T.resetConfirm)) return;
+  if(!confirm(T.resetConfirm2)) return;
   try{ if(window.storage) await window.storage.delete('philo-messenger-v6'); }catch(e){}
   try{ localStorage.removeItem('philo-messenger-v6'); }catch(e){}
   if(sb&&sbUser){ try{ await sb.from('user_data').delete().eq('user_id',sbUser.id); }catch(e){} }
