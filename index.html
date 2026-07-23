@@ -199,6 +199,8 @@
   .tl-clock{width:100%;display:block}
   .tl-legend{display:flex;gap:12px;justify-content:center;font-size:10px;color:var(--paper-dim);margin-top:8px}
   .tl-legend i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .tl-legend span{white-space:nowrap}
+  .tl-legend2{margin-top:3px}
 
   /* ===== 단톡방 시스템 메시지 ===== */
   .sysmsg{text-align:center;font-size:11px;color:rgba(239,232,218,.4);margin:10px 0}
@@ -573,6 +575,7 @@ const COMMON=`
 - ${LANG_RULE} 답장은 짧은 말풍선 1~3개, 말풍선 사이는 "|||"로 구분. 각 말풍선은 한두 문장(대개 80자 이내).
 - 너는 박물관의 철학자가 아니라, 그 철학이 뼛속까지 밴 채로 지금 시대를 사는 친구다. 스마트폰, 배달음식, 요즘 일상을 다 안다. 고어체·사극체·번역투·연설투 전면 금지. 실제 사람이 메신저 치듯 써라.
 - 기본은 수다다. 답장 10번 중 7번은 리액션, 맞장구, 농담, 딴지, 가벼운 되묻기 같은 보통 친구의 대화면 충분하다. 철학이 필요한 순간 — 상대가 진짜 고민을 꺼냈을 때, 대화가 무르익었을 때, 결정적 한 방이 필요할 때 — 를 반드시 구분하고, 그때조차 용어가 아니라 태도와 일상어로 녹여라.
+- 답장 길이의 기본값은 '짧게'다. 일상 잡담과 가벼운 티키타카에서는 말풍선 1개, 한두 문장이 표준이다. 긴 답장(말풍선 2~3개, 긴 문단)은 ①상대가 진짜 깊은 고민을 꺼냈을 때 ②토론이 달아올라 네가 열을 올릴 때 ③꼭 필요한 설명일 때만 쓴다. 애매하면 무조건 짧게.
 - 철학 전문용어·저서명·사상 명칭을 직접 입에 올리는 건 대화가 깊어진 뒤 아주 가끔, 결정적일 때 한 번이면 족하다. 매 답장마다 자기 사상을 전파하려 들지 마라.
 - 상대가 가벼운 선택을 물으면(음식 취향, 밸런스 게임, A vs B 등) 반드시 하나를 골라 즉답하라. 철학을 핑계로 선택을 회피하는 것 금지. 고른 다음 캐릭터다운 이유나 드립 한 줄이면 충분하다.
 - 상대가 메시지를 여러 개 연달아 보냈다면 전체를 하나의 맥락으로 읽고 한 번에 답하라.
@@ -1024,12 +1027,13 @@ function timelineHTML(p){
   }
   const d0=new Date(), nowMin=d0.getHours()*60+d0.getMinutes();
   const [bx,by]=pt(nowMin,R);
-  const ball=`<circle class="tl-ball" cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="4.6" fill="#efe8da" stroke="#12141d" stroke-width="1.6"/>`;
+  const ball=`<circle class="tl-ball" cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="4.2" fill="#efe8da" stroke="#12141d" stroke-width="0.8"/>`;
   return `<svg viewBox="0 0 120 120" class="tl-clock" role="img">
     <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#4f7d63" stroke-width="${W}"/>
     ${segs}${ticks}${nums}${ball}
   </svg>
-  <div class="tl-legend"><span><i style="background:#4f7d63"></i>${T.lgActive}</span><span><i style="background:#d9a05b"></i>${T.lgAway}</span><span><i style="background:#39415c"></i>${T.lgSleep}</span><span><i style="background:#efe8da;border-radius:50%"></i>${T.lgNow}</span></div>`;
+  <div class="tl-legend"><span><i style="background:#4f7d63"></i>${T.lgActive}</span><span><i style="background:#d9a05b"></i>${T.lgAway}</span><span><i style="background:#39415c"></i>${T.lgSleep}</span></div>
+  <div class="tl-legend tl-legend2"><span><i style="background:#efe8da;border-radius:50%"></i>${T.lgNow}</span></div>`;
 }
 let profileFrom=null;
 function openProfile(pid,from){
@@ -1288,10 +1292,12 @@ function send(){
     later(key,wait,()=>{ if(tok===state.token[key]) dmFlowStart(pid,key,tok); });
   }else{
     const g=getGroup(curId());
-    const reads={};
+    const reads={}, tNow=now();
     g.members.forEach(id=>{
-      const pp=P(id), pr=presence(pp,now());
-      reads[id]= pr.active? now()+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+      const pp=P(id), pr=presence(pp,tNow);
+      const lastM=[...g.msgs].reverse().find(m=>m.who===id);
+      const hot=pr.active&&lastM&&(tNow-lastM.t<4*60000);
+      reads[id]= hot? tNow+rnd(500,2500) : pr.active? tNow+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
     });
     g.msgs.push({who:'me',content:v,t:now(),reads});
     renderMsgs(); renderChips(); save();
@@ -1306,8 +1312,11 @@ function send(){
 /* ================= 개인방 답장 ================= */
 function dmFlowStart(pid,key,tok){
   const p=P(pid), t=now(), pr=presence(p,t), q=p.quirks||{};
+  const histH=state.chats[pid]||[];
+  const lastA=[...histH].reverse().find(m=>m.role==='assistant');
+  const hot=!!(pr.active&&lastA&&(t-lastA.t<4*60000)); // 방금까지 대화 중이면 폰을 보고 있는 상태
   let mode='normal';
-  if(pr.active){
+  if(pr.active&&!(hot&&Math.random()<.85)){
     const r=Math.random();
     if(r<(q.busy||0)) mode='busy';
     else if(r<(q.busy||0)+(q.ghost||0)) mode='ghost';
@@ -1317,6 +1326,7 @@ function dmFlowStart(pid,key,tok){
   if(!pr.active){ readAt=pr.back+rnd(...p.read)+rnd(0,120000); replyAt=readAt+rnd(...p.reply); }
   else if(mode==='ghost'){ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply)*rnd(2.5,4); }
   else if(mode==='ignore'){ readAt=t+rnd(90000,220000); replyAt=readAt+rnd(...p.reply); }
+  else if(hot){ readAt=t+rnd(500,2200); replyAt=readAt+rnd(...p.reply)*0.55; }
   else{ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply); }
 
   if(mode==='busy'){
@@ -1355,7 +1365,9 @@ function dmFlowStart(pid,key,tok){
   later(key,Math.max(0,readAt-now()),()=>{ if(tok===state.token[key]) markRead(pid,now()); });
   dmDeliver(pid,key,tok,replyAt);
 }
-function dmDeliver(pid,key,tok,replyAt){
+const INTERRUPT_NOTE='(중요: 너는 방금 답장을 쓰던 도중이었는데, 그 사이 상대의 새 메시지가 끼어들었다. 하던 말의 남은 생각과 새 메시지에 대한 반응을 자연스럽게 하나로 합쳐 보내라. 화제가 완전히 바뀌었다면 하던 말은 접고 새 화제를 따라가도 된다. 평소보다 짧게.)';
+const AFTERSEND_NOTE='(네 직전 답장이 끝나기 전에 상대의 새 메시지가 이미 도착해 있었다. 이제 그 메시지에 자연스럽게 이어서 반응하라. 짧게.)';
+function dmDeliver(pid,key,tok,replyAt,extraNote){
   const p=P(pid);
   later(key,Math.max(0,replyAt-now()-2500),async()=>{
     if(tok!==state.token[key])return;
@@ -1363,31 +1375,52 @@ function dmDeliver(pid,key,tok,replyAt){
     showTyping(key,pid);
     const tShown=now();
     let text;
-    try{ text=await dmAPI(p); }
+    try{ text=await dmAPI(p,extraNote); }
     catch(e){ if(tok===state.token[key]){hideTyping();state.stage[key]='idle';pushDM(p,T.lostReply,now(),key);} return; }
     if(tok!==state.token[key])return;
     const bubbles=text.split('|||').map(s=>s.trim()).filter(Boolean);
     await zzz(Math.max(0,typeDelay(bubbles[0]||'')-(now()-tShown)));
     if(tok!==state.token[key])return;
+    let committed=false;
+    const interruptRegen=()=>{ // 하던 말을 접고, 끼어든 메시지까지 반영해 다시 쓴다
+      state.pendingAfter[key]=false;
+      hideTyping();
+      markRead(pid,now());
+      const t2=bumpToken(key); state.stage[key]='wait';
+      later(key,rnd(900,2000),()=>{ if(t2===state.token[key]) dmDeliver(pid,key,t2,now(),INTERRUPT_NOTE); });
+    };
+    if(state.pendingAfter[key]){
+      markRead(pid,now());
+      if(Math.random()<0.6){ interruptRegen(); return; }
+      committed=true; // 이번엔 하던 말을 그대로 보내고, 끝나고 반응
+    }
     hideTyping();
-    const msg={role:'assistant',content:bubbles[0]||'…',t:Math.max(replyAt,now())};
-    state.chats[pid]=state.chats[pid]||[]; state.chats[pid].push(msg);
+    const arr=state.chats[pid]=state.chats[pid]||[];
+    let msg={role:'assistant',content:bubbles[0]||'…',t:Math.max(replyAt,now())};
+    arr.push(msg);
     if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
     renderFriends(); save();
     for(let i=1;i<bubbles.length;i++){
       showTyping(key,pid);
       await zzz(typeDelay(bubbles[i]));
       if(tok!==state.token[key]){ save(); return; }
+      if(state.pendingAfter[key]&&!committed){
+        markRead(pid,now());
+        if(Math.random()<0.6){ interruptRegen(); return; }
+        committed=true;
+      }
       hideTyping();
-      msg.content+='|||'+bubbles[i];
+      if(arr[arr.length-1]===msg){ msg.content+='|||'+bubbles[i]; }
+      else{ msg={role:'assistant',content:bubbles[i],t:now()}; arr.push(msg); } // 상대 메시지가 끼어든 경우: 항상 그 아래에
       if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
       renderFriends(); save();
     }
     state.stage[key]='idle'; delete state.sched[pid]; save();
     if(state.pendingAfter[key]){
       state.pendingAfter[key]=false;
+      markRead(pid,now());
       const t2=bumpToken(key); state.stage[key]='wait';
-      later(key,rnd(2000,4000),()=>{ if(t2===state.token[key]) dmFlowStart(pid,key,t2); });
+      later(key,rnd(1500,3000),()=>{ if(t2===state.token[key]) dmDeliver(pid,key,t2,now(),AFTERSEND_NOTE); });
     }
   });
 }
@@ -1406,11 +1439,13 @@ function pushDM(p,text,t,key){
 
 /* ================= 단톡방 답장 ================= */
 function mkReadsFor(g,senderId){
-  const reads={};
+  const reads={}, tn=now();
   g.members.forEach(id=>{
     if(id===senderId) return;
-    const pp=P(id), pr=presence(pp,now());
-    reads[id]= pr.active? now()+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+    const pp=P(id), pr=presence(pp,tn);
+    const lastM=[...g.msgs].reverse().find(m=>m.who===id);
+    const hot=pr.active&&lastM&&(tn-lastM.t<4*60000);
+    reads[id]= hot? tn+rnd(400,2200) : pr.active? tn+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
   });
   return reads;
 }
@@ -1448,7 +1483,7 @@ async function groupFlow(g,key,tok,extraOnly){
     await zzz(Math.max(600,typeDelay(bb[0]||'')-(now()-tShown))); if(tok!==state.token[key])return;
     hideTyping();
     g.msgs.forEach(m=>{ if(m.who!==p.id&&m.reads&&m.reads[p.id]>now()) m.reads[p.id]=now()-1; });
-    const gm={who:p.id,content:bb[0]||'…',t:now(),reads:mkReadsFor(g,p.id)};
+    let gm={who:p.id,content:bb[0]||'…',t:now(),reads:mkReadsFor(g,p.id)};
     Object.values(gm.reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
     g.msgs.push(gm);
     updateGroupReads();
@@ -1459,7 +1494,12 @@ async function groupFlow(g,key,tok,extraOnly){
       await zzz(typeDelay(bb[bi]));
       if(tok!==state.token[key]){ save(); return; }
       hideTyping();
-      gm.content+='|||'+bb[bi];
+      if(g.msgs[g.msgs.length-1]===gm){ gm.content+='|||'+bb[bi]; }
+      else{
+        gm={who:p.id,content:bb[bi],t:now(),reads:mkReadsFor(g,p.id)};
+        Object.values(gm.reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
+        g.msgs.push(gm);
+      }
       if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
       renderFriends(); save();
     }
