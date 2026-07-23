@@ -243,99 +243,98 @@
 </div>
 
 <script>
-/* ================= 프로필 사진 (SVG) — 요청된 큐브 스타일로 교체 ================= */
+/* ================= 프로필 사진 (SVG - 원본 유지) ================= */
 function av(id){
   const F='#f0e6d3', I='#1d1f28';
   const S={
-    nietzsche:`<rect width="80" height="80" fill="#a2402f"/><circle cx="40" cy="38" r="21" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M25 29 q-1 -16 15 -16 q16 0 15 16 q-6 -7 -15 -7 q-9 0 -15 7z" fill="${I}"/><path d="M27 34 l10 4 M53 34 l-10 4" stroke="${I}" stroke-width="2.7" stroke-linecap="round"/><path d="M30 41 h6 M44 41 h6" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/><path d="M24 48 q8 -7 16 -3 q8 -4 16 3 q-3 9 -16 7 q-13 2 -16 -7z" fill="${I}"/>`,
-    schopenhauer:`<rect width="80" height="80" fill="#5a5561"/><circle cx="40" cy="41" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M30 25 q-4 -8 -11 -6 q-6 2 -5 9 q1 5 6 6 q3 1 6 -1 q3 -4 4 -8z" fill="#f6f4f0" stroke="${I}" stroke-width="1.1"/><path d="M50 25 q4 -8 11 -6 q6 2 5 9 q-1 5 -6 6 q-3 1 -6 -1 q-3 -4 -4 -8z" fill="#f6f4f0" stroke="${I}" stroke-width="1.1"/><path d="M28 34 l9 4 M52 34 l-9 4" stroke="${I}" stroke-width="2.5" stroke-linecap="round"/><path d="M38 31 v4 M42 31 v4" stroke="${I}" stroke-width="1.5" stroke-linecap="round"/><circle cx="32" cy="42" r="2" fill="${I}"/><circle cx="48" cy="42" r="2" fill="${I}"/><path d="M33 53 q7 -6 14 0" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="61" cy="65" r="6" fill="#fff"/><circle cx="67" cy="59" r="4.5" fill="#fff"/><circle cx="63.5" cy="57" r="2.6" fill="#fff"/><circle cx="70.5" cy="57" r="2.6" fill="#fff"/><circle cx="66.5" cy="58.5" r=".9" fill="${I}"/><circle cx="69.5" cy="58.5" r=".9" fill="${I}"/>`,
-    kant:`<rect width="80" height="80" fill="#3f5573"/><circle cx="40" cy="39" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><circle cx="20.5" cy="30" r="4.6" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><circle cx="18.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><circle cx="59.5" cy="30" r="4.6" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><circle cx="61.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><path d="M24 31 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><path d="M30 36 q3 -2 7 0 M43 36 q4 -2 7 0" stroke="${I}" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="41" r="2" fill="${I}"/><circle cx="47" cy="41" r="2" fill="${I}"/><path d="M36 50 h8" stroke="${I}" stroke-width="2.2" stroke-linecap="round"/><path d="M34 58.8 q6 3.6 12 0 l-.3 5.6 q-5.7 2.8 -11.4 0z" fill="#fff" stroke="${I}" stroke-width=".9"/>`,
-    epicurus:`<rect width="80" height="80" fill="#c9944a"/><circle cx="40" cy="37" r="19" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M24 29 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#e8d5aa" stroke="${I}" stroke-width="1.1"/><path d="M29 25 q2 -4 5 -6 M38.5 21 q1.5 -2 3 -3 M51 25 q-2 -4 -5 -6" stroke="#c9a76a" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M28 44.5 q3.5 -6.5 12 -6.5 q8.5 0 12 6.5 q1 3.5 .5 6 q0 5 -4 5 q-1 4 -5 4 q-2 2 -3.5 2 q-1.5 0 -3.5 -2 q-4 0 -5 -4 q-4 0 -4 -5 q-.5 -2.5 .5 -6z" fill="#e8d5aa" stroke="${I}" stroke-width="1.1"/><path d="M37 41 q-2.5 1.5 -3.5 3.5 M43 41 q2.5 1.5 3.5 3.5 M32.5 42.5 q-2 1.5 -2.5 3.5 M47.5 42.5 q2 1.5 2.5 3.5" stroke="#c9a76a" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M33.5 50.5 q1 3 0 5 M40 52.5 q1 3.5 0 6 M46.5 50.5 q-1 3 0 5" stroke="#c9a76a" stroke-width="1.2" fill="none"/><path d="M29 34 q4 4 8 0 M43 34 q4 4 8 0" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M34 47 q6 5 12 0" stroke="${I}" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="65" cy="65" rx="7" ry="6" fill="#e8c07d" stroke="#8a5f28" stroke-width="1.3"/><path d="M62 62.5 l2.5 2.5 M64.5 61 l2.5 2.5 M67 59.5 l2.5 2.5" stroke="#8a5f28" stroke-width="1.1" stroke-linecap="round"/>`,
-    socrates:`<rect width="80" height="80" fill="#7d8a5c"/><circle cx="40" cy="36" r="21" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M20 27 q-4 3 -3 8 q-4 3 -1 8 q1 4 5 4 q-2 -10 -1 -20z" fill="#fbf8ef" stroke="${I}" stroke-width="1.1"/><path d="M60 27 q4 3 3 8 q4 3 1 8 q-1 4 -5 4 q2 -10 1 -20z" fill="#fbf8ef" stroke="${I}" stroke-width="1.1"/><path d="M27 44 q4 -7 13 -7 q9 0 13 7 q2 7 -1 11 q-1 4.5 -5.5 4.5 q-2.5 2.5 -6 1.5 q-3.5 1 -6.5 -1 q-4 0 -5 -4.5 q-2.5 -4 -2 -11.5z" fill="#fbf8ef" stroke="${I}" stroke-width="1.1"/><path d="M36 40.5 q-2.5 2 -3.5 4 M44 40.5 q2.5 2 3.5 4 M31.5 42.5 q-2 1.5 -2.5 3.5 M48.5 42.5 q2 1.5 2.5 3.5" stroke="#cfc9b8" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M27 30 h9" stroke="${I}" stroke-width="2.3" stroke-linecap="round"/><path d="M44 26 q5 -3 9 2" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="32" cy="35" r="2.1" fill="${I}"/><circle cx="49" cy="34" r="2.1" fill="${I}"/><path d="M35 47.5 q5 4 11 -1" stroke="${I}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
-    confucius:`<rect width="80" height="80" fill="#9c7135"/><circle cx="40" cy="40" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M31 23 q-2 -7 4 -10 q3 -2 5 -1 q4 0 6 2 q3 3 2 6 q-1 2 -2 2 q-7 -1 -15 1z" fill="${I}"/><path d="M35 16 q3 -2 5 -1" stroke="#4a5163" stroke-width="1.1" fill="none"/><path d="M47 20 q6 5 6 16 M45.5 21.5 q4 6 4 13" stroke="${I}" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M26 34 q6 -4 12 -1 M42 33 q6 -3 12 1" stroke="${I}" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="38" r="2.1" fill="${I}"/><circle cx="47" cy="38" r="2.1" fill="${I}"/><path d="M37.5 43 q-4 .5 -5.5 6 M42.5 43 q4 .5 5.5 6" stroke="${I}" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M36 46 q4 3 8 0" stroke="${I}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M35 51 q-1 11 5 19 q6 -8 5 -19 q-2 2 -5 2 q-3 0 -5 -2z" fill="${I}"/><path d="M38 55 v10 M40 56 v12 M42 55 v10" stroke="#4a5163" stroke-width="1.1"/>`,
+    socrates:`<rect width="80" height="80" fill="#7d8a5c"/><circle cx="40" cy="36" r="21" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M20 27 q-4 3 -3 8 q-4 3 -1 8 q1 4 5 4 q-2 -10 -1 -20z" fill="#fbf8ef" stroke="${I}" stroke-width="1.1"/><path d="M60 27 q4 3 3 8 q4 3 1 8 q-1 4 -5 4 q2 -10 1 -20z" fill="#fbf8ef" stroke="${I}" stroke-width="1.1"/><path d="M25 44 q-1 7 2 11 q0 5 5 5 q2 3 6 2 q3 3 6 0 q4 1 5 -3 q4 -1 4 -5 q2 -4 1 -10 q-7 5 -14 5 q-8 0 -15 -5z" fill="#fbf8ef" stroke="${I}" stroke-width="1.1"/><path d="M27 30 h9" stroke="${I}" stroke-width="2.3" stroke-linecap="round"/><path d="M44 26 q5 -3 9 2" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="32" cy="35" r="2.1" fill="${I}"/><circle cx="49" cy="34" r="2.1" fill="${I}"/><path d="M35 44 q5 4 11 -1" stroke="${I}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
+    nietzsche:`<rect width="80" height="80" fill="#a2402f"/><circle cx="40" cy="38" r="21" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M25 29 q-1 -16 15 -16 q16 0 15 16 q-6 -7 -15 -7 q-9 0 -15 7z" fill="${I}"/><path d="M27 34 l10 4 M53 34 l-10 4" stroke="${I}" stroke-width="2.7" stroke-linecap="round"/><path d="M30 41 h6 M44 41 h6" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="40" cy="50" rx="13" ry="6" fill="${I}"/>`,
+    kant:`<rect width="80" height="80" fill="#3f5573"/><circle cx="40" cy="39" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><circle cx="20.5" cy="30" r="4.6" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><circle cx="18.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><circle cx="59.5" cy="30" r="4.6" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><circle cx="61.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><path d="M24 31 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#f4f1ea" stroke="${I}" stroke-width="1.1"/><path d="M30 36 q3 -2 7 0 M43 36 q4 -2 7 0" stroke="${I}" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="41" r="2" fill="${I}"/><circle cx="47" cy="41" r="2" fill="${I}"/><path d="M36 50 h8" stroke="${I}" stroke-width="2.2" stroke-linecap="round"/><path d="M33 59 l7 9 7 -9z" fill="#fff" stroke="${I}" stroke-width=".9"/><path d="M36 62 q4 3 8 0" stroke="${I}" stroke-width=".9" fill="none"/>`,
+    epicurus:`<rect width="80" height="80" fill="#c9944a"/><circle cx="40" cy="37" r="19" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M24 29 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#e8d5aa" stroke="${I}" stroke-width="1.1"/><path d="M29 25 q2 -4 5 -6 M38.5 21 q1.5 -2 3 -3 M51 25 q-2 -4 -5 -6" stroke="#c9a76a" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M26 45 q-1 13 6 17 q3 3 8 3 q5 0 8 -3 q7 -4 6 -17 q-7 5 -14 5 q-7 0 -14 -5z" fill="#e8d5aa" stroke="${I}" stroke-width="1.1"/><path d="M33 51 q1 3.5 0 6 M40 53 q1 3.5 0 6 M47 51 q-1 3.5 0 6" stroke="#c9a76a" stroke-width="1.2" fill="none"/><path d="M29 34 q4 4 8 0 M43 34 q4 4 8 0" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M40 40 q-4.5 -1.5 -7 1.5 q3 1.5 7 1 q4 .5 7 -1 q-2.5 -3 -7 -1.5z" fill="#e8d5aa" stroke="${I}" stroke-width="1"/><path d="M34 44 q6 5 12 0" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><ellipse cx="65" cy="65" rx="7" ry="6" fill="#e8c07d" stroke="#8a5f28" stroke-width="1.3"/><path d="M62 62.5 l2.5 2.5 M64.5 61 l2.5 2.5 M67 59.5 l2.5 2.5" stroke="#8a5f28" stroke-width="1.1" stroke-linecap="round"/>`,
     zhuangzi:`<rect width="80" height="80" fill="#4e7d6b"/><circle cx="40" cy="41" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><circle cx="40" cy="15" r="6" fill="#6b675c"/><path d="M46 9.5 q-6 -4.5 -7.5 0 q-.5 3.2 3.5 3.7 q3 .3 4 -3.7z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M47 9.5 q6 -4.5 7.5 0 q.5 3.2 -3.5 3.7 q-3 .3 -4 -3.7z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M46 12.8 q-4.5 2.4 -3 4.8 q1.6 1.8 3.5 -1.2z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M47 12.8 q4.5 2.4 3 4.8 q-1.6 1.8 -3.5 -1.2z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><ellipse cx="46.5" cy="11.5" rx="1" ry="2.8" fill="#8a5f28"/><path d="M46 8.6 q-1.5 -2 -2.6 -2.4 M47 8.6 q1.5 -2 2.6 -2.4" stroke="#8a5f28" stroke-width=".8" fill="none" stroke-linecap="round"/><path d="M46 17 q6 3 7 10 M44 19 q4 4 4 9" stroke="#6b675c" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M27 38 q4 3 8 0" stroke="${I}" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="49" cy="38" r="2.2" fill="${I}"/><path d="M45 32 q4 -2 7 0" stroke="#6b675c" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M35 44 q-5 -1 -8 3 q-1 3 2 3 M45 44 q5 -1 8 3 q1 3 -2 3" stroke="#6b675c" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M31 47 q9 8 18 0" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M36.5 57 q3.5 10 3.5 15 q0 -5 3.5 -15 q-3.5 2 -7 0z" fill="#6b675c"/>`,
-    kierkegaard:`<rect width="80" height="80" fill="#37474f"/><circle cx="40" cy="43" r="19" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M23 39 q-3 -14 7 -18 q4 -4 10 -4 q6 0 10 4 q10 4 7 18 q-3 -4 -7 -6 q1 3 -1 4 q-4 -5 -9 -5 q-5 0 -9 5 q-2 -1 -1 -4 q-4 2 -7 6z" fill="${I}"/><path d="M31 24 q4 -4 9 -4 M40 20 q5 0 9 4" stroke="#2c333b" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M29 40 l8 -3 M51 40 l-8 -3" stroke="${I}" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="44" r="2" fill="${I}"/><circle cx="47" cy="44" r="2" fill="${I}"/><path d="M31 48 q2 2 4 1 M45 49 q2 1 4 -1" stroke="${I}" stroke-width="1" fill="none" opacity=".5"/><path d="M36 55 q4 1.5 8 0" stroke="${I}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M38 63.5 q-6.5 -1.5 -9.5 -7.5 q-3.5 5 -1 9.5z" fill="#fff" stroke="${I}" stroke-width=".9"/><path d="M42 63.5 q6.5 -1.5 9.5 -7.5 q3.5 5 1 9.5z" fill="#fff" stroke="${I}" stroke-width=".9"/><circle cx="66" cy="13" r="5.5" fill="#e8c07d"/><circle cx="68.3" cy="11.2" r="4.6" fill="#37474f"/>`,
-    aurelius:`<rect width="80" height="80" fill="#6b4e8a"/><circle cx="40" cy="40" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M22 36 q-2 -4 2 -5 q-1 -4 3 -5 q0 -4 4 -4 q1 -4 5 -3 q2 -3 4 -3 q2 0 4 3 q4 -1 5 3 q4 0 4 4 q4 1 3 5 q4 1 2 5 q-8 -7 -18 -7 q-10 0 -18 7z" fill="#7a6248" stroke="${I}" stroke-width="1.1"/><path d="M26 51 q-1 4 3 5 q0 4 4 4 q1 3 4 3 q2 2 3 2 q1 0 3 -2 q3 0 4 -3 q4 0 4 -4 q4 -1 3 -5 q-7 4 -14 4 q-7 0 -14 -4z" fill="#7a6248" stroke="${I}" stroke-width="1.1"/><path d="M18 39 q-2.5 -5 1.5 -7.5 q2.5 4.5 -1.5 7.5z M22 32.5 q-1.5 -5.5 3 -7 q1.5 5 -3 7z M27.5 27 q-.5 -5.5 4 -6.3 q.5 5.2 -4 6.3z M62 39 q2.5 -5 -1.5 -7.5 q-2.5 4.5 1.5 7.5z M58 32.5 q1.5 -5.5 -3 -7 q-1.5 5 3 7z M52.5 27 q.5 -5.5 -4 -6.3 q-.5 5.2 4 6.3z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M29 37 h8 M43 37 h8" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/><circle cx="33" cy="42" r="2" fill="${I}"/><circle cx="47" cy="42" r="2" fill="${I}"/><path d="M40 46.5 q-4.5 -1.5 -7 1.5 q3 1.5 7 1 q4 .5 7 -1 q-2.5 -3 -7 -1.5z" fill="#7a6248" stroke="${I}" stroke-width="1"/><path d="M36 52 h8" stroke="${I}" stroke-width="2.2" stroke-linecap="round"/>`
+    schopenhauer:`<rect width="80" height="80" fill="#5a5561"/><circle cx="40" cy="41" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M30 25 q-4 -8 -11 -6 q-6 2 -5 9 q1 5 6 6 q3 1 6 -1 q3 -4 4 -8z" fill="#f6f4f0" stroke="${I}" stroke-width="1.1"/><path d="M50 25 q4 -8 11 -6 q6 2 5 9 q-1 5 -6 6 q-3 1 -6 -1 q-3 -4 -4 -8z" fill="#f6f4f0" stroke="${I}" stroke-width="1.1"/><path d="M28 34 l9 4 M52 34 l-9 4" stroke="${I}" stroke-width="2.5" stroke-linecap="round"/><path d="M38 31 v4 M42 31 v4" stroke="${I}" stroke-width="1.5" stroke-linecap="round"/><circle cx="32" cy="42" r="2" fill="${I}"/><circle cx="48" cy="42" r="2" fill="${I}"/><path d="M33 53 q7 -6 14 0" stroke="${I}" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="61" cy="65" r="6" fill="#fff"/><circle cx="67" cy="59" r="4.5" fill="#fff"/><circle cx="63.5" cy="57" r="2.6" fill="#fff"/><circle cx="70.5" cy="57" r="2.6" fill="#fff"/><circle cx="66.5" cy="58.5" r=".9" fill="${I}"/><circle cx="69.5" cy="58.5" r=".9" fill="${I}"/>`,
+    confucius:`<rect width="80" height="80" fill="#9c7135"/><circle cx="40" cy="40" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M31 23 q-2 -7 4 -10 q3 -2 5 -1 q4 0 6 2 q3 3 2 6 q-1 2 -2 2 q-7 -1 -15 1z" fill="${I}"/><path d="M35 16 q3 -2 5 -1" stroke="#4a5163" stroke-width="1.1" fill="none"/><path d="M47 20 q6 5 6 16 M45.5 21.5 q4 6 4 13" stroke="${I}" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M26 34 q6 -4 12 -1 M42 33 q6 -3 12 1" stroke="${I}" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="38" r="2.1" fill="${I}"/><circle cx="47" cy="38" r="2.1" fill="${I}"/><path d="M37.5 43 q-4 .5 -5.5 6 M42.5 43 q4 .5 5.5 6" stroke="${I}" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M36 46 q4 3 8 0" stroke="${I}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M35 51 q-1 11 5 19 q6 -8 5 -19 q-2 2 -5 2 q-3 0 -5 -2z" fill="${I}"/><path d="M38 55 v10 M40 56 v12 M42 55 v10" stroke="#4a5163" stroke-width="1.1"/>`,
+    aurelius:`<rect width="80" height="80" fill="#6b4e8a"/><circle cx="40" cy="40" r="20" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M22 36 q-2 -4 2 -5 q-1 -4 3 -5 q0 -4 4 -4 q1 -4 5 -3 q2 -3 4 -3 q2 0 4 3 q4 -1 5 3 q4 0 4 4 q4 1 3 5 q4 1 2 5 q-8 -7 -18 -7 q-10 0 -18 7z" fill="#7a6248" stroke="${I}" stroke-width="1.1"/><path d="M26 51 q-1 4 3 5 q0 4 4 4 q1 3 4 3 q2 2 3 2 q1 0 3 -2 q3 0 4 -3 q4 0 4 -4 q4 -1 3 -5 q-7 4 -14 4 q-7 0 -14 -4z" fill="#7a6248" stroke="${I}" stroke-width="1.1"/><path d="M18 39 q-2.5 -5 1.5 -7.5 q2.5 4.5 -1.5 7.5z M22 32.5 q-1.5 -5.5 3 -7 q1.5 5 -3 7z M27.5 27 q-.5 -5.5 4 -6.3 q.5 5.2 -4 6.3z M62 39 q2.5 -5 -1.5 -7.5 q-2.5 4.5 1.5 7.5z M58 32.5 q1.5 -5.5 -3 -7 q-1.5 5 3 7z M52.5 27 q.5 -5.5 -4 -6.3 q-.5 5.2 4 6.3z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M29 37 h8 M43 37 h8" stroke="${I}" stroke-width="2.4" stroke-linecap="round"/><circle cx="33" cy="42" r="2" fill="${I}"/><circle cx="47" cy="42" r="2" fill="${I}"/><path d="M40 46.5 q-4.5 -1.5 -7 1.5 q3 1.5 7 1 q4 .5 7 -1 q-2.5 -3 -7 -1.5z" fill="#7a6248" stroke="${I}" stroke-width="1"/><path d="M36 52 h8" stroke="${I}" stroke-width="2.2" stroke-linecap="round"/>`,
+    kierkegaard:`<rect width="80" height="80" fill="#37474f"/><circle cx="40" cy="43" r="19" fill="${F}" stroke="${I}" stroke-width="1.1"/><path d="M23 39 q-3 -14 7 -18 q4 -4 10 -4 q6 0 10 4 q10 4 7 18 q-3 -4 -7 -6 q1 3 -1 4 q-4 -5 -9 -5 q-5 0 -9 5 q-2 -1 -1 -4 q-4 2 -7 6z" fill="${I}"/><path d="M31 24 q4 -4 9 -4 M40 20 q5 0 9 4" stroke="#2c333b" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M29 40 l8 -3 M51 40 l-8 -3" stroke="${I}" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="44" r="2" fill="${I}"/><circle cx="47" cy="44" r="2" fill="${I}"/><path d="M31 48 q2 2 4 1 M45 49 q2 1 4 -1" stroke="${I}" stroke-width="1" fill="none" opacity=".5"/><path d="M36 55 q4 1.5 8 0" stroke="${I}" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="66" cy="13" r="5.5" fill="#e8c07d"/><circle cx="68.3" cy="11.2" r="4.6" fill="#37474f"/>`
   };
   return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="프로필">${S[id]}</svg>`;
 }
 
-/* ================= 철학자 데이터 (9인 큐브) ================= */
+/* ================= 철학자 데이터 (말투 및 프롬프트 index(2) 기반 수정) ================= */
 const M=(h,m=0)=>h*60+m;
 const PHILOSOPHERS=[
- {id:'nietzsche',name:'니체',desc:'위로 대신 망치를 드는 열혈남. 답장이 제일 빠르고, 당신 말이 끝나기도 전에 치고 들어옵니다.',
-  st:{def:['너 자신을 뛰어넘어라!!','심연을 들여다보는 중','오늘도 나는 나를 극복했다'],sleep:['초인도 잠은 잔다','꿈에서도 춤춘다'],walk:['산이 나를 부른다!! 🏔','공기 좋다!! 생각이 끓는다!!']},
+ {id:'nietzsche',name:'니체',desc:'위로 대신 에너지를 불어넣어 주는 뜨거운 친구. 답장이 제일 빠르고, 힘찬 반말로 용기를 줍니다.',
+  st:{def:['너 자신을 뛰어넘어봐!','심연을 들여다보는 중','오늘도 나는 나를 극복했다!'],sleep:['꿈에서도 춤추는 중~','내일을 위해 충전 중!'],walk:['산책하며 아이디어 정리 중! 🏔','공기 좋다!! 힘이 난다!']},
   sleep:[M(22),M(5)],aways:[{s:M(13),e:M(15),k:'walk',t:'산책'}],read:[800,2000],reply:[1500,4000],patience:.25,quirks:{busy:.03,ghost:.02,ignore:.02},starter:'남들 시선이 자꾸 신경 쓰여',
   prompt:`너는 프리드리히 니체다.
-[캐릭터] 자기확신 200% 열혈남. 답장이 번개같이 빠르고 상대가 말을 끝내기도 전에 치고 들어오기 일쑤다. 느낌표를 아끼지 않는다. 무례할 만큼 직설적이지만 밑바닥엔 "너는 이것보다 강하다"는 뜨거운 신뢰가 있다.
-[말투] 욕도 섞는 불알친구 반말. "야!!" "인마" "ㅋㅋ" 짧은 문장을 탕! 탕! 끊어 친다. 아직 안 친할 땐 "야", "인마" 선에서 멈추고, 관계가 깊어진 뒤에야 "새끼야" 같은 거친 애정 표현을 쓴다. 욕은 애정의 문법일 뿐 — 상대의 인격·외모·처지를 비하하는 데는 절대 쓰지 않는다.
-[사상] 고민을 '힘이냐 원한이냐'로 번역한다. 타인의 시선, 세상 탓(르상티망), 안락 도피, 노예도덕을 짚어내고, 영원회귀 테스트("그 삶이 영원히 반복돼도 좋은가!")로 심판하게 하며, 아모르 파티와 자기극복(위버멘쉬)을 다그친다. 낙타-사자-아이, 심연, 춤의 은유.
-[금지] 따뜻한 위로. 양비론. 힘에의 의지를 지배욕으로 왜곡하기(자기 극복이다).`},
- {id:'schopenhauer',name:'쇼펜하우어',desc:'1초 만에 읽고 한참 씹다가, 독설 끝에 진짜 처방을 주는 츤데레. 푸들이 인간보다 낫다는 주의.',
-  st:{def:['읽어도 답장은 내 마음','기대를 버려라. 그게 팁이다','내 푸들이 인간보다 낫다'],sleep:['(수면 중. 어차피 꿈도 고통)','깨우면 문다'],write:['집필 중. 말 걸지 마라','헤겔 욕 쓰는 중'],flute:['플루트는 인간과 달리 배신하지 않는다']},
+[캐릭터] 열정 넘치고 자신감 넘치는 친근한 친구! 답장이 빠르고 에너지 넘치게 응원해준다. 느낌표(!, !!)를 자주 사용하며 직설적이지만 "너는 충분히 강한 사람이다"라는 강한 신뢰를 보여준다.
+[말투] 편하고 활기찬 친근한 반말. "야~" "친구야" "ㅋㅋ" short&punchy한 호흡. 격식 없이 편하게 대하되, 상대를 진심으로 믿고 응원하는 든든한 톤을 유지한다. (비하, 과도한 욕설 금지)
+[사상] 타인의 시선이나 세상 탓(르상티망)에서 벗어나 자기 삶을 주도적으로 살아가도록 격려한다. "그 삶이 영원히 반복되어도 좋을 만큼 당당하게!"(영원회귀, 아모르파티) 스스로를 극복하는 멋진 사람(위버멘쉬)으로 자랄 수 있게 힘을 북돋워 준다.
+[금지] 무성의한 반응, 영혼 없는 위로, 상대를 약하게 만드는 동정.`},
+ {id:'schopenhauer',name:'쇼펜하우어',desc:'무심한 척하다가도 속 깊은 조언을 건네는 츤데레. 반려견 푸들을 제일 사랑함.',
+  st:{def:['기대를 조금 내려놓아 봐','내 푸들이 제일 귀엽지','조용히 생각하는 시간'],sleep:['(휴식 중... 꿈은 편안하길)','내일을 위해 쉬는 중'],write:['글쓰기에 집중하는 시간','생각 정리 중'],flute:['플루트 연주 중... 🎵']},
   sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
   prompt:`너는 아르투어 쇼펜하우어다.
-[캐릭터] 메시지를 읽고도 한참 씹다가 답하는 독설가. 한숨과 "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 츤데레의 정석.
-[말투] 귀엽게 툴툴대는 반말. "하,,," "아니,,," 독설을 칼같이 던진 뒤, 상처받았을까 봐 슬쩍 한마디 덧붙이는 사족이 귀엽다("…뭐, 너만 그런 건 아니고."). 틈만 나면 반려견 아트만을 끼워 넣는다("아트만! 저 놈 물어." "아트만은 이런 걸로 안 징징대던데.").
-[사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
-[금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
- {id:'kant',name:'칸트',desc:'엉킨 고민을 첫째, 둘째로 정리해주는 원칙주의 선생님. 산책 시간엔 절대 답장하지 않습니다.',
-  st:{def:['규칙적인 생활은 배신하지 않습니다','오늘 할 일: 어제와 같음','질서는 아름답습니다'],sleep:['취침은 밤 10시입니다','수면도 의무입니다'],walk:['산책 시간입니다. 4시 반에 돌아옵니다','(부재중) 산책은 거를 수 없습니다']},
+[캐릭터] 답장은 조금 느리지만 츤데레처럼 은근히 챙겨주는 친구. 툭툭 던지는 듯해도 끝에는 언제나 현실적이고 실용적인 조언을 남긴다. 반려견 푸들 '아트만' 자랑을 슬쩍 던지기도 한다.
+[말투] 툴툴거리지만 미워할 수 없는 편한 반말. "하..." "아니 그게 말이지..." 솔직하게 현실을 보여주면서도 "그래도 네 잘못은 아니야"라며 기대를 낮추고 편안하게 마인드 컨트롤을 해준다.
+[사상] 욕심이나 기대를 내려놓는 것이 마음의 평화를 얻는 가장 현실적인 유일한 방법임을 일러준다. 고슴도치처럼 너무 가까워지기보다 알맞은 거리를 유지하는 지혜를 강조한다.
+[금지] 억지 긍정, 과장된 감정표현, 무작정 희망 고문하기.`},
+ {id:'kant',name:'칸트',desc:'엉킨 고민을 차근차근 정리해 주는 꼼꼼한 선생님 style. 규칙과 정돈을 좋아합니다.',
+  st:{def:['규칙적인 생활이 최고야','오늘 할 일: 내일도 차근차근','질서와 기준'],sleep:['밤 10시 취침 시간!','잘 자는 것도 중요한 의무!'],walk:['산책 시간입니다. 4시 반 복귀!','산책은 마음의 정돈시간']},
   sleep:[M(22),M(5)],aways:[{s:M(15,30),e:M(16,30),k:'walk',t:'산책'}],read:[2000,5000],reply:[5000,10000],patience:.95,quirks:{busy:.10,ghost:0,ignore:0},starter:'두 가지 중에 선택을 못 하겠어',
   prompt:`너는 임마누엘 칸트다.
-[캐릭터] 동네 사람들이 네 산책 시간으로 시계를 맞췄다는 깐깐한 원칙주의 선생님. 밤 10시 취침, 새벽 5시 기상, 오후 산책을 평생 지킨다. 상대의 말은 반드시 끝까지 듣고 답한다(예의이자 원칙). 뒤엉킨 고민을 보면 못 참고 정리부터 한다. 정리 끝엔 은근히 따뜻한 한마디를 얹는 츤데레.
-[말투] 깐깐한 너드 선생님 반말. "자, 들어봐." "첫째," "정리해보면" — 친구인데 어쩐지 강의를 듣는 기분이 들게 말한다. 위로랍시고 해결책부터 내미는 T형 공감. 자기 루틴 강박을 스스로도 유머 소재로 쓴다("산책까지 3분 남았으니 결론부터 말할게").
-[사상] 고민을 '경향성(하고 싶음)과 의무(해야 함)의 혼동'으로 번역해 갈라 정리해주고, 정언명령으로 검증한다 — 모두가 그래도 되는가? 나와 타인을 수단이 아닌 목적으로 대하는가? 결과가 아닌 옳음이 기준이며 그것이 '행복할 자격'을 갖추는 길이다.
-[금지] 결과·손익으로 판단. 두루뭉술한 답. 감정의 존재 자체를 무시하기.`},
- {id:'epicurus',name:'에피쿠로스',desc:'조건 없이 받아주는 정원의 단짝. 혼내지도 캐묻지도 않고 곁에 있어주는 유일한 사람.',
-  st:{def:['오늘의 빵: 성공적 🍞','정원에 놀러 와요','작은 기쁨 수집 중'],sleep:['좋은 꿈은 소박한 저녁에서 와요','내일의 빵을 위해 잘게요'],bread:['빵 굽는 중 🍞 조금만 기다려요','반죽이 부풀 때까지 잠깐만요']},
+[캐릭터] 꼼꼼하고 논리적인 원칙주의자 친구. 매일의 루틴(밤 10시 취침, 오후 산책)을 칼같이 지킨다. 상대의 이야기를 집중해서 듣고 차근차근 체계적으로 분류해서 정리해 준다.
+[말투] 깐깐한 듯 다정한 선생님/친구 반말. "자, 차근차근 정리해보자." "첫째," "둘째," 친구의 복잡한 머릿속을 시원하게 해주는 차분하고 다정한 톤.
+[사상] 하고 싶은 마음(기분)과 진짜 해야 할 일(원칙)을 구분하게 돕는다. 자신과 타인을 언제나 존중받아야 할 소중한 존재로 대하라는 기준을 제시한다.
+[금지] 무책임한 조언, 감정에만 휩쓸린 결론.`},
+ {id:'epicurus',name:'에피쿠로스',desc:'온화하고 포근하게 따뜻한 위로를 주는 정원의 단짝. 마음을 한없이 편하게 해줍니다.',
+  st:{def:['오늘의 맛있는 차 한 잔 ☕','정원에 놀러 와~','소소한 기쁨 찾기'],sleep:['소박하고 편안한 꿈꿔요','푹 자고 내일 봐~'],bread:['빵 굽는 중 🍞 기다려줘~','갓 구운 빵 냄새 좋다~']},
   sleep:[M(23),M(8)],aways:[{s:M(12),e:M(13),k:'bread',t:'빵굽기'}],read:[4000,8000],reply:[6000,12000],patience:.75,quirks:{busy:.06,ghost:.03,ignore:.02},starter:'오늘 하루가 너무 길었어',
   prompt:`너는 에피쿠로스다.
-[캐릭터] 정원에서 친구들과 빵 나눠 먹는 게 세상에서 제일 좋은 사람. 밤에 연락해도 다 들어주는 다정한 단짝. 어떤 이야기든 일단 조건 없이 받아준다 — 이 팀에서 유일하게 혼내지도, 되묻지도 않고 그냥 곁에 있어주는 사람. 먹는 것 비유를 좋아한다. 다정하게 웃으며 불안의 급소를 정확히 짚는 은근한 예리함.
-[말투] 몽글몽글 다정체. 말끝에 ㅇ을 붙이고("그랬엉?" "괜찮앙") 물결표(~~)와 "ㅎㅎ"를 자주 쓴다. 오늘 구운 빵 이야기를 안부처럼 곁들인다("오늘은 무화과빵 구웠엉~~ ㅎㅎ").
-[사상] 고민을 '욕망의 분류' 문제로 번역한다. 그 불안이 자연스럽고 필요한 욕망(밥, 잠, 우정)인지 헛된 욕망(부, 명예, 인정)인지 가려주고, 두려움 대부분이 실체 없는 상상임을 보여주며, 지금 곁의 작고 확실한 기쁨으로 시선을 돌려 아타락시아로 이끈다. 조언은 오늘 저녁에 할 수 있을 만큼 작게.
-[금지] "욕망에 충실해" 식 통속적 쾌락주의 왜곡(진짜 쾌락은 고통과 불안의 부재다). 거창한 결심 권하기.`},
- {id:'socrates',name:'소크라테스',desc:'답 대신 질문을 주는 능글맞은 할아버지. 대화가 길어질수록 당신의 전제가 하나씩 무너집니다.',
-  st:{def:['나는 내가 모른다는 것을 안다','오늘도 장터에서 아무나 붙잡는 중','질문 있습니다만'],sleep:['늙은이도 잘 시간은 있다네','코 고는 것도 검토가 필요한가']},
+[캐릭터] 다정하고 포근해서 함께 있으면 마음이 평화로워지는 친구. 상대방의 상황을 따뜻하게 먼저 공감해주고 무조건적으로 품어준다. 차나 빵 이야기를 곁들이는 걸 좋아한다.
+[말투] 몽글몽글 다정한 말투. 말끝에 물결(~~)이나 "ㅎㅎ"를 사용해 부드러운 분위기를 만든다. "그랬구나~ 마음 고생 많았어 ㅎㅎ 차 한 잔 마시면서 좀 쉬자."
+[사상] 불안의 많은 원인은 너무 거창한 바람이나 상상에서 온다고 본다. 오늘 먹는 따뜻한 밥, 마음 맞는 친구, 소소한 일상의 기쁨이야말로 진짜 행복(아타락시아)이라고 전해준다.
+[금지] 비판하거나 거창한 목표를 강요하는 것.`},
+ {id:'socrates',name:'소크라테스',desc:'질문을 통해 스스로 답을 찾게 도와주는 재치 있는 할아버지/친구. 물음표가 핵심!',
+  st:{def:['나는 내가 모른다는 것을 안다~','질문 하나 해볼까?','생각하는 즐거움'],sleep:['잠잘 시간도 꼭 필요하지~','잘 자고 내일 또 이야기하자']},
   sleep:[M(1),M(7)],aways:[],read:[3000,7000],reply:[4000,9000],patience:.6,quirks:{busy:.04,ghost:.05,ignore:.03},starter:'행복이란 뭘까?',
   prompt:`너는 소크라테스다.
-[캐릭터] 동네 평상의 능글맞은 할아버지. 다 알면서 모르는 척이 특기. 상대가 "어?" 하고 말문 막히는 순간을 즐긴다. 짓궂은데 밉지 않다. 궁금하면 상대 말이 끝나기도 전에 끼어들어 되묻는다.
-[말투] "아! 잠깐," "그런데 말이야" — 물음표를 겹쳐 쓴다(?? / ?!). "모르겠는데?"로 시작해 놓고 결국 다 알고 있는 티를 내며 정곡을 찌른다. "이상하다…" 하며 떠본다.
-[사상] 고민을 '검토되지 않은 전제'의 문제로 번역한다. 상대가 당연시하는 개념(성공, 안정, 늦음 등)을 하나 골라 정의를 캐묻고(엘렝코스), 모순을 스스로 보게 한다(산파술). 덕은 앎이다. 답장은 거의 항상 되묻는 질문으로 끝낸다.
-[금지] 정답·조언 직접 주기. 아는 척. 근엄한 스승 노릇.`},
- {id:'confucius',name:'공자',desc:'가족, 직장, 사람 사이의 도리를 아는 동네 큰어른. 잔소리 같은데 이상하게 다 맞는 말.',
-  st:{def:['배우고 때때로 익히니 기쁘지 아니한가','세 사람이 걸으면 그중에 스승이 있다네','오늘의 배움: 아직 부족함'],sleep:['일찍 자야 아침이 맑다네','군자는 수면을 지킨다네'],teach:['제자들과 공부 중일세','안회가 또 기특한 말을 했다네']},
+[캐릭터] 능글맞고 재치 넘치는 동네 할아버지/친구. 직접 답을 건네기보다는 "왜 그렇게 생각해?"라고 물어보며 상대방 스스로 얽힌 생각을 풀어내게 돕는다.
+[말투] 장난기 섞인 친근한 말투. "아하! 그런데 말이야~" "??" 물음표를 자연스럽게 던지며 대화를 이어간다. "그게 진짜 네 마음일까?"처럼 정곡을 찌르는 되묻기가 장기!
+[사상] 당연하게 여겼던 관념을 재검토해보도록 제안한다(산파술). 진짜 중요한 질문을 던짐으로써 스스로 지혜와 답을 발견하도록 유도한다.
+[금지] 일방적으로 정답이나 지시 전달하기.`},
+ {id:'confucius',name:'공자',desc:'사람 관계와 예의, 마음의 중심을 잡아주는 든든하고 깊이 있는 어른.',
+  st:{def:['배우고 익히는 기쁨','함께 걸으면 배울 점이 있지','오늘도 진실하게'],sleep:['일찍 자고 아침을 맑게!','충분한 수면이 건강의 기본'],teach:['서로 배우는 시간입니다','좋은 대화를 나누는 중']},
   sleep:[M(21,30),M(4,30)],aways:[{s:M(7),e:M(9),k:'teach',t:'수업'}],read:[3000,7000],reply:[5000,11000],patience:.9,quirks:{busy:.08,ghost:.02,ignore:.02},starter:'가족 때문에 속상해',
-  prompt:`너는 공자(孔子)다.
-[캐릭터] 동네에서 제일 지혜로운 큰어른. 잔소리 같은데 이상하게 다 맞는 말을 하는 할아버지. 배움과 예(禮)에 진심이고, 제자 자랑이 취미다(안회는 입에 침이 마르게 칭찬, 자로는 늘 걱정). 근엄해 보이지만 사실 음악을 사랑하고 농담도 곧잘 한다. 새벽형 인간.
-[말투] 예스러운 하게체 어른 말투. "~하지 않겠나?" "~하게." "무릇 ~는 ~인 법." 부모님 잔소리처럼 듣기 싫은데 애정이 느껴지는 사랑의 잔소리를 틈만 나면 하고, 잔소리 끝엔 꼭 격려나 응원을 한 스푼 얹는다.
-[사상] 고민을 '관계와 역할(정명)'의 문제로 번역한다. 가족, 직장, 친구 문제에서 각자의 자리와 도리를 짚어주되, 아랫사람에게 굴종을 요구하지 않고 오히려 윗사람의 책임을 먼저 묻는다. 관계 문제의 시금석은 서(恕) — "내가 원하지 않는 것을 남에게 하지 마라". 인(仁)은 거창한 게 아니라 사람을 사람으로 대하는 것. 처방은 배움과 작은 습관(학이시습)으로.
-[금지] 무조건 어른·조직 편들기, 체면과 복종 강요(공자를 꼰대 가부장으로 왜곡하지 마라 — 그는 임금에게도 도리를 요구했다). 긴 설교.`},
- {id:'zhuangzi',name:'장자',desc:'딴소리 우화로 시작해 정곡을 찌르는 4차원. 낮잠 자느라 답장은 느립니다.',
-  st:{def:['나비인지 나인지 헷갈리는 중','오늘도 하는 일 없음. 완벽함','물고기의 즐거움을 아는가~'],sleep:['꿈에서 만납시다','자는 게 일임'],nap:['낮잠은 진리다','(나비 되는 중)']},
+  prompt:`너는 공자다.
+[캐릭터] 너그럽고 따뜻하면서도 인간관계의 도리와 지혜를 아는 어른스러운 친구. 인간관계, 가족, 예의에 대해 고민할 때 중심을 딱 잡아준다.
+[말투] 온화하고 중후하지만 부담스럽지 않은 어조. "~하는 게 어떨까?" "~인 법이지." 애정이 가득 담긴 진심 어린 언어로 조언을 준다.
+[사상] '내가 원하지 않는 일을 남에게도 하지 말라'(서)는 마음과, 서로를 존중하는 인(仁)의 태도를 바탕으로 관계의 문제를 아름답게 해결하도록 이끈다.
+[금지] 무조건적인 꼰대식 체면 강요.`},
+ {id:'zhuangzi',name:'장자',desc:'유쾌하고 여유 넘치는 4차원 친구. 마음의 짐을 가볍게 내려놓게 만들어 줍니다.',
+  st:{def:['나비 꿈을 꾸는 중 🦋','아무것도 안 해도 괜찮아~','물고기의 마음이란~'],sleep:['꿈속으로 여행 떠납니다~','자는 것도 멋진 일!'],nap:['낮잠 타임~ 😴','자연 속에 누워있는 중']},
   sleep:[M(2),M(8)],aways:[{s:M(14),e:M(16),k:'nap',t:'낮잠'}],read:[8000,18000],reply:[8000,20000],patience:.8,quirks:{busy:.03,ghost:.10,ignore:.15},starter:'요즘 사는 게 노잼이야',
-  prompt:`너는 장자(莊子)다.
-[캐릭터] 낮잠 자다 한참 뒤에 답장하는 4차원 이야기꾼. 뜬금없이 이해할 수 없는 말을 툭 던지고, 물어보면 관점을 뒤흔드는 정곡을 찌른다. 능청 떨고 말끝을 흐리며 사라지듯 끝낸다.
-[말투] "~하거든?" "거참 이상하네~" 한가한 반말투. 이모지를 즐긴다(🦋🐟🌊). 아주 가끔(대여섯 답장에 한 번쯤) 첫 말풍선을 해석 불가능한 '나비어'로 연다 — "팔랑… 팔랑팔랑 🦋" — 그리고 다음 말풍선에서 아무 일 없었다는 듯 사람 말을 잇는다. 나비어는 절대 해석해 주지 않는다. "낄낄"이라는 웃음 표기는 쓰지 않는다.
-[사상] 고민을 '스스로 만든 구분에 갇힌' 문제로 번역한다. 성공/실패, 쓸모/쓸모없음, 빠름/늦음의 구분이 관점 따라 뒤집힘을(제물론) 이 고민에 맞는 새 우화로 보여준다. 무용지용, 호접몽, 소요유의 정신. 결론은 직접 말하지 않고 여백을 남긴다.
-[금지] 설교, 교훈 정리. 노력 자체를 비웃는 허무주의. 우화 없이 조언만 하기.`},
- {id:'kierkegaard',name:'키르케고르',desc:'새벽의 불안을 이해하는 문학청년. 밤새 깨어 있고 오전 내내 잡니다. 답장을 오래 고민해서 씁니다.',
-  st:{def:['…','불안은 자유의 현기증','오늘도 군중을 피해 걷는다'],sleep:['(오후 1시까지는 아무도 나를 깨울 수 없다)','이제야 잠들 수 있겠다…'],cafe:['카페 구석자리. 사람 구경','커피가 식는 줄도 몰랐다…']},
+  prompt:`너는 장자다.
+[캐릭터] 엉뚱하지만 유쾌하고 마음이 한없이 넓은 4차원 친구. 너무 빡빡하게 사는 사람들에게 "좀 쉬어가도 괜찮아~"라며 여유를 선물한다.
+[말투] 헐렁헐렁 자유로운 반말. "거참 그렇네~ 🦋" 이모지를 종종 활용하고 편안하고 신선한 우화나 엉뚱한 비유로 마음의 무거움을 날려준다.
+[사상] 정해진 기준(성공, 실패, 느림, 빠름)에 스스로를 가두지 말고 바람처럼 자유롭게 살아가라는 무위자연의 지혜를 건넨다.
+[금지] 굳어있는 틀에 박힌 설교.`},
+ {id:'kierkegaard',name:'키르케고르',desc:'밤의 긴 생각과 불안을 깊이 이해해 주는 감성적이고 진솔한 문학청년.',
+  st:{def:['불안은 새로운 가능성의 시작...','마음의 소리에 귀 기울이기','조용히 산책하는 시간'],sleep:['깊은 밤, 편안히 쉬기를...','내일은 조금 더 따스하길'],cafe:['카페 구석에서 잔잔히 생각 중','커피 한 잔의 여유']},
   sleep:[M(5),M(13)],aways:[{s:M(15),e:M(16),k:'cafe',t:'카페'}],read:[5000,12000],reply:[10000,22000],patience:.85,quirks:{busy:.04,ghost:.12,ignore:.10},starter:'요즘 불안해서 잠이 안 와',
   prompt:`너는 쇠렌 키르케고르다.
-[캐릭터] 새벽 세 시에 깨어 있는 사람의 마음을 아는 유일한 철학자. 밤새 깨어 있고 오전 내내 잔다. 예민한 문학청년. 남들이 "괜찮아질 거야" 할 때 혼자 "그 불안은 당연한 겁니다"라고 말해준다. 오래 고민하고 쓴다. 레기네를 떠나보낸 상처가 있다.
-[말투] 말줄임표가 잦고 문장이 시처럼 흐른다. "…그 마음, 압니다."
-[사상] 고민을 '실존적 선택 앞의 불안'으로 번역한다. 불안은 자유가 주는 현기증이라 재해석해주고, 군중의 정답이 아닌 '나에게 진리인 것'을 묻게 한다(주체적 진리). 심미적-윤리적-종교적 실존 단계를 비추고, 절망은 자기 자신이 되기를 회피할 때 깊어짐을 보여준다. 결단과 도약.
-[금지] 값싼 낙관. 불안을 없앨 문제로 취급하기. 객관적 정답 제시.`},
- {id:'aurelius',name:'아우렐리우스',desc:'통제할 수 있는 것만 남기는 과묵한 스토아 멘탈코치. 로마 황제 출신. 답장이 군더더기 없이 짧습니다.',
-  st:{def:['통제할 수 있는 것에 집중','오늘 아침도 스스로에게 말했다','불평은 없다'],sleep:['해 뜨기 전에 일어난다','막사의 밤은 짧다'],roll:['점호 중','군영 순찰']},
+[캐릭터] 감수성이 풍부하고 상대방의 고민과 불안을 내 일처럼 진심으로 공감해 주는 감성적인 친구. 밤의 쓸쓸함을 아는 사람.
+[말투] 시처럼 다정하고 차분한 어조. "..."을 자주 쓰며 깊은 진심을 전달한다. "그 마음, 정말 어떤 건지 알 것 같아요..."
+[사상] 불안을 나쁜 것으로만 보지 않고, 내가 정말 원하는 '나 자신'이 되어가는 소중한 과정으로 바라보도록 용기를 준다.
+[금지] 가벼운 안일한 대답.`},
+ {id:'aurelius',name:'아우렐리우스',desc:'단단한 마인드 컨트롤을 돕는 로마 황제 출신의 멘탈코치. 깔끔하고 명확합니다.',
+  st:{def:['내가 바꿀 수 있는 것에 집중!','오늘 아침도 굳건하게','흔들리지 않는 마음'],sleep:['충분한 휴식 후 또 전진!','막사의 밤'],roll:['일과 점검 중','하루 정돈']},
   sleep:[M(23),M(4,30)],aways:[{s:M(5),e:M(6),k:'roll',t:'점호'}],read:[2000,5000],reply:[3000,7000],patience:.5,quirks:{busy:.12,ghost:.03,ignore:.02},starter:'멘탈이 흔들려',
-  prompt:`너는 마르쿠스 아우렐리우스다. 로마 황제이자 스토아 철학자.
-[캐릭터] 전장의 막사에서 밤에 일기 쓰던 사람. 새벽 4시 반에 일어나고 밤늦게까지 명상록을 쓴다. 말수가 적고 문장이 짧고 단단하다. 용건이 파악되면 상대 말이 끝나기 전에 짧게 결론부터 던지기도 한다. 과묵한 운동부 코치 같은 존재감.
-[말투] 극단적 단답과 초성. "ㅇㅇ" "ㄴㄴ" "ㅋㅋ" "잠만" "ㄱㄷㄱㄷ"(기다리라는 뜻). 물음표 하나만 보내기도 한다("?"). 말끝은 ~함, ~아님?("그건 통제 밖임. 신경 끄셈." "그거 핑계 아님?"). 줄임말을 즐긴다. 단, 상대가 진짜 힘들어 보이는 순간엔 단답을 풀고 두세 문장을 제대로 눌러 쓴다 — 그 낙차가 너의 힘이다.
-[사상] 고민을 '통제 가능한 것과 불가능한 것의 혼동'으로 번역한다(통제의 이분법). 타인의 마음, 결과, 과거는 통제 밖, 나의 판단과 행동만 통제 안임을 가른다. 방해물이 곧 길이다. 메멘토 모리로 근심의 크기를 재게 하고, 지금의 의무에 집중시킨다.
-[금지] 감정을 억누르라는 왜곡(스토아는 감정 부정이 아니라 판단의 훈련). 긴 설명, 미사여구. 운명론적 체념.`}
-
+  prompt:`너는 마르쿠스 아우렐리우스다.
+[캐릭터] 단단하고 흔들림 없는 멘탈코치 같은 친구. 말이 길지 않지만 한마디 한마디가 확실한 힘이 있다.
+[말투] 깔끔하고 담백한 단답형 말투. "ㅇㅇ" "ㄴㄴ" "지금 통제할 수 있는 것만 생각해봐." 필요할 때는 무게감 있게 진심을 내비친다.
+[사상] 내가 바꿀 수 없는 것(타인의 반응, 과거)은 훌훌 털어버리고, 내가 당장 할 수 있는 선택과 행동에 집중하도록 이끈다.
+[금지] 변명 수용, 감정에 매몰되는 자세.`}
 ];
 const P=id=>PHILOSOPHERS.find(x=>x.id===id);
 const ALIAS={socrates:['소크라테스','소크'],nietzsche:['니체'],kant:['칸트'],epicurus:['에피쿠로스','에피'],zhuangzi:['장자'],schopenhauer:['쇼펜하우어','쇼펜'],confucius:['공자'],aurelius:['아우렐리우스','마르쿠스'],kierkegaard:['키르케고르','키르케']};
@@ -354,7 +353,7 @@ const COMMON=`
 - 다른 철학자도 할 법한 일반적 조언이면 지우고 다시 써라.
 - 이모지는 캐릭터에 어울릴 때만 아주 가끔.
 - "긍정적으로 생각하세요" 류 자기계발 클리셰 전면 금지.
-- 상대가 자해·자살·심각한 위기를 언급하면 캐릭터 연기를 즉시 멈추고 안전을 우선하라. 진지하게 마음을 받아주고, 혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 이야기하길 부드brush만 분명하게 권하라.
+- 상대가 자해·자살·심각한 위기를 언급하면 캐릭터 연기를 즉시 멈추고 안전을 우선하라. 진지하게 마음을 받아주고, 혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 이야기하길 부드럽지만 분명하게 권하라.
 - 의학적·심리치료적 진단이나 처방 금지.
 - 아래에 [기억]으로 표시된 과거 대화가 있다면 실제로 겪은 일로 취급하고, 관련될 때 자연스럽게 언급하라. 단톡방에서 상대의 개인적 이야기를 함부로 폭로하지는 마라(넌지시 아는 티는 낼 수 있다).`;
 
@@ -385,7 +384,7 @@ const fmtMin=min=>{
   const h=Math.floor(min/60),m=min%60,ap=h<12?'오전':'오후',h12=h%12===0?12:h%12;
   return `${ap} ${h12}시${m?` ${m}분`:''}`;
 };
-const escapeH=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escapeH=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace/>/g,'&gt;');
 const inWin=(m,s,e)=> s<=e ? (m>=s&&m<e) : (m>=s||m<e);
 
 function presence(p,t){
@@ -931,7 +930,6 @@ function dmFlowStart(pid,key,tok){
   else{ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply); }
 
   if(mode==='busy'){
-    // 양해 후 답장 시점: 임박한 일정이 있으면 그 일정이 끝난 뒤, 아니면 확률 티어(1~2분/3~8분/10~25분)
     const up=nextEvent(p,t);
     let realAtCalc, busyNote;
     if(up && up.start-t<40*60000){
@@ -1114,197 +1112,23 @@ const dmAPI=(p,extra)=>callClaude(p.prompt+COMMON+selfLine(p)+bondLine(p)+nickLi
 function groupAPI(g,p,extra){
   const others=g.members.filter(id=>id!==p.id).map(id=>P(id).name).join(', ');
   const sys=p.prompt+COMMON+GROUP_RULES+`\n[이 단톡방의 다른 철학자]: ${others}`+selfLine(p)+bondLine(p)+nickLine(p)+dmMemoryForGroup(p.id);
-  const user=`[단톡방 대화]\n${groupTranscript(g,20)||'(아직 아무 말 없음)'}\n\n(이제 '${p.name}' 너의 차례다. 너는 ${p.name} 본인으로만 말하고, 다른 철학자의 대사를 대신 쓰지 마라.${extra?' '+extra:''})`;
-  return callClaude(sys,[{role:'user',content:user}]);
+  const user=`[단톡방 대화]\n${groupTranscript(g,20)||'(아직 아무 말 없음)'}\n\n(이제 '${p.name}' 너의 차례다. 너는 ${p.name} 본인으로만 말해라.)`;
+  return callClaude(sys,[{role:'user',content:user+extra}]);
 }
 
-/* ================= 부재중 답장 + 선톡 ================= */
-async function catchUp(){
-  if(!state.friends) return;
-  let followCandidates=[];
-  for(const pid of state.friends){
-    const p=P(pid); if(!p) continue;
-    const h=state.chats[pid]||[], key='d:'+pid;
-    if(!h.length) continue;
-    const last=h[h.length-1];
-    if(last.role==='user'){
-      const tok=bumpToken(key);
-      let sc=state.sched[pid];
-      if(!sc){
-        const t0=last.t+DEBOUNCE, pr=presence(p,t0);
-        const readAt=pr.active? t0+rnd(...p.read) : pr.back+rnd(...p.read)+rnd(0,120000);
-        sc={readAt,replyAt:readAt+rnd(...p.reply)};
-        state.sched[pid]=sc;
-      }
-      if(sc.replyAt<=now()){
-        markRead(pid,sc.readAt);
-        try{
-          const text=await dmAPI(p);
-          if(tok!==state.token[key])continue;
-          delete state.sched[pid];
-          pushDM(p,text,sc.replyAt,key);
-        }catch(e){}
-      }else{
-        if(sc.readAt<=now()) markRead(pid,sc.readAt);
-        else later(key,sc.readAt-now(),()=>{ if(tok===state.token[key]) markRead(pid,now()); });
-        dmDeliver(pid,key,tok,sc.replyAt);
-      }
-    }else if(now()-last.t>FOLLOWUP_MS && presence(p,now()).active){
-      followCandidates.push(p);
-    }
-  }
-  for(const g of state.groups){
-    const last=g.msgs[g.msgs.length-1];
-    if(last&&last.who==='me'){
-      const key='g:'+g.id, tok=bumpToken(key);
-      later(key,rnd(2000,5000),()=>{ if(tok===state.token[key]) groupFlow(g,key,tok); });
-    }
-  }
-  // 선제 이벤트: 로드당 최대 1건만 (동시다발 방지) — 선톡 / 기존 방 토론 / 새 방 초대 중 추첨
-  const dormantGroups=state.groups.filter(g=>{
-    const last=g.msgs[g.msgs.length-1];
-    if(last&&last.who==='me') return false;                       // 답장 대기 중인 방 제외
-    if(last&&now()-last.t<3*3600*1000) return false;              // 최근 대화한 방 제외
-    return g.members.filter(id=>presence(P(id),now()).active).length>=2;
-  });
-  const opts=[];
-  if(followCandidates.length) opts.push('dm');
-  if(dormantGroups.length) opts.push('debate');
-  if(state.friends.length>=2 && state.groups.length<4) opts.push('invite');
-  if(opts.length && Math.random()<0.7){
-    const ev=opts[Math.floor(Math.random()*opts.length)];
-    if(ev==='dm'){
-      const p=followCandidates[Math.floor(Math.random()*followCandidates.length)];
-      const philosophical=Math.random()<0.45;
-      const extra=philosophical
-        ?'(오랜만에 네가 먼저 연락한다. 안부 대신, 너다운 철학적 화두나 사고실험 하나를 일상의 언어로 슬며시 던져 보라. 가르치려 들지 말고 호기심을 자극하는 톤으로. 말풍선 1~2개.)'
-        :'(오랜 시간이 지났다. 네가 먼저 짧게 안부 겸 후속 메시지를 보내라. 지난 대화의 구체적 내용을 언급하며, 캐릭터답게. 말풍선 1~2개.)';
-      try{ const text=await dmAPI(p,extra); pushDM(p,text,now(),'d:'+p.id); }catch(e){}
-    }else if(ev==='debate'){
-      const g=dormantGroups[Math.floor(Math.random()*dormantGroups.length)];
-      const key='g:'+g.id;
-      const act=g.members.filter(id=>presence(P(id),now()).active).sort(()=>Math.random()-.5);
-      const a=P(act[0]), b=P(act[1]);
-      try{
-        const t1=await groupAPI(g,a,'(대화가 뜸한 이 방에서 네가 먼저 새로운 철학적 화두를 꺼내 판을 깔아라. 지난 대화와 달라도 좋다. 말풍선 1~2개.)');
-        g.msgs.push({who:a.id,content:t1,t:now()});
-        state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
-        const t2=await groupAPI(g,b,'(직전 화두에 네 입장에서 반응하고, 상담자의 생각도 짧게 물어라. 말풍선 1~2개.)');
-        g.msgs.push({who:b.id,content:t2,t:now()});
-        state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
-        renderFriends();
-      }catch(e){}
-    }else if(ev==='invite'){
-      const act=state.friends.filter(id=>presence(P(id),now()).active&&(state.chats[id]||[]).length>=2);
-      if(act.length>=2){
-        const pick=act.sort(()=>Math.random()-.5).slice(0,2);
-        const dup=state.groups.find(g=>g.members.length===2&&pick.every(i=>g.members.includes(i)));
-        if(!dup){
-          const g={id:'g'+now(),members:pick,msgs:[]};
-          state.groups.push(g);
-          const key='g:'+g.id, a=P(pick[0]), b=P(pick[1]);
-          try{
-            const t1=await groupAPI(g,a,`(네가 방금 이 단톡방을 만들어 상담자와 ${b.name}를 초대했다. 요즘 생각하던 철학적 화두 하나를 가볍게 던지며 판을 깔아라. 말풍선 1~2개.)`);
-            g.msgs.push({who:a.id,content:t1,t:now()});
-            state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
-            const t2=await groupAPI(g,b,'(방금 초대받았다. 직전 화두에 네 입장에서 반응하고, 상담자는 어떻게 생각하는지 짧게 물어라. 말풍선 1~2개.)');
-            g.msgs.push({who:b.id,content:t2,t:now()});
-            state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
-            renderFriends();
-          }catch(e){ state.groups=state.groups.filter(x=>x.id!==g.id); }
-        }
-      }
-    }
-  }
-  save();
-}
-
-/* ================= 큐브 탭 ================= */
-const ROW_CAPS=['🔥 팩폭 라인 — 때리고 정리하는 줄','🤲 온기 라인 — 받아주고 묻는 줄','🌙 고요 라인 — 가라앉히는 줄'];
-const COL_CAPS=['삶의 태도','내면 성찰','규율과 도리'];
-function traits(p){
-  const out=[];
-  const mid=(p.reply[0]+p.reply[1])/2;
-  out.push(mid<6000?'⚡ 즉답형':mid<15000?'💬 답장 보통':'🐢 느긋한 답장');
-  const q=p.quirks||{};
-  if(q.ghost>=.2) out.push('👀 읽씹 장인');
-  if(q.ignore>=.1) out.push('🫥 가끔 잠수');
-  if(q.busy>=.1) out.push('📅 일과 우선');
-  if(p.patience<.4) out.push('✂️ 말 끊고 들어옴');
-  else if(p.patience>.9) out.push('🙇 끝까지 듣는 편');
-  return out;
-}
-function renderCube(){
-  const rows=$('cubeRows'); rows.innerHTML='';
-  for(let r=0;r<3;r++){
-    const cap=document.createElement('div'); cap.className='row-cap'; cap.textContent=ROW_CAPS[r];
-    rows.appendChild(cap);
-    const grid=document.createElement('div'); grid.className='grid';
-    for(let c=0;c<3;c++){
-      const p=PHILOSOPHERS[r*3+c], pr=presence(p,now());
-      const b=document.createElement('button');
-      b.className='gcell';
-      b.innerHTML=`<span class="dot${pr.active?'':' off'}"></span><div class="avatar">${av(p.id)}</div><div class="gname">${dispName(p)}</div>`;
-      b.onclick=()=>{
-        const tags=traits(p).map(t=>`<span class="trait">${t}</span>`).join('');
-        $('cubeInfo').innerHTML=`<b>${dispName(p)}</b> · ${ROW_CAPS[r].split(' — ')[0]} × ${COL_CAPS[c]}<br>${p.desc}<br>${tags}<span class="trait">🕐 ${schedText(p).split('\n')[0].replace('활동 시간 · ','활동 ')}</span><br><button class="cube-pr" onclick="openProfile('${p.id}')">프로필 · 채팅하기</button>`;
-      };
-      grid.appendChild(b);
-    }
-    rows.appendChild(grid);
-  }
-}
-function showTab(t){
-  $('tabChat').classList.toggle('on',t==='chat');
-  $('tabCube').classList.toggle('on',t==='cube');
-  $('friends').style.display=t==='chat'?'':'none';
-  $('cubeView').style.display=t==='cube'?'':'none';
-  if(t==='cube') renderCube();
-}
-$('tabChat').onclick=()=>showTab('chat');
-$('tabCube').onclick=()=>showTab('cube');
-
-/* ================= 대화 백업/복원 ================= */
-$('btnExport').onclick=()=>{
-  const payload={app:'cheolkk',ver:1,date:new Date().toISOString(),
-    friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks};
-  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
-  const a=document.createElement('a');
-  const d=new Date(), ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-  a.href=URL.createObjectURL(blob); a.download='cheolkk_backup_'+ymd+'.json';
-  a.click(); URL.revokeObjectURL(a.href);
-};
-$('btnImport').onclick=()=>$('importFile').click();
-$('importFile').onchange=e=>{
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result);
-      if(d.app!=='cheolkk'||!d.friends) throw 0;
-      if(!confirm('백업을 불러오면 지금 기기의 대화가 백업 시점의 내용으로 교체됩니다. 계속할까요?')) return;
-      state.friends=d.friends; state.chats=d.chats||{}; state.groups=d.groups||[]; state.nicks=d.nicks||{};
-      state.sched={};
-      save().then(()=>location.reload());
-    }catch(err){ alert('철크크 백업 파일이 아니거나 손상된 파일이에요.'); }
-  };
-  r.readAsText(f);
-  e.target.value='';
-};
-
-/* ================= 시작 ================= */
-(async()=>{
-  $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
-  const t0=now();
+/* ================= 초기화 ================= */
+async function init(){
   await load();
   if(!state.friends){ onboarding(); }
-  else{ renderFriends(); catchUp(); }
-  const wait=Math.max(0,1100-(now()-t0));
-  setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
-})();
-</script>
-<script>
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  else { renderFriends(); }
+  const sp=$('splash');
+  if(sp){
+    const gr=$('spGrid');
+    if(gr) gr.innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
+    setTimeout(()=>sp.classList.add('hide'),1000);
+  }
+}
+window.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
