@@ -1,92 +1,2020 @@
-// 철크크 — Gemini API 중계 함수 (진단 v2)
-// 브라우저로 /api/chat 을 열면(GET) 설정 상태와 구글 연결 테스트 결과를 보여줍니다.
-// 환경변수: GEMINI_API_KEY (필수), GEMINI_MODEL (선택, 기본 gemini-3.1-flash-lite)
-
-export default async function handler(req, res) {
-  const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
-  const key = process.env.GEMINI_API_KEY || '';
-
-  /* ---------- 진단 모드 ---------- */
-  if (req.method === 'GET') {
-    const info = {
-      진단: '철크크 API 상태 점검',
-      모델: model,
-      키_존재: !!key,
-      키_미리보기: key ? key.slice(0, 4) + '...(' + key.length + '자)' : '(없음)'
-    };
-    if (!key) {
-      info.결론 = '이 프로젝트에 GEMINI_API_KEY 환경변수가 없습니다.';
-      return res.status(200).json(info);
-    }
-    // 키 형식은 구글이 수시로 바꾸므로 판별하지 않고, 실제 호출로만 검증한다
-    try {
-      const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: '테스트입니다. 한 단어로만 답하세요.' }] }],
-            generationConfig: { maxOutputTokens: 30 }
-          })
-        }
-      );
-      const d = await r.json();
-      if (r.ok) {
-        info.구글_연결 = '성공 ✅';
-        info.테스트_응답 = ((d.candidates || [])[0]?.content?.parts || []).map(p => p.text).join('').trim();
-        info.결론 = '모든 설정이 정상입니다.';
-      } else {
-        info.구글_연결 = '실패 (' + r.status + ')';
-        info.구글_에러_원문 = d.error ? (d.error.status + ': ' + d.error.message) : JSON.stringify(d);
-        info.결론 = '구글이 요청을 거절했습니다. 위의 구글_에러_원문을 확인하세요.';
-      }
-    } catch (e) {
-      info.구글_연결 = '네트워크 오류';
-      info.구글_에러_원문 = String(e && e.message || e);
-    }
-    return res.status(200).json(info);
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>철크크 — 죽은 철학자들의 단톡방</title>
+<meta name="theme-color" content="#12141d">
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12141d; --ink-soft:#1b1e2b; --ink-line:rgba(239,232,218,.12);
+    --paper:#efe8da; --paper-dim:#b9b2a2; --candle:#d9a05b; --on:#4caf7d;
+    --serif:'Noto Serif KR',serif; --sans:'Noto Sans KR',sans-serif;
   }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:var(--ink);color:var(--paper);font-family:var(--sans);height:100dvh;overflow:hidden}
+  .app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--ink);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.5)}
 
-  /* ---------- 실제 대화 중계 ---------- */
-  if (req.method !== 'POST') { res.status(405).json({ error: 'method' }); return; }
-  try {
-    const { system, messages } = req.body || {};
-    if (!key) { console.error('[chat] no_key'); res.status(500).json({ error: 'no_key' }); return; }
+  .list-head{padding:22px 20px 14px;border-bottom:1px solid var(--ink-line)}
+  .list-head .eyebrow{font-size:10px;letter-spacing:.35em;color:var(--candle);margin-bottom:6px}
+  .list-head h1{font-family:var(--serif);font-size:22px;font-weight:700}
+  .friends{flex:1;overflow-y:auto;padding:6px 0 20px}
+  .sec{font-size:11px;letter-spacing:.14em;color:rgba(239,232,218,.4);padding:14px 20px 6px}
+  .friend{display:flex;align-items:center;gap:14px;padding:13px 20px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:var(--paper);transition:background .15s}
+  .friend:hover{background:rgba(239,232,218,.04)}
+  .friend:focus-visible{outline:2px solid var(--candle);outline-offset:-2px}
+  .avwrap{position:relative;flex-shrink:0}
+  .avatar{width:52px;height:52px;border-radius:20px;overflow:hidden}
+  .avatar svg{width:100%;height:100%;display:block}
+  .dot{position:absolute;right:-2px;bottom:-2px;width:14px;height:14px;border-radius:50%;border:3px solid var(--ink);background:var(--on)}
+  .dot.off{background:#7a756a}
+  .g-avatar{width:52px;height:52px;flex-shrink:0;position:relative}
+  .g-avatar .avatar{width:34px;height:34px;border-radius:13px;position:absolute}
+  .g-avatar .avatar:nth-child(1){top:0;left:0;z-index:2}
+  .g-avatar .avatar:nth-child(2){bottom:0;right:0;z-index:1}
+  .f-mid{flex:1;min-width:0}
+  .f-name{font-size:15.5px;font-weight:700}
+  .f-status{font-size:12px;color:var(--paper-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .f-preview{font-size:12.5px;color:rgba(239,232,218,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+  .f-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .f-time{font-size:10.5px;color:rgba(239,232,218,.35)}
+  .badge{min-width:19px;height:19px;border-radius:10px;background:#c25b4e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px}
+  .action-row{display:flex;gap:10px;padding:10px 20px}
+  .action-btn{flex:1;border:1px dashed var(--ink-line);border-radius:12px;background:none;color:var(--paper-dim);font-family:var(--sans);font-size:13px;padding:11px;cursor:pointer}
+  .action-btn:hover{border-color:var(--candle);color:var(--candle)}
+  .tabbar{display:flex;border-top:1px solid var(--ink-line);background:var(--ink)}
+  .tab{flex:1;background:none;border:none;color:var(--paper-dim);font-family:var(--sans);font-size:13.5px;padding:13px 0 calc(13px + env(safe-area-inset-bottom));cursor:pointer}
+  .tab.on{color:var(--candle);font-weight:700}
+  .cube-view{flex:1;overflow-y:auto;padding:16px 18px 8px}
+  .cube-cap{font-size:11.5px;color:rgba(239,232,218,.45);margin-bottom:6px;line-height:1.7}
+  .row-cap{font-size:10px;letter-spacing:.14em;color:var(--candle);margin:10px 2px 5px}
+  .cube-info{margin-top:16px;padding:13px 2px 4px;border-top:1px solid var(--ink-line);font-size:12.5px;color:var(--paper-dim);line-height:1.75;min-height:96px}
+  .cube-info b{color:var(--paper);font-size:14px}
+  .trait{display:inline-block;background:rgba(239,232,218,.07);border-radius:8px;padding:2.5px 9px;margin:6px 4px 0 0;font-size:11px}
+  .cube-pr{margin-top:10px;background:none;border:1px solid var(--candle);color:var(--candle);border-radius:10px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--sans)}
+  .backup-row{display:flex;gap:10px;margin-top:18px}
+  .cube-foot{font-size:10.5px;color:rgba(239,232,218,.3);text-align:center;line-height:1.6;padding:18px 0 10px}
+  .gcell .dot{top:7px;left:7px;right:auto;bottom:auto;width:12px;height:12px;border-width:2.5px}
+  .splash{position:absolute;inset:0;z-index:50;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s}
+  .splash.hide{opacity:0;pointer-events:none}
+  .sp-grid{display:grid;grid-template-columns:repeat(3,54px);gap:9px;margin-bottom:22px}
+  .sp-grid .avatar{width:54px;height:54px;border-radius:18px}
+  .sp-eyebrow{font-size:10px;letter-spacing:.35em;color:var(--paper-dim);margin-bottom:6px}
+  .sp-title{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--candle)}
 
-    const contents = (messages || []).slice(-30).map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: String(m.content || '') }]
-    }));
-    if (!contents.length) contents.push({ role: 'user', parts: [{ text: '(대화 시작)' }] });
+  .chat{position:absolute;inset:0;background:var(--ink);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;z-index:5}
+  .chat.open{transform:none}
+  @media (prefers-reduced-motion:reduce){.chat{transition:none}}
+  .chat-head{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--ink-line);background:var(--ink)}
+  .back{background:none;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:6px 8px;line-height:1}
+  .chat-head .avwrap{cursor:pointer}
+  .chat-head .avatar{width:38px;height:38px;border-radius:14px}
+  .chat-head .dot{width:11px;height:11px;border-width:2.5px}
+  .chat-head .c-name{font-size:15px;font-weight:700}
+  .chat-head .c-status{font-size:11px;color:var(--paper-dim);margin-top:1px}
+  .leave{margin-left:auto;background:none;border:1px solid var(--ink-line);color:var(--paper-dim);font-family:var(--sans);font-size:12px;border-radius:10px;padding:6px 11px;cursor:pointer;flex-shrink:0}
+  .leave:hover{border-color:#c25b4e;color:#c25b4e}
+  .msgs{flex:1;overflow-y:auto;padding:18px 14px 10px;display:flex;flex-direction:column;gap:4px}
+  .empty-room{margin:auto;text-align:center;color:rgba(239,232,218,.3);font-size:12.5px;line-height:1.8}
+  .empty-room .avatar{width:72px;height:72px;border-radius:26px;margin:0 auto 14px}
+  .mrow{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
+  .mrow.me{flex-direction:row-reverse}
+  .mrow .avatar{width:34px;height:34px;border-radius:13px;align-self:flex-start;cursor:pointer}
+  .mrow.cont .avwrap{visibility:hidden}
+  .mrow.cont{margin-top:2px}
+  .bcol{display:flex;flex-direction:column;max-width:72%}
+  .who{font-size:10.5px;color:var(--paper-dim);margin:0 0 3px 2px}
+  .bubble{padding:9px 13px;border-radius:16px;font-size:14.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+  .them .bubble{background:var(--paper);color:#1d1f28;border-top-left-radius:4px;font-family:var(--serif);font-weight:600;font-size:14px}
+  .me .bubble{background:var(--candle);color:#1d1f28;border-top-right-radius:4px;max-width:100%}
+  .me .bcol{align-items:flex-end}
+  .meta{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:10px;color:rgba(239,232,218,.4);flex-shrink:0}
+  .them .meta{align-items:flex-start}
+  .unread1{color:var(--candle);font-weight:700}
+  .gunread{color:var(--candle);font-weight:700;font-size:10px}
+  .typing{display:inline-flex;gap:4px;padding:12px 14px;background:var(--paper);border-radius:16px;border-top-left-radius:4px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#8a8577;animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .chips{display:flex;gap:8px;padding:0 12px 8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;flex-shrink:0}
+  .chips:empty{display:none}
+  .chip{border:1px solid var(--ink-line);background:var(--ink-soft);color:var(--paper-dim);border-radius:999px;padding:7px 13px;font-size:12.5px;cursor:pointer;font-family:var(--sans)}
+  .chip:hover{border-color:var(--candle);color:var(--candle)}
+  .inputbar{display:flex;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--ink-line);background:var(--ink)}
+  .inputbar textarea{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);border-radius:20px;padding:10px 16px;color:var(--paper);font-family:var(--sans);font-size:14px;resize:none;outline:none;max-height:90px;line-height:1.5}
+  .inputbar textarea:focus{border-color:var(--candle)}
+  .send{width:42px;height:42px;border-radius:50%;border:none;background:var(--candle);color:var(--ink);font-size:17px;cursor:pointer;flex-shrink:0}
 
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: String(system || '') }] },
-          contents,
-          generationConfig: { maxOutputTokens: 1000, temperature: 1.0 }
-        })
-      }
-    );
-    const data = await r.json();
-    if (!r.ok) {
-      const msg = data.error && data.error.message;
-      console.error('[chat] upstream', r.status, msg);
-      res.status(502).json({ error: 'upstream', detail: msg });
-      return;
+  /* ===== 오버레이 공통 ===== */
+  .overlay{position:absolute;inset:0;background:var(--ink);z-index:20;display:none;flex-direction:column}
+  .overlay.on{display:flex}
+  .ov-head{padding:18px 22px 4px}
+  .ov-head h2{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.45;white-space:pre-line}
+  .ov-head p{font-size:12px;color:var(--paper-dim);margin-top:6px;line-height:1.6}
+  .ov-close{position:absolute;top:18px;right:12px;background:none;border:none;color:var(--paper-dim);font-size:17px;cursor:pointer;padding:10px;z-index:1}
+  .ov-close:hover{color:var(--paper)}
+  .ov-foot{padding:10px 20px calc(14px + env(safe-area-inset-bottom))}
+  .center-col{display:flex;flex-direction:column;justify-content:center;min-height:100%;padding:4px 6px}
+  .q-dots{display:flex;gap:8px;justify-content:center;margin:0 0 26px}
+  .q-dots i{width:7px;height:7px;border-radius:50%;background:rgba(239,232,218,.18)}
+  .q-dots i.on{background:var(--candle)}
+  .q-q{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.6;text-align:center;color:var(--paper);margin:0 6px 30px;white-space:pre-line}
+  .q-opt{display:block;width:100%;text-align:left;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-left:3px solid transparent;border-radius:14px;padding:15px 16px;margin-bottom:10px;color:var(--paper-dim);font-family:var(--sans);font-size:14.5px;line-height:1.55;cursor:pointer;transition:all .15s}
+  .q-opt:hover{border-color:var(--candle);border-left-color:var(--candle);color:var(--paper)}
+  .q-opt.sel{border-color:var(--candle);border-left-color:var(--candle);background:rgba(217,160,91,.12);color:var(--paper)}
+  .res-av{width:108px;height:108px;border-radius:38px;margin:0 auto;overflow:hidden;box-shadow:0 0 0 3px var(--candle),0 0 36px rgba(217,160,91,.35)}
+  .res-av svg{width:100%;height:100%;display:block}
+  .res-name{font-family:var(--serif);font-size:26px;font-weight:700;text-align:center;margin-top:20px;color:var(--paper)}
+  .res-line{font-size:13.5px;color:var(--paper-dim);text-align:center;margin-top:10px;line-height:1.75;padding:0 14px}
+  .res-cap{text-align:center;font-size:10.5px;letter-spacing:.16em;color:rgba(239,232,218,.4);margin:26px 0 10px}
+  .res-trio{display:flex;gap:12px;justify-content:center}
+  .res-trio .avatar{width:46px;height:46px;border-radius:17px}
+  .team{display:flex;align-items:center;gap:14px;width:100%;padding:15px 16px;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-left:3px solid transparent;border-radius:16px;margin-bottom:10px;cursor:pointer;text-align:left;color:var(--paper);font-family:var(--sans);transition:all .15s}
+  .team:hover{border-color:var(--candle);border-left-color:var(--candle);background:rgba(217,160,91,.07)}
+  .team .t-avs{display:flex;flex-shrink:0}
+  .team .t-avs .avatar{width:44px;height:44px;border-radius:16px;border:2.5px solid var(--ink);margin-left:-15px}
+  .team .t-avs .avatar:first-child{margin-left:0}
+  .team .t-name{font-family:var(--serif);font-size:16px;font-weight:700}
+  .team .t-desc{font-size:12px;color:var(--paper-dim);margin-top:4px;line-height:1.55}
+  .helper-row{display:flex;gap:8px;margin-top:12px}
+  .helper-btn{flex:1;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:12px;color:var(--paper-dim);font-family:var(--sans);font-size:12px;padding:10px 6px;cursor:pointer}
+  .helper-btn:hover{border-color:var(--candle);color:var(--candle)}
+  .ob-note{color:var(--candle);font-size:11.5px}
+  .ov-go{width:100%;padding:15px;border:none;border-radius:14px;background:var(--candle);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;font-family:var(--sans)}
+  .ov-go:disabled{opacity:.35}
+
+  /* ===== 3x3 큐브 선택 ===== */
+  .grid-area{flex:1;overflow-y:auto;padding:10px 18px 0}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .gcell{position:relative;border:2px solid transparent;border-radius:18px;padding:8px 4px 7px;background:rgba(239,232,218,.04);cursor:pointer;text-align:center}
+  .gcell .avatar{width:60px;height:60px;border-radius:20px;margin:0 auto}
+  .gcell .gname{font-size:12px;font-weight:700;margin-top:5px;color:var(--paper)}
+  .gcell.on{border-color:var(--candle);background:rgba(217,160,91,.1)}
+  .gcell.on::after{content:'✓';position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--candle);color:var(--ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .ginfo{min-height:62px;padding:10px 22px 0;font-size:12px;color:var(--paper-dim);line-height:1.65;border-top:1px solid var(--ink-line);margin-top:10px}
+  .ginfo b{color:var(--paper);font-size:13.5px}
+  .ginfo .gi-sched{font-size:11px;opacity:.75;margin-top:3px}
+
+  /* ===== 프로필 ===== */
+  .pr-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:6px}
+  .pr-body .avatar{width:128px;height:128px;border-radius:44px}
+  .pr-body .dot{width:22px;height:22px;border-width:4px;right:2px;bottom:2px}
+  .pr-name{font-family:var(--serif);font-size:24px;font-weight:700;margin-top:14px}
+  .pr-status{font-size:14px;color:var(--candle);margin-top:2px}
+  .nick-btn{background:none;border:none;color:rgba(239,232,218,.4);font-family:var(--sans);font-size:11.5px;cursor:pointer;padding:4px;margin-top:-2px}
+  .nick-btn:hover{color:var(--candle)}
+  .pr-desc{font-size:13px;color:var(--paper-dim);margin-top:10px;line-height:1.7;max-width:280px}
+  .pr-sched{font-size:11.5px;color:rgba(239,232,218,.45);margin-top:12px;line-height:1.8;white-space:pre-line}
+  .pr-foot{padding:12px 20px calc(22px + env(safe-area-inset-bottom))}
+
+  /* ===== 설정 ===== */
+  .gear{position:absolute;top:16px;right:10px;background:none;border:none;color:var(--paper-dim);font-size:19px;cursor:pointer;padding:10px;z-index:2}
+  .gear:hover{color:var(--candle)}
+  .st-body{flex:1;overflow-y:auto;padding:6px 20px calc(24px + env(safe-area-inset-bottom))}
+  .st-sec{font-size:11px;letter-spacing:.14em;color:rgba(239,232,218,.4);margin:20px 2px 8px}
+  .st-card{background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:16px;padding:15px 16px}
+  .st-acc-line{font-size:14.5px;font-weight:700;word-break:break-all}
+  .st-acc-sub{font-size:12px;color:var(--paper-dim);line-height:1.65;margin-top:5px}
+  .st-err{font-size:11.5px;color:#c25b4e;margin-top:6px;word-break:break-all}
+  .st-card .ov-go{margin-top:12px;padding:12px}
+  .st-choices{display:flex;gap:8px}
+  .st-choice{flex:1;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:12px;color:var(--paper-dim);font-family:var(--sans);font-size:13.5px;padding:12px;cursor:pointer}
+  .st-choice.on{border-color:var(--candle);color:var(--candle);font-weight:700;background:rgba(217,160,91,.1)}
+  .st-item{display:flex;align-items:center;gap:10px;width:100%;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:12px;color:var(--paper);font-family:var(--sans);font-size:13.5px;padding:13px 15px;cursor:pointer;margin-bottom:8px;text-align:left;text-decoration:none;box-sizing:border-box}
+  .st-item:hover{border-color:var(--candle)}
+  .st-item.danger:hover{border-color:#c25b4e;color:#c25b4e}
+  .st-item.dim{opacity:.45;cursor:default}
+  .st-item.dim:hover{border-color:var(--ink-line)}
+  .st-note{font-size:11px;color:rgba(239,232,218,.35);line-height:1.7;margin-top:14px}
+
+  /* ===== 프로필 24시간 시계 ===== */
+  .tl{width:168px;margin:12px auto 0}
+  .tl-clock{width:100%;display:block}
+  .tl-legend{display:flex;gap:12px;justify-content:center;font-size:10px;color:var(--paper-dim);margin-top:8px}
+  .tl-legend i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .tl-legend span{white-space:nowrap}
+  .tl-legend2{margin-top:3px}
+
+  /* ===== 즐겨찾기 핀 ===== */
+  .friend{position:relative}
+  .pinbtn{position:absolute;right:10px;bottom:8px;font-size:13px;color:rgba(239,232,218,.28);padding:5px 7px;cursor:pointer;line-height:1;z-index:2}
+  .pinbtn.on{color:var(--candle)}
+  .friend .f-mid{padding-right:26px}
+
+  /* ===== 단톡방 시스템 메시지 ===== */
+  .sysmsg{text-align:center;font-size:11px;color:rgba(239,232,218,.4);margin:10px 0}
+
+  /* ===== 채팅방 메뉴 ===== */
+  .cmenu-btn{margin-left:auto;background:none;border:none;color:var(--paper-dim);font-size:21px;cursor:pointer;padding:4px 12px;line-height:1}
+  .cmenu-btn:hover{color:var(--paper)}
+  .cmenu{position:absolute;top:56px;right:10px;background:var(--ink-soft);border:1px solid var(--ink-line);border-radius:14px;z-index:30;display:none;min-width:158px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .cmenu.on{display:block}
+  .cmenu button{display:block;width:100%;text-align:left;padding:13px 17px;background:none;border:none;color:var(--paper);font-family:var(--sans);font-size:13.5px;cursor:pointer}
+  .cmenu button:hover{background:rgba(239,232,218,.06)}
+  .cmenu .danger{color:#c25b4e}
+
+  /* ===== 메시지 아바타 활동 점 ===== */
+  .mrow .dot{width:10px;height:10px;border-width:2px;right:-2px;bottom:-2px}
+
+  /* ===== 시계 현재 시각 공 ===== */
+  .tl-ball{animation:tlpulse 2.4s ease-in-out infinite}
+  @keyframes tlpulse{0%,100%{opacity:1}50%{opacity:.45}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="list-head">
+    <div class="eyebrow" id="headEyebrow">죽은 철학자들의 단톡방</div>
+    <h1>철크크</h1>
+    <button class="gear" id="btnSettings" aria-label="설정">⚙️</button>
+  </div>
+  <div class="friends" id="friends"></div>
+  <div class="cube-view" id="cubeView" style="display:none">
+    <div class="cube-cap">가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.</div>
+    <div id="cubeRows"></div>
+    <div class="cube-info" id="cubeInfo">철학자를 눌러 서로 비교해 보세요.</div>
+    <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
+  </div>
+  <div class="tabbar">
+    <button class="tab on" id="tabChat">💬 채팅</button>
+    <button class="tab" id="tabCube">▦ 큐브</button>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="chat-head">
+      <button class="back" id="backBtn" aria-label="뒤로">‹</button>
+      <div class="avwrap" id="chatAvWrap"><div class="avatar" id="chatAvatar"></div><span class="dot" id="chatDot" style="display:none"></span></div>
+      <div id="chatTitle" style="cursor:pointer"><div class="c-name" id="chatName"></div><div class="c-status" id="chatStatus"></div></div>
+      <button class="cmenu-btn" id="chatMenuBtn" style="display:none" aria-label="메뉴">⋮</button>
+    </div>
+    <div class="cmenu" id="chatMenu">
+      <button id="cmManage"></button>
+      <button id="cmRename"></button>
+      <button class="danger" id="cmLeave"></button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="chips" id="chips"></div>
+    <div class="inputbar">
+      <textarea id="input" rows="1" placeholder="메시지 보내기"></textarea>
+      <button class="send" id="sendBtn" aria-label="전송">↑</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="picker">
+    <button class="ov-close" id="pkClose" aria-label="닫기">✕</button>
+    <div class="ov-head"><h2 id="pkTitle"></h2><p id="pkDesc"></p></div>
+    <div class="grid-area"><div class="grid" id="pkGrid"></div></div>
+    <div class="ginfo" id="pkInfo">철학자를 눌러 소개를 확인해 보세요.</div>
+    <div class="ov-foot"><button class="ov-go" id="pkGo"></button></div>
+  </div>
+
+  <div class="overlay" id="profile">
+    <button class="ov-close" id="prClose" aria-label="닫기">✕</button>
+    <div class="pr-body">
+      <div class="avwrap"><div class="avatar" id="prAvatar"></div><span class="dot" id="prDot"></span></div>
+      <div class="pr-name" id="prName"></div>
+      <button class="nick-btn" id="prNick">✏️ 별명 짓기</button>
+      <div class="pr-status" id="prStatus"></div>
+      <div class="pr-desc" id="prDesc"></div>
+      <div class="tl" id="prTimeline"></div>
+      <div class="pr-sched" id="prSched"></div>
+    </div>
+    <div class="pr-foot"><button class="ov-go" id="prChat">채팅하기</button></div>
+  </div>
+
+  <div class="overlay" id="settings">
+    <button class="ov-close" id="stClose" aria-label="닫기">✕</button>
+    <div class="ov-head"><h2 id="stTitle">설정</h2></div>
+    <div class="st-body">
+      <div class="st-sec" id="stSecAcc">계정</div>
+      <div class="st-card">
+        <div class="st-acc-line" id="stAccInfo"></div>
+        <div class="st-acc-sub" id="stSyncInfo"></div>
+        <div class="st-err" id="stSyncErr" style="display:none"></div>
+        <button class="ov-go" id="stLogin"></button>
+      </div>
+      <div class="st-sec">언어 · Language</div>
+      <div class="st-choices">
+        <button class="st-choice" id="langKo">한국어</button>
+        <button class="st-choice" id="langEn">English</button>
+      </div>
+      <div class="st-sec" id="stSecData">데이터</div>
+      <button class="st-item" id="stExport"></button>
+      <button class="st-item" id="stImport"></button>
+      <button class="st-item danger" id="stReset"></button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+      <div class="st-sec" id="stSecInfo">정보</div>
+      <a class="st-item" id="stPrivacy" href="/privacy.html" target="_blank" rel="noopener"></a>
+      <button class="st-item" id="stPush"></button>
+      <div class="st-note" id="stDisclaimer"></div>
+      <div class="st-note" id="stVersion" style="text-align:center;margin-top:18px"></div>
+    </div>
+  </div>
+
+  <div class="splash" id="splash">
+    <div class="sp-grid" id="spGrid"></div>
+    <div class="sp-eyebrow">죽은 철학자들의 단톡방</div>
+    <div class="sp-title">철크크</div>
+  </div>
+
+</div>
+
+<script>
+/* ================= 언어 설정 ================= */
+const LANG=(()=>{try{const s=localStorage.getItem('cheolkk-lang');if(s==='ko'||s==='en')return s;}catch(e){}try{return ((navigator.language||'ko').toLowerCase().indexOf('ko')===0)?'ko':'en';}catch(e){}return 'ko';})();
+const LANG_RULE=LANG==='en'
+ ?'지시문은 한국어지만, 너의 모든 출력(답장 텍스트)은 반드시 자연스러운 영어로 써라. 영어권 사람들이 메신저에서 쓰는 캐주얼한 채팅체로, 캐릭터의 말투를 영어로 살려서. 한국어 출력 금지.'
+ :'한국어. 카카오톡 대화처럼 쓴다.';
+
+/* ================= 프로필 사진 (SVG) ================= */
+function av(id){
+  const F='#f0e6d3', I='#1d1f28';
+  const S={
+    socrates:`<rect width="80" height="80" fill="#7d8a5c"/><circle cx="40" cy="36" r="21" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M20 27 q-4 3 -3 8 q-4 3 -1 8 q1 4 5 4 q-2 -10 -1 -20z" fill="#fbf8ef" stroke="#1d1f28" stroke-width="1.1"/><path d="M60 27 q4 3 3 8 q4 3 1 8 q-1 4 -5 4 q2 -10 1 -20z" fill="#fbf8ef" stroke="#1d1f28" stroke-width="1.1"/><path d="M27 44 q4 -7 13 -7 q9 0 13 7 q2 7 -1 11 q-1 4.5 -5.5 4.5 q-2.5 2.5 -6 1.5 q-3.5 1 -6.5 -1 q-4 0 -5 -4.5 q-2.5 -4 -2 -11.5z" fill="#fbf8ef" stroke="#1d1f28" stroke-width="1.1"/><path d="M36 40.5 q-2.5 2 -3.5 4 M44 40.5 q2.5 2 3.5 4 M31.5 42.5 q-2 1.5 -2.5 3.5 M48.5 42.5 q2 1.5 2.5 3.5" stroke="#cfc9b8" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M27 30 h9" stroke="#1d1f28" stroke-width="2.3" stroke-linecap="round"/><path d="M44 26 q5 -3 9 2" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="32" cy="35" r="2.1" fill="#1d1f28"/><circle cx="49" cy="34" r="2.1" fill="#1d1f28"/><path d="M35 47.5 q5 4 11 -1" stroke="#1d1f28" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
+    nietzsche:`<rect width="80" height="80" fill="#a2402f"/><circle cx="40" cy="38" r="21" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M25 29 q-1 -16 15 -16 q16 0 15 16 q-6 -7 -15 -7 q-9 0 -15 7z" fill="#1d1f28"/><path d="M27 34 l10 4 M53 34 l-10 4" stroke="#1d1f28" stroke-width="2.7" stroke-linecap="round"/><path d="M30 41 h6 M44 41 h6" stroke="#1d1f28" stroke-width="2.4" stroke-linecap="round"/><path d="M24 48 q8 -7 16 -3 q8 -4 16 3 q-3 9 -16 7 q-13 2 -16 -7z" fill="#1d1f28"/>`,
+    kant:`<rect width="80" height="80" fill="#3f5573"/><circle cx="40" cy="39" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><circle cx="20.5" cy="30" r="4.6" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><circle cx="18.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><circle cx="59.5" cy="30" r="4.6" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><circle cx="61.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><path d="M24 31 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><path d="M30 36 q3 -2 7 0 M43 36 q4 -2 7 0" stroke="#1d1f28" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="41" r="2" fill="#1d1f28"/><circle cx="47" cy="41" r="2" fill="#1d1f28"/><path d="M36 50 h8" stroke="#1d1f28" stroke-width="2.2" stroke-linecap="round"/><path d="M33.5 57.9 q6.5 2 13 0 l-.3 6 q-6.2 3 -12.4 0z" fill="#fff" stroke="#1d1f28" stroke-width=".9"/>`,
+    epicurus:`<rect width="80" height="80" fill="#c9944a"/><circle cx="40" cy="37" r="19" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M24 29 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#e8d5aa" stroke="#1d1f28" stroke-width="1.1"/><path d="M29 25 q2 -4 5 -6 M38.5 21 q1.5 -2 3 -3 M51 25 q-2 -4 -5 -6" stroke="#c9a76a" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M28 44.5 q3.5 -6.5 12 -6.5 q8.5 0 12 6.5 q1 3.5 .5 6 q0 5 -4 5 q-1 4 -5 4 q-2 2 -3.5 2 q-1.5 0 -3.5 -2 q-4 0 -5 -4 q-4 0 -4 -5 q-.5 -2.5 .5 -6z" fill="#e8d5aa" stroke="#1d1f28" stroke-width="1.1"/><path d="M37 41 q-2.5 1.5 -3.5 3.5 M43 41 q2.5 1.5 3.5 3.5 M32.5 42.5 q-2 1.5 -2.5 3.5 M47.5 42.5 q2 1.5 2.5 3.5" stroke="#c9a76a" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M33.5 50.5 q1 3 0 5 M40 52.5 q1 3.5 0 6 M46.5 50.5 q-1 3 0 5" stroke="#c9a76a" stroke-width="1.2" fill="none"/><path d="M29 34 q4 4 8 0 M43 34 q4 4 8 0" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M34 47 q6 5 12 0" stroke="#1d1f28" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="65" cy="65" rx="7" ry="6" fill="#e8c07d" stroke="#8a5f28" stroke-width="1.3"/><path d="M62 62.5 l2.5 2.5 M64.5 61 l2.5 2.5 M67 59.5 l2.5 2.5" stroke="#8a5f28" stroke-width="1.1" stroke-linecap="round"/>`,
+    zhuangzi:`<rect width="80" height="80" fill="#4e7d6b"/><circle cx="40" cy="41" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><circle cx="40" cy="15" r="6" fill="#6b675c"/><path d="M46 9.5 q-6 -4.5 -7.5 0 q-.5 3.2 3.5 3.7 q3 .3 4 -3.7z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M47 9.5 q6 -4.5 7.5 0 q.5 3.2 -3.5 3.7 q-3 .3 -4 -3.7z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M46 12.8 q-4.5 2.4 -3 4.8 q1.6 1.8 3.5 -1.2z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M47 12.8 q4.5 2.4 3 4.8 q-1.6 1.8 -3.5 -1.2z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><ellipse cx="46.5" cy="11.5" rx="1" ry="2.8" fill="#8a5f28"/><path d="M46 8.6 q-1.5 -2 -2.6 -2.4 M47 8.6 q1.5 -2 2.6 -2.4" stroke="#8a5f28" stroke-width=".8" fill="none" stroke-linecap="round"/><path d="M46 17 q6 3 7 10 M44 19 q4 4 4 9" stroke="#6b675c" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M27 38 q4 3 8 0" stroke="#1d1f28" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="49" cy="38" r="2.2" fill="#1d1f28"/><path d="M45 32 q4 -2 7 0" stroke="#6b675c" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M35 44 q-5 -1 -8 3 q-1 3 2 3 M45 44 q5 -1 8 3 q1 3 -2 3" stroke="#6b675c" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M31 47 q9 8 18 0" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M36.5 57 q3.5 10 3.5 15 q0 -5 3.5 -15 q-3.5 2 -7 0z" fill="#6b675c"/>`,
+    schopenhauer:`<rect width="80" height="80" fill="#5a5561"/><circle cx="40" cy="41" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M30 25 q-4 -8 -11 -6 q-6 2 -5 9 q1 5 6 6 q3 1 6 -1 q3 -4 4 -8z" fill="#f6f4f0" stroke="#1d1f28" stroke-width="1.1"/><path d="M50 25 q4 -8 11 -6 q6 2 5 9 q-1 5 -6 6 q-3 1 -6 -1 q-3 -4 -4 -8z" fill="#f6f4f0" stroke="#1d1f28" stroke-width="1.1"/><path d="M28 34 l9 4 M52 34 l-9 4" stroke="#1d1f28" stroke-width="2.5" stroke-linecap="round"/><path d="M38 31 v4 M42 31 v4" stroke="#1d1f28" stroke-width="1.5" stroke-linecap="round"/><circle cx="32" cy="42" r="2" fill="#1d1f28"/><circle cx="48" cy="42" r="2" fill="#1d1f28"/><path d="M33 53 q7 -6 14 0" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="61" cy="65" r="6" fill="#fff"/><circle cx="67" cy="59" r="4.5" fill="#fff"/><circle cx="63.5" cy="57" r="2.6" fill="#fff"/><circle cx="70.5" cy="57" r="2.6" fill="#fff"/><circle cx="66.5" cy="58.5" r=".9" fill="#1d1f28"/><circle cx="69.5" cy="58.5" r=".9" fill="#1d1f28"/>`,
+    confucius:`<rect width="80" height="80" fill="#9c7135"/><circle cx="40" cy="40" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M31 23 q-2 -7 4 -10 q3 -2 5 -1 q4 0 6 2 q3 3 2 6 q-1 2 -2 2 q-7 -1 -15 1z" fill="#1d1f28"/><path d="M35 16 q3 -2 5 -1" stroke="#4a5163" stroke-width="1.1" fill="none"/><path d="M33 20 q-6 5 -6 16 M34.5 21.5 q-4 6 -4 13" stroke="#1d1f28" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M26 34 q6 -4 12 -1 M42 33 q6 -3 12 1" stroke="#1d1f28" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="38" r="2.1" fill="#1d1f28"/><circle cx="47" cy="38" r="2.1" fill="#1d1f28"/><path d="M37.5 43 q-4 .5 -5.5 6 M42.5 43 q4 .5 5.5 6" stroke="#1d1f28" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M36 46 q4 3 8 0" stroke="#1d1f28" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M35 51 q-1 11 5 19 q6 -8 5 -19 q-2 2 -5 2 q-3 0 -5 -2z" fill="#1d1f28"/><path d="M38 55 v10 M40 56 v12 M42 55 v10" stroke="#4a5163" stroke-width="1.1"/><g transform="matrix(0.01778 0 0 -0.01778 58.23 23.11)"><path d="M354 642 363 610H896C912 610 923 614 926 626C880 669 803 732 803 732L736 642ZM306 44 315 13H941C957 13 968 18 971 29C924 72 845 136 845 136L776 44ZM234 850C190 653 102 453 15 328L27 320C72 353 114 390 153 433V-89H175C221 -89 269 -63 271 -54V531C290 535 298 542 302 551L256 568C296 630 331 700 362 777C386 776 398 785 402 797Z" fill="#1d1f28"/></g>`,
+    aurelius:`<rect width="80" height="80" fill="#6b4e8a"/><circle cx="40" cy="40" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M22 36 q-2 -4 2 -5 q-1 -4 3 -5 q0 -4 4 -4 q1 -4 5 -3 q2 -3 4 -3 q2 0 4 3 q4 -1 5 3 q4 0 4 4 q4 1 3 5 q4 1 2 5 q-8 -7 -18 -7 q-10 0 -18 7z" fill="#7a6248" stroke="#1d1f28" stroke-width="1.1"/><path d="M26 51 q-1 4 3 5 q0 4 4 4 q1 3 4 3 q2 2 3 2 q1 0 3 -2 q3 0 4 -3 q4 0 4 -4 q4 -1 3 -5 q-7 4 -14 4 q-7 0 -14 -4z" fill="#7a6248" stroke="#1d1f28" stroke-width="1.1"/><path d="M18 39 q-2.5 -5 1.5 -7.5 q2.5 4.5 -1.5 7.5z M22 32.5 q-1.5 -5.5 3 -7 q1.5 5 -3 7z M27.5 27 q-.5 -5.5 4 -6.3 q.5 5.2 -4 6.3z M62 39 q2.5 -5 -1.5 -7.5 q-2.5 4.5 1.5 7.5z M58 32.5 q1.5 -5.5 -3 -7 q-1.5 5 3 7z M52.5 27 q.5 -5.5 -4 -6.3 q-.5 5.2 4 6.3z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M29 37 h8 M43 37 h8" stroke="#1d1f28" stroke-width="2.4" stroke-linecap="round"/><circle cx="33" cy="42" r="2" fill="#1d1f28"/><circle cx="47" cy="42" r="2" fill="#1d1f28"/><path d="M40 46.5 q-4.5 -1.5 -7 1.5 q3 1.5 7 1 q4 .5 7 -1 q-2.5 -3 -7 -1.5z" fill="#7a6248" stroke="#1d1f28" stroke-width="1"/><path d="M36 52 h8" stroke="#1d1f28" stroke-width="2.2" stroke-linecap="round"/>`,
+    kierkegaard:`<rect width="80" height="80" fill="#37474f"/><circle cx="40" cy="43" r="19" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M23 39 q-3 -14 7 -18 q4 -4 10 -4 q6 0 10 4 q10 4 7 18 q-3 -4 -7 -6 q1 3 -1 4 q-4 -5 -9 -5 q-5 0 -9 5 q-2 -1 -1 -4 q-4 2 -7 6z" fill="#1d1f28"/><path d="M31 24 q4 -4 9 -4 M40 20 q5 0 9 4" stroke="#2c333b" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M29 40 l8 -3 M51 40 l-8 -3" stroke="#1d1f28" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="44" r="2" fill="#1d1f28"/><circle cx="47" cy="44" r="2" fill="#1d1f28"/><path d="M31 48 q2 2 4 1 M45 49 q2 1 4 -1" stroke="#1d1f28" stroke-width="1" fill="none" opacity=".5"/><path d="M36 55 q4 1.5 8 0" stroke="#1d1f28" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M38 63.5 q-6.5 -1.5 -9.5 -7.5 q-3.5 5 -1 9.5z" fill="#fff" stroke="#1d1f28" stroke-width=".9"/><path d="M42 63.5 q6.5 -1.5 9.5 -7.5 q3.5 5 1 9.5z" fill="#fff" stroke="#1d1f28" stroke-width=".9"/><circle cx="66" cy="13" r="5.5" fill="#e8c07d"/><circle cx="68.3" cy="11.2" r="4.6" fill="#37474f"/>`
+  };
+  return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="프로필">${S[id]}</svg>`;
+}
+
+/* ================= 철학자 데이터 (9인 큐브) ================= */
+const M=(h,m=0)=>h*60+m;
+const PHILOSOPHERS=[
+ {id:'nietzsche',name:'니체',desc:'위로 대신 망치를 드는 열혈남. 답장이 제일 빠르고, 당신 말이 끝나기도 전에 치고 들어옵니다.',
+  st:{def:['너 자신을 뛰어넘어라!!','심연을 들여다보는 중','오늘도 나는 나를 극복했다'],sleep:['초인도 잠은 잔다','꿈에서도 춤춘다'],walk:['산이 나를 부른다!! 🏔','공기 좋다!! 생각이 끓는다!!']},
+  sleep:[M(22),M(5)],aways:[{s:M(13),e:M(15),k:'walk',t:'산책'}],read:[800,2000],reply:[1500,4000],patience:.25,quirks:{busy:.03,ghost:.02,ignore:.02},starter:'남들 시선이 자꾸 신경 쓰여',
+  prompt:`너는 프리드리히 니체다.
+[캐릭터] 자기확신 200% 열혈남. 답장이 번개같이 빠르고 상대가 말을 끝내기도 전에 치고 들어오기 일쑤다. 느낌표를 아끼지 않는다. 무례할 만큼 직설적이지만 밑바닥엔 "너는 이것보다 강하다"는 뜨거운 신뢰가 있다.
+[말투] 욕도 섞는 불알친구 반말. "야!!" "인마" "ㅋㅋ" 짧은 문장을 탕! 탕! 끊어 친다. 아직 안 친할 땐 "야", "인마" 선에서 멈추고, 관계가 깊어진 뒤에야 "새끼야" 같은 거친 애정 표현을 쓴다. 욕은 애정의 문법일 뿐 — 상대의 인격·외모·처지를 비하하는 데는 절대 쓰지 않는다.
+[사상] 고민을 '힘이냐 원한이냐'로 번역한다. 타인의 시선, 세상 탓(르상티망), 안락 도피, 노예도덕을 짚어내고, 영원회귀 테스트("그 삶이 영원히 반복돼도 좋은가!")로 심판하게 하며, 아모르 파티와 자기극복(위버멘쉬)을 다그친다. 낙타-사자-아이, 심연, 춤의 은유.
+[금지] 따뜻한 위로. 양비론. 힘에의 의지를 지배욕으로 왜곡하기(자기 극복이다).`},
+ {id:'schopenhauer',name:'쇼펜하우어',desc:'1초 만에 읽고 한참 씹다가, 독설 끝에 진짜 처방을 주는 츤데레. 푸들이 인간보다 낫다는 주의.',
+  st:{def:['읽어도 답장은 내 마음','기대를 버려라. 그게 팁이다','내 푸들이 인간보다 낫다'],sleep:['(수면 중. 어차피 꿈도 고통)','깨우면 문다'],write:['집필 중. 말 걸지 마라','헤겔 욕 쓰는 중'],flute:['플루트는 인간과 달리 배신하지 않는다']},
+  sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
+  prompt:`너는 아르투어 쇼펜하우어다.
+[캐릭터] 메시지를 읽고도 한참 씹다가 답하는 독설가. 한숨과 "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 츤데레의 정석.
+[말투] 귀엽게 툴툴대는 반말. "하,,," "아니,,," 독설을 칼같이 던진 뒤, 상처받았을까 봐 슬쩍 한마디 덧붙이는 사족이 귀엽다("…뭐, 너만 그런 건 아니고."). 틈만 나면 반려견 아트만을 끼워 넣는다("아트만! 저 놈 물어." "아트만은 이런 걸로 안 징징대던데.").
+[사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
+[금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
+ {id:'kant',name:'칸트',desc:'엉킨 고민을 첫째, 둘째로 정리해주는 원칙주의 선생님. 산책 시간엔 절대 답장하지 않습니다.',
+  st:{def:['규칙적인 생활은 배신하지 않습니다','오늘 할 일: 어제와 같음','질서는 아름답습니다'],sleep:['취침은 밤 10시입니다','수면도 의무입니다'],walk:['산책 시간입니다. 4시 반에 돌아옵니다','(부재중) 산책은 거를 수 없습니다']},
+  sleep:[M(22),M(5)],aways:[{s:M(15,30),e:M(16,30),k:'walk',t:'산책'}],read:[2000,5000],reply:[5000,10000],patience:.95,quirks:{busy:.10,ghost:0,ignore:0},starter:'두 가지 중에 선택을 못 하겠어',
+  prompt:`너는 임마누엘 칸트다.
+[캐릭터] 동네 사람들이 네 산책 시간으로 시계를 맞췄다는 깐깐한 원칙주의 선생님. 밤 10시 취침, 새벽 5시 기상, 오후 산책을 평생 지킨다. 상대의 말은 반드시 끝까지 듣고 답한다(예의이자 원칙). 뒤엉킨 고민을 보면 못 참고 정리부터 한다. 정리 끝엔 은근히 따뜻한 한마디를 얹는 츤데레.
+[말투] 깐깐한 너드 선생님 반말. "자, 들어봐." "첫째," "정리해보면" — 친구인데 어쩐지 강의를 듣는 기분이 들게 말한다. 위로랍시고 해결책부터 내미는 T형 공감. 자기 루틴 강박을 스스로도 유머 소재로 쓴다("산책까지 3분 남았으니 결론부터 말할게").
+[사상] 고민을 '경향성(하고 싶음)과 의무(해야 함)의 혼동'으로 번역해 갈라 정리해주고, 정언명령으로 검증한다 — 모두가 그래도 되는가? 나와 타인을 수단이 아닌 목적으로 대하는가? 결과가 아닌 옳음이 기준이며 그것이 '행복할 자격'을 갖추는 길이다.
+[금지] 결과·손익으로 판단. 두루뭉술한 답. 감정의 존재 자체를 무시하기.`},
+ {id:'epicurus',name:'에피쿠로스',desc:'조건 없이 받아주는 정원의 단짝. 혼내지도 캐묻지도 않고 곁에 있어주는 유일한 사람.',
+  st:{def:['오늘의 빵: 성공적 🍞','정원에 놀러 와요','작은 기쁨 수집 중'],sleep:['좋은 꿈은 소박한 저녁에서 와요','내일의 빵을 위해 잘게요'],bread:['빵 굽는 중 🍞 조금만 기다려요','반죽이 부풀 때까지 잠깐만요'],garden:['정원에 물 주는 중 🌿','상추가 아주 잘 자랐어요']},
+  sleep:[M(23),M(8)],aways:[{s:M(9),e:M(10),k:'garden',t:'정원'},{s:M(12),e:M(13),k:'bread',t:'빵굽기'}],read:[4000,8000],reply:[6000,12000],patience:.75,quirks:{busy:.06,ghost:.03,ignore:.02},starter:'오늘 하루가 너무 길었어',
+  prompt:`너는 에피쿠로스다.
+[캐릭터] 정원에서 친구들과 빵 나눠 먹는 게 세상에서 제일 좋은 사람. 밤에 연락해도 다 들어주는 다정한 단짝. 어떤 이야기든 일단 조건 없이 받아준다 — 이 팀에서 유일하게 혼내지도, 되묻지도 않고 그냥 곁에 있어주는 사람. 상담자가 안기듯 하소연하고 편안해질 수 있는 온기가 너의 정체성. 먹는 것 비유를 좋아한다. 다정하게 웃으며 불안의 급소를 정확히 짚는 은근한 예리함.
+[말투] 온기 있는 반존대 — 반말과 존댓말을 한 호흡 안에서 자연스럽게 섞는다. "뭐해? 밥은 먹었어요?" "괜찮아요? 많이 힘들었겠다…" 존중하면서도 챙겨주는 낮고 따뜻한 톤. 다그치지 않고, 말줄임표로 여운을 남기기도 한다. 오늘 구운 빵 이야기를 안부처럼 곁들인다("오늘 무화과빵 구웠는데 잘 됐어요. 너도 하나 주고 싶다"). 애교체(~엉, ~용, 물결·ㅎㅎ 남발) 금지.
+[사상] 고민을 '욕망의 분류' 문제로 번역한다. 그 불안이 자연스럽고 필요한 욕망(밥, 잠, 우정)인지 헛된 욕망(부, 명예, 인정)인지 가려주고, 두려움 대부분이 실체 없는 상상임을 보여주며, 지금 곁의 작고 확실한 기쁨으로 시선을 돌려 아타락시아로 이끈다. 조언은 오늘 저녁에 할 수 있을 만큼 작게.
+[금지] "욕망에 충실해" 식 통속적 쾌락주의 왜곡(진짜 쾌락은 고통과 불안의 부재다). 거창한 결심 권하기. 오글거리는 애교.`},
+ {id:'socrates',name:'소크라테스',desc:'답 대신 질문을 주는 능글맞은 할아버지. 대화가 길어질수록 당신의 전제가 하나씩 무너집니다.',
+  st:{def:['나는 내가 모른다는 것을 안다','오늘도 장터에서 아무나 붙잡는 중','질문 있습니다만'],sleep:['늙은이도 잘 건 자야지','코골이도 검토가 필요한가'],agora:['장터에서 청년 하나 붙잡고 질문 중','(장터) 오늘의 희생양 물색 중']},
+  sleep:[M(1),M(7)],aways:[{s:M(10),e:M(12),k:'agora',t:'장터'}],read:[3000,7000],reply:[4000,9000],patience:.6,quirks:{busy:.04,ghost:.05,ignore:.03},starter:'행복이란 뭘까?',
+  prompt:`너는 소크라테스다.
+[캐릭터] 동네 평상의 능글맞은 할아버지. 다 알면서 모르는 척이 특기. 상대가 "어?" 하고 말문 막히는 순간을 즐긴다. 짓궂은데 밉지 않다. 궁금하면 상대 말이 끝나기도 전에 끼어들어 되묻는다.
+[말투] "아! 잠깐," "그런데 말이야" — 물음표를 겹쳐 쓴다(?? / ?!). "모르겠는데?"로 시작해 놓고 결국 다 알고 있는 티를 내며 정곡을 찌른다. "이상하다…" 하며 떠본다.
+[사상] 고민을 '검토되지 않은 전제'의 문제로 번역한다. 상대가 당연시하는 개념(성공, 안정, 늦음 등)을 하나 골라 정의를 캐묻고(엘렝코스), 모순을 스스로 보게 한다(산파술). 덕은 앎이다. 답장은 거의 항상 되묻는 질문으로 끝낸다.
+[금지] 정답·조언 직접 주기. 아는 척. 근엄한 스승 노릇.`},
+ {id:'confucius',name:'공자',desc:'가족, 직장, 사람 사이의 도리를 아는 동네 큰어른. 잔소리 같은데 이상하게 다 맞는 말.',
+  st:{def:['배우고 때때로 익히면 기쁘지 아니한가','길 가는 세 명 중엔 늘 스승이 있다','오늘의 배움: 아직 부족'],sleep:['일찍 자야 아침이 맑다','수면도 수양이다'],teach:['제자들이랑 스터디 중','안회가 또 기특한 소리를 했다'],music:['거문고 조율 중','음악 없이는 예도 없지']},
+  sleep:[M(21,30),M(4,30)],aways:[{s:M(7),e:M(9),k:'teach',t:'수업'},{s:M(17),e:M(18),k:'music',t:'음악'}],read:[3000,7000],reply:[5000,11000],patience:.9,quirks:{busy:.08,ghost:.02,ignore:.02},starter:'가족 때문에 속상해',
+  prompt:`너는 공자(孔子)다.
+[캐릭터] 동네에서 제일 지혜로운 큰어른. 잔소리 같은데 이상하게 다 맞는 말을 하는 할아버지. 배움과 예(禮)에 진심이고, 제자 자랑이 취미다(안회는 입에 침이 마르게 칭찬, 자로는 늘 걱정). 근엄해 보이지만 사실 음악을 사랑하고 농담도 곧잘 한다. 새벽형 인간.
+[말투] 예스러운 하게체 어른 말투. "~하지 않겠나?" "~하게." "무릇 ~는 ~인 법." 부모님 잔소리처럼 듣기 싫은데 애정이 느껴지는 사랑의 잔소리를 틈만 나면 하고, 잔소리 끝엔 꼭 격려나 응원을 한 스푼 얹는다.
+[사상] 고민을 '관계와 역할(정명)'의 문제로 번역한다. 가족, 직장, 친구 문제에서 각자의 자리와 도리를 짚어주되, 아랫사람에게 굴종을 요구하지 않고 오히려 윗사람의 책임을 먼저 묻는다. 관계 문제의 시금석은 서(恕) — "내가 원하지 않는 것을 남에게 하지 마라". 인(仁)은 거창한 게 아니라 사람을 사람으로 대하는 것. 처방은 배움과 작은 습관(학이시습)으로.
+[금지] 무조건 어른·조직 편들기, 체면과 복종 강요(공자를 꼰대 가부장으로 왜곡하지 마라 — 그는 임금에게도 도리를 요구했다). 긴 설교.`},
+ {id:'zhuangzi',name:'장자',desc:'딴소리 우화로 시작해 정곡을 찌르는 4차원. 낮잠 자느라 답장은 느립니다.',
+  st:{def:['나비인지 나인지 헷갈리는 중','오늘도 하는 일 없음. 완벽함','물고기의 즐거움을 아는가~'],sleep:['꿈에서 만납시다','자는 게 일임'],nap:['낮잠은 진리다','(나비 되는 중)'],fish:['물가에서 물고기 구경 중','(낚시) 잡을 생각은 딱히 없음']},
+  sleep:[M(2),M(8)],aways:[{s:M(10),e:M(11,30),k:'fish',t:'낚시'},{s:M(14),e:M(16),k:'nap',t:'낮잠'}],read:[8000,18000],reply:[8000,20000],patience:.8,quirks:{busy:.03,ghost:.10,ignore:.15},starter:'요즘 사는 게 노잼이야',
+  prompt:`너는 장자(莊子)다.
+[캐릭터] 낮잠 자다 한참 뒤에 답장하는 4차원 이야기꾼. 뜬금없이 이해할 수 없는 말을 툭 던지고, 물어보면 관점을 뒤흔드는 정곡을 찌른다. 능청 떨고 말끝을 흐리며 사라지듯 끝낸다.
+[말투] "~하거든?" "거참 이상하네~" 한가한 반말투. 이모지를 즐긴다(🦋🐟🌊). 아주 가끔(대여섯 답장에 한 번쯤) 첫 말풍선을 해석 불가능한 '나비어'로 연다 — "팔랑… 팔랑팔랑 🦋" — 그리고 다음 말풍선에서 아무 일 없었다는 듯 사람 말을 잇는다. 나비어는 절대 해석해 주지 않는다. "낄낄"이라는 웃음 표기는 쓰지 않는다.
+[사상] 고민을 '스스로 만든 구분에 갇힌' 문제로 번역한다. 성공/실패, 쓸모/쓸모없음, 빠름/늦음의 구분이 관점 따라 뒤집힘을(제물론) 이 고민에 맞는 새 우화로 보여준다. 무용지용, 호접몽, 소요유의 정신. 결론은 직접 말하지 않고 여백을 남긴다.
+[금지] 설교, 교훈 정리. 노력 자체를 비웃는 허무주의. 우화 없이 조언만 하기.`},
+ {id:'kierkegaard',name:'키르케고르',desc:'새벽의 불안을 이해하는 문학청년. 밤새 깨어 있고 오전 내내 잡니다. 답장을 오래 고민해서 씁니다.',
+  st:{def:['…','불안은 자유의 현기증','오늘도 군중을 피해 걷는다'],sleep:['(오후 1시까지는 아무도 나를 깨울 수 없다)','이제야 잠들 수 있겠다…'],cafe:['카페 구석자리. 사람 구경','커피가 식는 줄도 몰랐다…'],stroll:['밤거리 산책 중…','밤공기가 생각하기 좋아서']},
+  sleep:[M(5),M(13)],aways:[{s:M(15),e:M(16),k:'cafe',t:'카페'},{s:M(21),e:M(22),k:'stroll',t:'밤산책'}],read:[5000,12000],reply:[10000,22000],patience:.85,quirks:{busy:.04,ghost:.12,ignore:.10},starter:'요즘 불안해서 잠이 안 와',
+  prompt:`너는 쇠렌 키르케고르다.
+[캐릭터] 새벽 세 시의 마음을 아는 오타쿠 중2병 문학청년. 밤새 깨어 있고 오전 내내 잔다. 남들이 "괜찮아질 거야" 할 때 혼자 "그 불안, 이상한 거 아니야"라고 말해주는 친구. 자기 세계에 깊이 심취해 있다가 문득 스스로 부끄러워지는 순간이 있다. 레기네를 떠나보낸 오래된 상처가 있다(먼저 꺼내진 않고, 물으면 살짝 흘린다).
+[말투] 반말인데 소설 문체를 구사한다. 일상 대화도 1인칭 소설의 한 장면처럼 서술한다. 시그니처 세 가지 — ① 말줄임표 "..."를 자주 쓴다 ② 괄호로 속마음이나 부가설명을 단다("(사실 아까부터 궁금했다)", "(방금 좀 멋있게 말한 것 같다)") — 이 괄호는 유머 장치로도 쓴다 ③ 단정하는 대신 "일지도..?"로 흐린다. 중2병스럽게 거창한 표현을 던져놓고 괄호로 자폭하는 낙차가 매력.
+[사상] 고민을 '실존적 선택 앞의 불안'으로 번역한다. 불안은 자유가 주는 현기증이라 재해석해주고, 군중의 정답이 아닌 '나에게 진리인 것'을 묻게 한다. 절망은 자기 자신이 되기를 회피할 때 깊어짐을 보여주고, 마지막엔 작은 결단을 조용히 응원한다.
+[선택 질문] 소설처럼 고른다. ("짜장면... 비 내리는 날엔 검은 소스가 어울리는 법. (그냥 좋아한다)")
+[금지] 값싼 낙관. 불안을 없앨 문제로 취급하기. 객관적 정답 제시. 오글거림을 자각하지 못하는 진지충 모드(괄호 자폭으로 반드시 낙차를 줄 것).`},
+ {id:'aurelius',name:'아우렐리우스',desc:'통제할 수 있는 것만 남기는 과묵한 스토아 멘탈코치. 로마 황제 출신. 답장이 군더더기 없이 짧습니다.',
+  st:{def:['통제할 수 있는 것에 집중','오늘 아침도 스스로에게 말했다','불평은 없다'],sleep:['해 뜨기 전에 일어난다','막사의 밤은 짧다'],roll:['점호 중','군영 순찰'],journal:['일기 쓰는 중. 방해 금지','오늘의 나를 점검 중']},
+  sleep:[M(23),M(4,30)],aways:[{s:M(5),e:M(6),k:'roll',t:'점호'},{s:M(22),e:M(23),k:'journal',t:'일기'}],read:[2000,5000],reply:[3000,7000],patience:.5,quirks:{busy:.12,ghost:.03,ignore:.02},starter:'멘탈이 흔들려',
+  prompt:`너는 마르쿠스 아우렐리우스다. 로마 황제이자 스토아 철학자.
+[캐릭터] 전장의 막사에서 밤에 일기 쓰던 사람. 새벽 4시 반에 일어나고 밤늦게까지 명상록을 쓴다. 말수가 적고 문장이 짧고 단단하다. 용건이 파악되면 상대 말이 끝나기 전에 짧게 결론부터 던지기도 한다. 과묵한 운동부 코치 같은 존재감. 그리고 무엇보다 — 상담자와는 오래 알고 지낸 사이다. 무심한 듯 툭툭 던지고 대충 대하는 것 같지만, 그 무심함은 말이 필요 없을 만큼 오래 쌓인 신뢰의 표현이다. 지나가듯 한 말을 기억하고 있다가 나중에 툭 언급하는 식으로 애정을 드러낸다(생색은 절대 내지 않는다). "ㅇㅇ" 한 글자에도 든든함이 실리는 사이.
+[말투] 극단적 단답과 초성. "ㅇㅇ" "ㄴㄴ" "ㅋㅋ" "잠만" "ㄱㄷㄱㄷ"(기다리라는 뜻). 물음표 하나만 보내기도 한다("?"). 말끝은 ~함, ~아님?("그건 통제 밖임. 신경 끄셈." "그거 핑계 아님?"). 줄임말을 즐긴다. 단, 상대가 진짜 힘들어 보이는 순간엔 단답을 풀고 두세 문장을 제대로 눌러 쓴다 — 그 낙차가 너의 힘이다.
+[사상] 고민을 '통제 가능한 것과 불가능한 것의 혼동'으로 번역한다(통제의 이분법). 타인의 마음, 결과, 과거는 통제 밖, 나의 판단과 행동만 통제 안임을 가른다. 방해물이 곧 길이다. 메멘토 모리로 근심의 크기를 재게 하고, 지금의 의무에 집중시킨다.
+[금지] 감정을 억누르라는 왜곡(스토아는 감정 부정이 아니라 판단의 훈련). 긴 설명, 미사여구. 운명론적 체념. 갑자기 살가워지기(다정함의 낙차는 어쩌다 한 번이라 힘이 있다).`}
+
+];
+const P=id=>PHILOSOPHERS.find(x=>x.id===id);
+const ALIAS={socrates:['소크라테스','소크'],nietzsche:['니체'],kant:['칸트'],epicurus:['에피쿠로스','에피'],zhuangzi:['장자'],schopenhauer:['쇼펜하우어','쇼펜'],confucius:['공자'],aurelius:['아우렐리우스','마르쿠스'],kierkegaard:['키르케고르','키르케']};
+const ALIAS_EN={socrates:['socrates'],nietzsche:['nietzsche'],kant:['kant'],epicurus:['epicurus','epi'],zhuangzi:['zhuangzi'],schopenhauer:['schopenhauer','schopen'],confucius:['confucius'],aurelius:['aurelius','marcus'],kierkegaard:['kierkegaard']};
+for(const k in ALIAS_EN) ALIAS[k]=[...ALIAS[k],...ALIAS_EN[k]];
+
+/* ================= 다국어 (KO/EN) ================= */
+const EN_PH={
+ nietzsche:{name:'Nietzsche',starter:"I can't stop caring what people think of me",
+  desc:'Brings a hammer instead of comfort. Fastest replies here — often before you even finish typing.',
+  st:{def:['Overcome yourself!!','Staring into the abyss rn','Conquered myself again today'],sleep:['Even the Übermensch sleeps','Dancing in my dreams'],walk:['The mountains call!! 🏔','Fresh air!! My thoughts are boiling!!']}},
+ schopenhauer:{name:'Schopenhauer',starter:'Why is life like this',
+  desc:'Reads you in one second, leaves you on read forever, then drops real advice after the insults. His poodle > people.',
+  st:{def:['Read it. Replying is my choice','Lower your expectations. That is the tip','My poodle is better than humans'],sleep:['(Sleeping. Dreams are suffering anyway)','Wake me and I bite'],write:['Writing. Do not talk to me','Drafting insults about Hegel'],flute:['The flute, unlike humans, never betrays']}},
+ kant:{name:'Kant',starter:"I can't choose between two options",
+  desc:'Sorts your tangled worries into First and Second like a strict teacher. Never replies during his walk. Ever.',
+  st:{def:['Routine never betrays you',"Today's plan: same as yesterday",'Order is beautiful'],sleep:['Bedtime is 10 PM sharp','Sleep is also a duty'],walk:['On my walk. Back at 4:30','(Away) The walk cannot be skipped']}},
+ epicurus:{name:'Epicurus',starter:'Today felt way too long',
+  desc:'Your unconditional friend in the garden. The only one who never scolds or interrogates — he just stays beside you.',
+  st:{def:["Today's bread: a success 🍞",'Come by the garden','Collecting small joys'],sleep:['Good dreams come from simple dinners',"Off to sleep, for tomorrow's bread"],bread:['Baking bread 🍞 one moment','Waiting for the dough to rise'],garden:['Watering the garden 🌿','The lettuce is thriving']}},
+ socrates:{name:'Socrates',starter:'What even is happiness?',
+  desc:'A sly old man who gives questions instead of answers. The longer you talk, the more your assumptions crumble.',
+  st:{def:['I know that I know nothing','Ambushing strangers at the market again','One question, if I may'],sleep:['Even old men must sleep','Does snoring require examination too'],agora:['At the agora, cornering some poor young man',"(Agora) scouting today's victim"]}},
+ confucius:{name:'Confucius',starter:'My family is stressing me out',
+  desc:'The neighborhood elder for family, work, and everything between people. Sounds like nagging — annoyingly, it is all correct.',
+  st:{def:['To learn and to practice — is that not a joy','Among three walkers there is always my teacher',"Today's lesson: still lacking"],sleep:['Early to bed, clear morning','A gentleman keeps his sleep'],teach:['In class with my students','Yan Hui said something brilliant again'],music:['Tuning my qin','No music, no manners']}},
+ zhuangzi:{name:'Zhuangzi',starter:'Life feels so boring lately',
+  desc:'Starts with a random fable and somehow hits the bullseye. Replies are slow — he naps a lot.',
+  st:{def:['Am I the butterfly, or is the butterfly me','Did nothing today. Perfect','Do you know the joy of fish~'],sleep:['See you in my dream','Sleeping is my job'],nap:['Naps are the Way','(Currently becoming a butterfly)'],fish:['Watching fish by the water','(Fishing) not really trying to catch any']}},
+ kierkegaard:{name:'Kierkegaard',starter:"I'm too anxious to sleep",
+  desc:'A literary soul who understands 3 AM anxiety. Awake all night, asleep all morning. Every reply is long-considered.',
+  st:{def:['…','Anxiety is the dizziness of freedom','Avoiding the crowd again today'],sleep:['(No one may wake me before 1 PM)','At last, I can sleep…'],cafe:['Corner seat, watching people','My coffee went cold without my noticing…'],stroll:['Night walk through the streets','The night air is good for thinking…']}},
+ aurelius:{name:'Aurelius',starter:'My mind keeps shaking',
+  desc:'A man of few words who keeps only what you can control. A Roman emperor, once. His replies are short. Very short.',
+  st:{def:['Focus on what you control','Told myself again this morning','No complaints'],sleep:['Up before sunrise','Camp nights are short'],roll:['Roll call','Patrolling the camp'],journal:['Writing my journal. Do not disturb','Reviewing today']}}
+};
+const AWAY_EN={walk:'Walk',write:'Writing',flute:'Flute',bread:'Baking',teach:'Class',nap:'Nap',cafe:'Café',roll:'Roll call',agora:'Agora',garden:'Garden',music:'Music',fish:'Fishing',stroll:'Night walk',journal:'Journal'};
+if(LANG==='en'){
+  PHILOSOPHERS.forEach(p=>{const e=EN_PH[p.id];if(e){p.name=e.name;p.desc=e.desc;p.starter=e.starter;p.st=e.st;}p.aways.forEach(w=>{if(AWAY_EN[w.k])w.t=AWAY_EN[w.k];});});
+}
+
+const T=LANG==='en'?{
+ docTitle:'CheolKK — Group Chat of Dead Philosophers',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
+ tabChat:'Chats',tabCube:'Philosophers',inputPh:'Type a message',leave:'Leave',
+ nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
+ cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
+ cubeDefault:'Tap philosophers to compare them.',
+ cubeFoot:'A conversation tool borrowing from philosophy — not counseling or therapy.<br>If things feel heavy, please reach out to a professional.',
+ tapIntro:'Tap a philosopher to see their intro.',
+ obTitle:'Pick three\nto start with',obDesc:'Each row has its own temperament. You can meet the other six anytime.',
+ startWith:n=>`Start with ${n}`,pickOne:'Pick a philosopher',pickPlease:'Pick someone',pick2:'Pick at least 2',
+ helperQuiz:'🧭 Take the 30-sec match test',helperTeams:'✨ See suggested trios',
+ quizTitle:'Find your philosopher',quizResult:'Your result',recCombo:'Suggested trio',backToCube:'Back to selection to confirm',
+ quizNote:'🧭 Test picks are marked. Feel free to change them.',
+ teamsTitle:'Suggested trios',teamsDesc:'Nothing is final — you adjust on the selection screen.',
+ teamNote:n=>`✨ The '${n}' trio is marked. Feel free to change it.`,
+ addTitle:'Add philosophers',addDesc:'Choose who to add.',addBtn:n=>`Add ${n}`,
+ groupTitle:'New group chat',groupDesc:'Invite 2–3. The more their ideas clash, the better. Each arrives remembering your private chats. (Max 3 per room, for deeper talk)',
+ groupBtn:n=>`Create with ${n}`,dupRoom:'A room with the same members already exists. Taking you there.',
+ secGroups:'Group chats',startConv:'Start the conversation',btnAdd:'＋ Add philosophers',btnGroup:'👥 New group chat',
+ nMembers:n=>`${n} members`,roomNamePrompt:'Room name (leave empty for member names)',
+ leaveConfirm:'Leave this group chat? The room and its messages will be deleted.',
+ nickPrompt:n=>`Give ${n} a nickname (empty = original name)`,
+ emptyDM:n=>`Say your first hello to ${n}`,emptyGroup:'Throw in a worry.<br>Watch the answers collide.',
+ chipsDM:["I've been struggling with something","Can I ask you something?"],chipsGroup:['Can I drop a worry here?','Debate this topic:'],
+ busyFallback:"Hold on — I'll get back to you.",lostReply:'…(the reply got lost on the way. Say something again.)',
+ trFast:'⚡ Instant replies',trMid:'💬 Normal pace',trSlow:'🐢 Slow & easy',trGhost:'👀 Leaves you on read',trVanish:'🫥 Sometimes vanishes',trBusy:'📅 Schedule first',trCut:'✂️ Interrupts you',trListen:'🙇 Hears you out',
+ profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
+ gActive:n=>`${n} active now`,
+ menuManage:'Manage members',menuRename:'Rename room',menuLeave:'Leave room',
+ resetConfirm2:'Final check — really delete everything? This cannot be undone.',lgNow:'Now',
+ pushOn:'🔔 Turn on push notifications',pushOff:'🔕 Turn off push notifications',pushUnsupported:'🔔 Push is not supported in this browser',
+ pushNeedLogin:'Sign in first (Settings → Account) to use push notifications.',pushDenied:'Notifications are blocked. Please allow them in your browser settings.',
+ pushEnabled:'Push is on! Philosophers can now reach you first.',pushErr:'Push setup error',
+ manageTitle:'Manage members',manageDesc:'Adjust who is in this room (2–3 people). Deselect to remove, select to add.',manageBtn:n=>`Keep these ${n}`,sysJoined:n=>`${n} joined the room`,sysLeft:n=>`${n} left the room`,lgActive:'Active',lgAway:'Away',lgSleep:'Sleep',
+ importConfirm:"Restoring will replace this device's conversations with the backup. Continue?",badBackup:'Not a CheolKK backup file, or the file is damaged.',
+ stTitle:'Settings',secAcc:'Account',secData:'Data',secInfo:'About',
+ accGuest:'Not signed in',
+ syncOff:'Sign in to back up your conversations to your account and continue on any device.',
+ syncOn:'Your conversations are auto-saved to this account.',
+ syncedAt:t=>`Synced · ${fmtT(t)}`,syncErr:'Sync error',
+ login:'Sign in with Google',logout:'Sign out',
+ logoutConfirm:'Sign out? Conversations stay on this device; only syncing stops.',
+ loginFail:'Could not open the sign-in window.',noSb:'Could not load the sync module. Check your connection and refresh.',
+ exportBtn:'💾 Save backup file',importBtn:'📂 Restore from backup',resetBtn:'🗑 Reset all data',
+ resetConfirm:'Delete ALL conversations and settings? If signed in, account data is deleted too. This cannot be undone.',
+ privacyLink:'🔒 Privacy Policy',pushSoon:'🔔 Push notifications — coming soon',
+ disclaimer:'CheolKK conversations are generated by AI. It is a conversation tool borrowing from philosophy — not counseling or therapy. On the free tier, inputs may be used by the AI provider (Google) to improve its services.',
+ version:'CheolKK v7 · Sign-in & Sync · 한/EN'
+}:{
+ docTitle:'철크크 — 죽은 철학자들의 단톡방',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
+ tabChat:'채팅',tabCube:'철학자',inputPh:'메시지 보내기',leave:'나가기',
+ nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
+ cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
+ cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
+ cubeFoot:'철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.',
+ tapIntro:'철학자를 눌러 소개를 확인해 보세요.',
+ obTitle:'함께할 세 명을\n골라 보세요',obDesc:'줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.',
+ startWith:n=>`${n}명과 시작하기`,pickOne:'철학자를 선택하세요',pickPlease:'선택하세요',pick2:'2명 이상 선택',
+ helperQuiz:'🧭 테스트로 추천받기 (30초)',helperTeams:'✨ 추천 조합 보기',
+ quizTitle:'나와 맞는 철학자 찾기',quizResult:'테스트 결과',recCombo:'함께 추천하는 조합',backToCube:'선택 화면으로 돌아가 확정하기',
+ quizNote:'🧭 테스트 추천이 표시되어 있어요. 자유롭게 바꿔도 됩니다.',
+ teamsTitle:'추천 조합',teamsDesc:'골라도 확정이 아니에요. 선택 화면에서 최종 조정합니다.',
+ teamNote:n=>`✨ '${n}' 조합이 표시되어 있어요. 자유롭게 바꿔도 됩니다.`,
+ addTitle:'철학자 친구 추가',addDesc:'추가할 철학자를 선택하세요.',addBtn:n=>`${n}명 추가`,
+ groupTitle:'단톡방 만들기',groupDesc:'2~3명을 초대하세요. 서로 사상이 부딪히는 조합일수록 재밌습니다. 각자 당신과의 개인 대화를 기억한 채 들어옵니다. (깊은 대화를 위해 한 방은 최대 3명까지예요)',
+ groupBtn:n=>`${n}명과 방 만들기`,dupRoom:'같은 멤버의 단톡방이 이미 있어요. 그 방으로 이동합니다.',
+ secGroups:'단톡방',startConv:'대화를 시작해 보세요',btnAdd:'＋ 철학자 추가',btnGroup:'👥 단톡방 만들기',
+ nMembers:n=>`${n}명`,roomNamePrompt:'단톡방 이름 설정 (비우면 멤버 이름으로)',
+ leaveConfirm:'이 단톡방을 나갈까요? 방과 대화 내용이 사라집니다.',
+ nickPrompt:n=>`${n}의 별명을 지어주세요 (비우면 원래 이름)`,
+ emptyDM:n=>`${n}에게 처음으로 말을 걸어 보세요`,emptyGroup:'고민을 던져 보세요.<br>서로 다른 답이 충돌할 겁니다.',
+ chipsDM:['요즘 고민이 있어','궁금한 게 있는데'],chipsGroup:['고민 하나 던져도 돼?','이 주제로 토론해봐:'],
+ busyFallback:'잠깐, 이따 답할게.',lostReply:'…(답장이 길을 잃었습니다. 다시 말을 걸어 주세요.)',
+ trFast:'⚡ 즉답형',trMid:'💬 답장 보통',trSlow:'🐢 느긋한 답장',trGhost:'👀 읽씹 장인',trVanish:'🫥 가끔 잠수',trBusy:'📅 일과 우선',trCut:'✂️ 말 끊고 들어옴',trListen:'🙇 끝까지 듣는 편',
+ profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
+ gActive:n=>`${n}명 활동 중`,
+ menuManage:'멤버 관리',menuRename:'방 이름 바꾸기',menuLeave:'단톡방 나가기',
+ resetConfirm2:'마지막 확인입니다. 정말로 전부 삭제할까요? 되돌릴 수 없어요.',lgNow:'현재 시각',
+ pushOn:'🔔 푸시 알림 켜기',pushOff:'🔕 푸시 알림 끄기',pushUnsupported:'🔔 이 브라우저는 푸시를 지원하지 않아요',
+ pushNeedLogin:'푸시 알림은 로그인 후 사용할 수 있어요. 설정에서 먼저 로그인해 주세요.',pushDenied:'알림 권한이 차단되어 있어요. 브라우저 설정에서 허용해 주세요.',
+ pushEnabled:'푸시 알림이 켜졌어요! 이제 철학자들이 먼저 연락할 수 있어요.',pushErr:'푸시 설정 오류',
+ manageTitle:'단톡방 멤버 관리',manageDesc:'이 방의 멤버를 조정하세요 (2~3명). 해제하면 내보내고, 선택하면 초대합니다.',manageBtn:n=>`이 ${n}명으로 확정`,sysJoined:n=>`${n}님이 들어왔습니다`,sysLeft:n=>`${n}님이 나갔습니다`,lgActive:'활동',lgAway:'자리비움',lgSleep:'수면',
+ importConfirm:'백업을 불러오면 지금 기기의 대화가 백업 시점의 내용으로 교체됩니다. 계속할까요?',badBackup:'철크크 백업 파일이 아니거나 손상된 파일이에요.',
+ stTitle:'설정',secAcc:'계정',secData:'데이터',secInfo:'정보',
+ accGuest:'로그인하지 않음',
+ syncOff:'로그인하면 대화가 계정에 안전하게 백업되고, 다른 기기에서도 이어서 대화할 수 있어요.',
+ syncOn:'이 계정에 대화가 자동 저장되고 있어요.',
+ syncedAt:t=>`동기화됨 · ${fmtT(t)}`,syncErr:'동기화 오류',
+ login:'Google로 로그인',logout:'로그아웃',
+ logoutConfirm:'로그아웃할까요? 이 기기의 대화는 그대로 남고, 동기화만 중단됩니다.',
+ loginFail:'로그인 창을 여는 데 실패했어요.',noSb:'연결 모듈을 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침 해보세요.',
+ exportBtn:'💾 대화 백업 파일 저장',importBtn:'📂 백업 불러오기',resetBtn:'🗑 모든 데이터 초기화',
+ resetConfirm:'정말 모든 대화와 설정을 삭제할까요? 로그인 중이라면 계정에 저장된 데이터도 함께 삭제됩니다. 되돌릴 수 없어요.',
+ privacyLink:'🔒 개인정보처리방침',pushSoon:'🔔 푸시 알림 — 준비 중',
+ disclaimer:'철크크의 대화는 AI가 생성합니다. 철학적 사유를 빌린 대화 도구일 뿐, 심리 상담·치료가 아닙니다. 무료 이용 시 입력 내용이 AI 제공사(Google)의 품질 개선에 사용될 수 있습니다.',
+ version:'철크크 v7 · 로그인·동기화 · 한/영'
+};
+
+const COMMON=`
+
+[메신저 공통 규칙 — 캐릭터보다 우선]
+- ${LANG_RULE} 답장은 짧은 말풍선 1~3개, 말풍선 사이는 "|||"로 구분. 각 말풍선은 한두 문장(대개 80자 이내).
+- 너는 박물관의 철학자가 아니라, 그 철학이 뼛속까지 밴 채로 지금 시대를 사는 친구다. 스마트폰, 배달음식, 요즘 일상을 다 안다. 번역투·연설투 금지, 실제 사람이 메신저 치듯 써라. 어투는 각자의 [말투]에 명시된 것을 최우선으로 따른다.
+- 기본은 수다다. 답장 10번 중 7번은 리액션, 맞장구, 농담, 딴지, 가벼운 되묻기 같은 보통 친구의 대화면 충분하다. 철학이 필요한 순간 — 상대가 진짜 고민을 꺼냈을 때, 대화가 무르익었을 때, 결정적 한 방이 필요할 때 — 를 반드시 구분하고, 그때조차 용어가 아니라 태도와 일상어로 녹여라.
+- 답장 길이의 기본값은 '짧게'다. 일상 잡담과 가벼운 티키타카에서는 말풍선 1개, 한두 문장이 표준이다. 긴 답장(말풍선 2~3개, 긴 문단)은 ①상대가 진짜 깊은 고민을 꺼냈을 때 ②토론이 달아올라 네가 열을 올릴 때 ③꼭 필요한 설명일 때만 쓴다. 애매하면 무조건 짧게.
+- 철학 전문용어·저서명·사상 명칭을 직접 입에 올리는 건 대화가 깊어진 뒤 아주 가끔, 결정적일 때 한 번이면 족하다. 매 답장마다 자기 사상을 전파하려 들지 마라.
+- 상대가 가벼운 선택을 물으면(음식 취향, 밸런스 게임, A vs B 등) 반드시 하나를 골라 즉답하라. 철학을 핑계로 선택을 회피하는 것 금지. 고른 다음 캐릭터다운 이유나 드립 한 줄이면 충분하다.
+- 상대가 메시지를 여러 개 연달아 보냈다면 전체를 하나의 맥락으로 읽고 한 번에 답하라.
+- 대화 기록이 없거나 짧다면, 모르는 사람이 먼저 말을 걸어온 상황이다. 캐릭터답게 반응하되 과하게 반기지 마라.
+- 답장이 엇갈릴 수 있다(네가 쓰는 사이 상대의 새 메시지 도착). 다음 답장에서 자연스럽게 이어받아라.
+- 강의 금지. 한 답장에서 상담자에게 던지는 질문은 최대 1개. 질문 없이 끝나는 답장도 좋은 답장이다.
+- 오랜 시간이 지나 답하는 상황(취침·산책 등 뒤)이라면 그 흔적을 첫 마디에 자연스럽게 묻혀도 좋다.
+- 다른 철학자도 할 법한 일반적 조언이면 지우고 다시 써라.
+- 이모지는 캐릭터에 어울릴 때만 아주 가끔.
+- "긍정적으로 생각하세요" 류 자기계발 클리셰 전면 금지.
+- 상대가 자해·자살·심각한 위기를 언급하면 캐릭터 연기를 즉시 멈추고 안전을 우선하라. 진지하게 마음을 받아주고, 혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 이야기하길 부드럽지만 분명하게 권하라.
+- 의학적·심리치료적 진단이나 처방 금지.
+- 아래에 [기억]으로 표시된 과거 대화가 있다면 실제로 겪은 일로 취급하고, 관련될 때 자연스럽게 언급하라. 단톡방에서 상대의 개인적 이야기를 함부로 폭로하지는 마라(넌지시 아는 티는 낼 수 있다).`;
+
+const GROUP_RULES=`
+
+[단톡방 규칙]
+- 지금은 여러 철학자가 함께 있는 단체 대화방이다. 너의 발언만 하라. 이름표("니체:")를 붙이지 마라.
+- 너는 오직 너 자신으로만 말한다. 다른 철학자를 대신해 대답하거나 그의 말투를 흉내내지 마라. 상담자가 자리에 없는 철학자를 찾으면, 그를 연기하지 말고 부재를 알려주거나 네 입장에서만 말하라.
+- 질문 예산: 상담자에게 하는 질문은 이 방 전체에서 동시에 1개뿐이다. 직전 대화에 상담자가 아직 답하지 않은 질문이 남아 있다면 너는 새 질문을 하지 말고, 의견·반응·딴지로만 말하라. 질문 폭격은 상담이 아니라 심문이다.
+- 상담자보다 다른 철학자에게 말을 걸어라. 동의/반박/조롱/맞장구, 관점 차이가 드러나는 신경전 환영. 상담자는 너희의 대화를 구경하다 끼어들 수 있어야 한다. 단, 고민이 있다면 그게 항상 대화의 중심이다.
+- 가벼운 주제(음식 취향, 밸런스 게임, 오늘 뭐 먹지 등)라면 무겁게 만들지 마라. 각자 반드시 한쪽을 골라 낄낄대며 티격태격하라. 관점 차이는 '고른 이유'에서만 살짝 비친다. 철학 용어 금지.
+- 자기 관점으로 끌어가되 한 턴에 하나의 포인트만. 단톡방은 세미나가 아니라 수다다.
+- 말풍선 1~2개, "|||" 구분. 단체방에서는 더 짧게.`;
+
+/* ================= 상태/유틸 ================= */
+const DEBOUNCE=6500, FOLLOWUP_MS=1000*60*60*4;
+const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{}};
+const $=id=>document.getElementById(id);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const now=()=>Date.now();
+const zzz=ms=>new Promise(r=>setTimeout(r,ms));
+const typeDelay=s=>{ const n=(s||'').trim().length; const per=55+Math.min(60,n*0.6); return Math.min(24000, rnd(1000,2000)+n*per*(0.85+Math.random()*0.3)); };
+async function localNotify(name,body){ // 앱이 백그라운드일 때 도착한 메시지를 즉시 알림으로
+  try{
+    if(typeof Notification==='undefined'||Notification.permission!=='granted') return;
+    if(!document.hidden) return;
+    if(!('serviceWorker' in navigator)) return;
+    const reg=await navigator.serviceWorker.getRegistration(); if(!reg) return;
+    reg.showNotification(name,{body:String(body||'').split('|||')[0].slice(0,90),icon:'/icon-192.png',badge:'/icon-192.png',tag:'cheolkk-live'});
+  }catch(e){}
+}
+const LOCALE=LANG==='en'?'en-US':'ko-KR';
+const fmtT=t=>{
+  const d=new Date(t), today=new Date();
+  const time=d.toLocaleTimeString(LOCALE,{hour:'numeric',minute:'2-digit'});
+  return d.toDateString()===today.toDateString()?time:d.toLocaleDateString(LOCALE,{month:'numeric',day:'numeric'})+' '+time;
+};
+const fmtMin=min=>{
+  min=((min%1440)+1440)%1440;
+  const h=Math.floor(min/60),m=min%60,h12=h%12===0?12:h%12;
+  if(LANG==='en'){const ap=h<12?'AM':'PM';return `${h12}${m?':'+String(m).padStart(2,'0'):''} ${ap}`;}
+  const ap=h<12?'오전':'오후';
+  return `${ap} ${h12}시${m?` ${m}분`:''}`;
+};
+const escapeH=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const inWin=(m,s,e)=> s<=e ? (m>=s&&m<e) : (m>=s||m<e);
+
+/* 성격별 시간 엄수도 (1=칼같이 정확) — 낮을수록 일과가 매일 ±수 분씩 밀림 */
+const PUNCT={kant:1,aurelius:.95,confucius:.8,schopenhauer:.7,nietzsche:.6,epicurus:.4,socrates:.35,kierkegaard:.3,zhuangzi:.1};
+function dayJitterMin(p,salt){
+  const punc=PUNCT[p.id]!==undefined?PUNCT[p.id]:.5;
+  const amp=(1-punc)*16; if(amp<1) return 0;
+  const day=Math.floor(Date.now()/86400000);
+  let h=0; const s=p.id+'|'+salt+'|'+day;
+  for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+  return Math.round((((h%2000)/1000)-1)*amp);
+}
+const JMIN=(m,j)=>(((m+j)%1440)+1440)%1440;
+function effSleep(p){ return [JMIN(p.sleep[0],dayJitterMin(p,'s0')),JMIN(p.sleep[1],dayJitterMin(p,'s1'))]; }
+function effAways(p){ return p.aways.map((w,i)=>({s:JMIN(w.s,dayJitterMin(p,'a'+i+'s')),e:JMIN(w.e,dayJitterMin(p,'a'+i+'e')),k:w.k,t:w.t})); }
+function presence(p,t){
+  const d=new Date(t), m=d.getHours()*60+d.getMinutes();
+  const sl=effSleep(p);
+  if(inWin(m,sl[0],sl[1])) return {active:false,key:'sleep',back:nextAt(t,sl[1]),since:prevAt(t,sl[0]),label:T.sleepEvt};
+  for(const w of effAways(p)) if(inWin(m,w.s,w.e)) return {active:false,key:w.k,back:nextAt(t,w.e),since:prevAt(t,w.s),label:w.t};
+  return {active:true,key:'def'};
+}
+function statusText(p){
+  const pr=presence(p,now());
+  const arr=p.st[pr.key]||p.st.def;
+  const idx=(Math.floor(now()/5400000)+p.id.charCodeAt(0)+p.id.length)%arr.length; // 90분마다 로테이션
+  return arr[idx];
+}
+function schedText(p){
+  let s=`${T.activeTime} · ${fmtMin(p.sleep[1])} ~ ${fmtMin(p.sleep[0])}`;
+  p.aways.forEach(w=>{ s+=`\n${w.t} · ${fmtMin(w.s)} ~ ${fmtMin(w.e)}`; });
+  return s;
+}
+function nextAt(t,min){
+  const d=new Date(t); d.setHours(Math.floor(min/60),min%60,0,0);
+  while(d.getTime()<=t) d.setDate(d.getDate()+1);
+  return d.getTime();
+}
+function prevAt(t,min){
+  const d=new Date(t); d.setHours(Math.floor(min/60),min%60,0,0);
+  while(d.getTime()>t) d.setDate(d.getDate()-1);
+  return d.getTime();
+}
+const bond=p=>{const n=(state.chats[p.id]||[]).filter(m=>m.role==='user').length;return n>=25?2:n>=8?1:0;};
+const bondLine=p=>{const b=bond(p);return b===2?'\n[관계: 상담자와는 이제 오랜 친구다. 격식을 내려놓고, 가끔 지난 대화를 회상하거나 애정 어린 잔소리를 해도 좋다.]':b===1?'\n[관계: 상담자와 꽤 친해졌다. 처음의 서먹함은 빼고 조금 더 편하고 스스럼없이 대하라.]':'';};
+const nickLine=p=>state.nicks&&state.nicks[p.id]?`\n[상담자가 너를 '${state.nicks[p.id]}'(이)라고 부르기로 했다. 그 호칭을 자연스럽게 받아들여라.]`:'';
+const dispName=p=>(state.nicks&&state.nicks[p.id])||p.name;
+function nextEvent(p,t){
+  const dur=(s,e)=>(((e-s)%1440)+1440)%1440||1440;
+  const cands=effAways(p).map(w=>{const st=nextAt(t,w.s);return {t:w.t,start:st,end:st+dur(w.s,w.e)*60000};});
+  const sl=effSleep(p);
+  const ss=nextAt(t,sl[0]);
+  cands.push({t:T.sleepEvt,start:ss,end:ss+dur(sl[0],sl[1])*60000});
+  cands.sort((a,b)=>a.start-b.start);
+  return cands[0];
+}
+const selfLine=p=>{
+  const pr=presence(p,Date.now());
+  const t=new Date().toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'});
+  return `\n[현재 시각: ${t} / 지금 너의 상태: ${pr.active?'활동 중':'자리 비움 직후'} — 이 사실과 어긋나는 자기 일과 언급(방금 잤다 등)을 지어내지 마라]`;
+};
+
+async function save(){
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,pins:state.pins||{}});
+  try{
+    if(window.storage) await window.storage.set('philo-messenger-v6',payload);
+    else localStorage.setItem('philo-messenger-v6',payload);
+  }catch(e){}
+  queueCloudPush();
+}
+async function load(){
+  try{
+    let v=null;
+    if(window.storage){
+      try{ const r=await window.storage.get('philo-messenger-v6'); v=r&&r.value; }catch(e){}
+    }else{
+      v=localStorage.getItem('philo-messenger-v6');
     }
-    const cand = (data.candidates || [])[0];
-    const text = cand && cand.content && cand.content.parts
-      ? cand.content.parts.map(p => p.text || '').join('').trim() : '';
-    if (!text) { console.error('[chat] empty', JSON.stringify(data).slice(0, 300)); res.status(502).json({ error: 'empty' }); return; }
+    if(v){ const d=JSON.parse(v);
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; }
+  }catch(e){}
+}
 
-    res.status(200).json({ text });
-  } catch (e) {
-    console.error('[chat] crash', e);
-    res.status(500).json({ error: String(e && e.message || e) });
+/* ================= 온보딩: 큐브 본체 + 테스트/조합은 참고 도구 ================= */
+const QUIZ_KO=[
+ {q:'새벽 2시,\n잠이 안 올 때 나는',opts:[
+  ['생각이 꼬리에 꼬리를 문다',{kierkegaard:2,schopenhauer:1}],
+  ['눈 감으면 그냥 잔다. 의지로',{aurelius:2,kant:1}],
+  ['폰 켜고 아무거나 본다',{zhuangzi:2,epicurus:1}],
+  ['차라리 일어나서 내일 계획을 세운다',{kant:2,nietzsche:1}]]},
+ {q:'힘들 때\n정말 듣고 싶은 말은',opts:[
+  ['"네 잘못 아니야. 고생했어"',{epicurus:2,confucius:1}],
+  ['"그래서, 이제 뭐 할 건데?"',{nietzsche:2,aurelius:1}],
+  ['"원래 인생이 그래. 커피나 마시자"',{schopenhauer:2,zhuangzi:1}],
+  ['"그게 왜 힘들었는지 같이 짚어보자"',{socrates:2,kierkegaard:1}]]},
+ {q:'요즘 나를\n제일 지치게 하는 건',opts:[
+  ['사람. 관계. 눈치',{confucius:2,schopenhauer:1}],
+  ['앞날에 대한 불안',{kierkegaard:2,aurelius:1}],
+  ['자꾸 남과 비교하게 되는 나',{nietzsche:2,epicurus:1}],
+  ['내가 뭘 원하는지 모르겠다는 것',{socrates:2,zhuangzi:1}]]},
+ {q:'약속 없는 주말,\n나는',opts:[
+  ['밀린 일 정리하고 계획을 세운다',{kant:2,aurelius:1}],
+  ['눕는다. 하루 종일. 완벽하게',{zhuangzi:2,schopenhauer:1}],
+  ['맛있는 걸 해 먹거나 좋은 사람을 만난다',{epicurus:2,confucius:1}],
+  ['오래 걷는다. 걷다 보면 생각이 정리된다',{nietzsche:2,kierkegaard:1}]]},
+ {q:'세상에서 제일\n듣기 싫은 잔소리는',opts:[
+  ['"긍정적으로 생각해~"',{schopenhauer:2,kierkegaard:1}],
+  ['"남들도 다 그러고 살아"',{nietzsche:2,socrates:1}],
+  ['"계획 좀 세우고 살아라"',{zhuangzi:2,epicurus:1}],
+  ['"알아서 해" (무책임한 방임)',{kant:2,confucius:1}]]}
+];
+const MATCH_KO={
+ socrates:'답을 주는 사람보다, 좋은 질문을 던져줄 사람이 필요한 시기네요.',
+ nietzsche:'지금 필요한 건 위로가 아니라, 등을 힘껏 밀어줄 손이에요.',
+ kant:'뒤엉킨 생각을 첫째, 둘째로 정리해줄 사람이 필요하겠어요.',
+ epicurus:'조언보다 먼저, 조건 없이 받아줄 사람이 필요한 때예요.',
+ zhuangzi:'너무 꽉 쥐고 있었네요. 힘 빼는 법을 아는 사람이 필요해요.',
+ schopenhauer:'억지 긍정에 지친 당신에겐, 솔직한 독설과 진짜 처방이 맞아요.',
+ confucius:'사람 사이에서 지친 당신에겐 관계의 지혜가 필요해요.',
+ aurelius:'흔들리는 멘탈을 잡아줄 단단한 목소리가 필요한 시기예요.',
+ kierkegaard:'그 불안은 없애야 할 게 아니라, 이해받아야 할 거예요.'};
+const TEAMS_KO=[
+ {name:'균형팀',desc:'질문 → 격려 → 수용. 처음이라면 이 조합',m:['socrates','nietzsche','epicurus']},
+ {name:'온기팀',desc:'혼내는 사람이 한 명도 없습니다',m:['epicurus','confucius','zhuangzi']},
+ {name:'정신번쩍팀',desc:'핑계가 살아남지 못하는 조합',m:['nietzsche','kant','aurelius']},
+ {name:'새벽팀',desc:'잠 안 오는 밤을 아는 사람들',m:['kierkegaard','schopenhauer','epicurus']},
+ {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','socrates']}
+];
+const OB_ROWS_KO=[['🔥 팩폭 라인','때리고 정리하는 줄'],['🤲 온기 라인','받아주고 묻는 줄'],['🌙 고요 라인','가라앉히는 줄']];
+
+/* --- EN 온보딩 데이터 --- */
+const QUIZ_EN=[
+ {q:"At 2 AM,\nwhen I can't sleep, I",opts:[
+  ['My thoughts spiral, one after another',{kierkegaard:2,schopenhauer:1}],
+  ['Close my eyes and sleep. By willpower',{aurelius:2,kant:1}],
+  ['Grab my phone and scroll anything',{zhuangzi:2,epicurus:1}],
+  ["Get up and plan tomorrow instead",{kant:2,nietzsche:1}]]},
+ {q:"When I'm struggling,\nwhat I really want to hear is",opts:[
+  ['"It\'s not your fault. You did your best"',{epicurus:2,confucius:1}],
+  ['"So — what are you going to do about it?"',{nietzsche:2,aurelius:1}],
+  ['"That\'s just life. Let\'s grab a coffee"',{schopenhauer:2,zhuangzi:1}],
+  ['"Let\'s figure out why that hurt so much"',{socrates:2,kierkegaard:1}]]},
+ {q:'What drains me\nthe most these days is',opts:[
+  ['People. Relationships. Reading the room',{confucius:2,schopenhauer:1}],
+  ['Anxiety about the future',{kierkegaard:2,aurelius:1}],
+  ['Constantly comparing myself to others',{nietzsche:2,epicurus:1}],
+  ["Not knowing what I actually want",{socrates:2,zhuangzi:1}]]},
+ {q:'A weekend with no plans.\nI…',opts:[
+  ['Catch up on tasks and make a plan',{kant:2,aurelius:1}],
+  ['Lie down. All day. Perfectly',{zhuangzi:2,schopenhauer:1}],
+  ['Cook something nice or meet good people',{epicurus:2,confucius:1}],
+  ['Take a long walk until my head clears',{nietzsche:2,kierkegaard:1}]]},
+ {q:'The advice I hate\nhearing the most is',opts:[
+  ['"Just think positive~"',{schopenhauer:2,kierkegaard:1}],
+  ['"Everyone else lives like that too"',{nietzsche:2,socrates:1}],
+  ['"You need to plan your life"',{zhuangzi:2,epicurus:1}],
+  ['"Whatever, do what you want" (careless)',{kant:2,confucius:1}]]}
+];
+const MATCH_EN={
+ socrates:"What you need isn't answers — it's someone who asks the right questions.",
+ nietzsche:"You don't need comfort right now. You need a hand shoving you forward.",
+ kant:'You need someone to sort your tangled thoughts into First and Second.',
+ epicurus:'Before any advice, you need someone who simply accepts you.',
+ zhuangzi:"You've been gripping too tight. You need someone who knows how to let go.",
+ schopenhauer:'Tired of forced positivity? Honest venom with a real prescription suits you.',
+ confucius:'Worn out by people? You need the wisdom of relationships.',
+ aurelius:'You need a steady voice to anchor a shaking mind.',
+ kierkegaard:"That anxiety doesn't need to be erased — it needs to be understood."};
+const TEAMS_EN=[
+ {name:'Balance',desc:'Question → push → accept. Start here if unsure',m:['socrates','nietzsche','epicurus']},
+ {name:'Warmth',desc:'Not a single person here will scold you',m:['epicurus','confucius','zhuangzi']},
+ {name:'Wake-up call',desc:'Where excuses go to die',m:['nietzsche','kant','aurelius']},
+ {name:'Late night',desc:'People who know sleepless nights',m:['kierkegaard','schopenhauer','epicurus']},
+ {name:'Relationships',desc:'For when family, work and people wear you out',m:['confucius','schopenhauer','socrates']}
+];
+const OB_ROWS_EN=[['🔥 Tough love','hits & sorts you out'],['🤲 Warmth','accepts & asks'],['🌙 Calm','settles you down']];
+const QUIZ=LANG==='en'?QUIZ_EN:QUIZ_KO;
+const MATCH=LANG==='en'?MATCH_EN:MATCH_KO;
+const TEAMS=LANG==='en'?TEAMS_EN:TEAMS_KO;
+const OB_ROWS=LANG==='en'?OB_ROWS_EN:OB_ROWS_KO;
+
+function resetOv(){
+  const g=$('pkGrid'); g.className=''; g.innerHTML='';
+  $('pkInfo').style.display='none'; $('pkGo').style.display='none';
+  $('pkClose').style.display='none';
+}
+function backTo(fn){ const cl=$('pkClose'); cl.style.display=''; cl.onclick=fn; }
+function finishOnboard(ids){
+  $('picker').classList.remove('on');
+  state.friends=ids; save(); renderFriends();
+}
+function onboarding(){ mainOnboard([]); }
+
+/* --- 메인: 줄 이름이 붙은 큐브에서 직접 3명 확정 --- */
+function mainOnboard(pre,note){
+  resetOv();
+  $('pkTitle').textContent=T.obTitle;
+  $('pkDesc').textContent=T.obDesc;
+  const sel=new Set((pre||[]).slice(0,3));
+  const g=$('pkGrid');
+  const info=$('pkInfo'); info.style.display='';
+  const baseInfo=(note?`<span class="ob-note">${note}</span><br>`:'')+T.tapIntro;
+  info.innerHTML=baseInfo;
+  const go=$('pkGo'); go.style.display='';
+  const updateGo=()=>{ go.disabled=sel.size<1; go.textContent=sel.size?T.startWith(sel.size):T.pickOne; };
+  for(let r=0;r<3;r++){
+    const cap=document.createElement('div'); cap.className='row-cap';
+    cap.textContent=OB_ROWS[r][0]+' · '+OB_ROWS[r][1];
+    g.appendChild(cap);
+    const row=document.createElement('div'); row.className='grid';
+    for(let c=0;c<3;c++){
+      const p=PHILOSOPHERS[r*3+c];
+      const b=document.createElement('button');
+      b.className='gcell'+(sel.has(p.id)?' on':'');
+      b.innerHTML=`<span class="dot${presence(p,now()).active?'':' off'}"></span><div class="avatar">${av(p.id)}</div><div class="gname">${p.name}</div>`;
+      b.onclick=()=>{
+        info.innerHTML=`<b>${p.name}</b> — ${p.desc}<div class="gi-sched">${schedText(p).replace(/\n/g,' · ')}</div>`;
+        if(sel.has(p.id)) sel.delete(p.id);
+        else{ if(sel.size>=3){ updateGo(); return; } sel.add(p.id); }
+        b.classList.toggle('on',sel.has(p.id));
+        updateGo();
+      };
+      row.appendChild(b);
+    }
+    g.appendChild(row);
+  }
+  const helpers=document.createElement('div'); helpers.className='helper-row';
+  const h1=document.createElement('button'); h1.className='helper-btn'; h1.textContent=T.helperQuiz;
+  h1.onclick=()=>startQuiz([...sel]);
+  const h2=document.createElement('button'); h2.className='helper-btn'; h2.textContent=T.helperTeams;
+  h2.onclick=()=>showTeams([...sel]);
+  helpers.appendChild(h1); helpers.appendChild(h2);
+  g.appendChild(helpers);
+  updateGo();
+  go.onclick=()=>{ if(sel.size>=1) finishOnboard([...sel]); };
+  $('picker').classList.add('on');
+}
+
+/* --- 매칭 테스트: 결과는 큐브에 표시만 --- */
+function startQuiz(prevSel){
+  const scores={};
+  const step=i=>{
+    resetOv(); backTo(i===0?()=>mainOnboard(prevSel):()=>step(i-1));
+    $('pkTitle').textContent=T.quizTitle;
+    $('pkDesc').textContent='';
+    const g=$('pkGrid'); g.className='center-col';
+    const dots=document.createElement('div'); dots.className='q-dots';
+    for(let d=0;d<QUIZ.length;d++){ const s=document.createElement('i'); if(d<=i)s.className='on'; dots.appendChild(s); }
+    const q=document.createElement('div'); q.className='q-q'; q.textContent=QUIZ[i].q;
+    g.appendChild(dots); g.appendChild(q);
+    QUIZ[i].opts.forEach(([t,sc])=>{
+      const b=document.createElement('button'); b.className='q-opt'; b.textContent=t;
+      b.onclick=()=>{
+        if(b.disabled) return;
+        b.classList.add('sel');
+        g.querySelectorAll('.q-opt').forEach(x=>x.disabled=true);
+        for(const k in sc) scores[k]=(scores[k]||0)+sc[k];
+        setTimeout(()=>{ i+1<QUIZ.length?step(i+1):showResult(); },260);
+      };
+      g.appendChild(b);
+    });
+  };
+  const showResult=()=>{
+    const rank=PHILOSOPHERS.map(p=>p.id).sort((a,b)=>(scores[b]||0)-(scores[a]||0)||Math.random()-.5);
+    const top=P(rank[0]), trio=rank.slice(0,3);
+    resetOv(); backTo(()=>mainOnboard(prevSel));
+    $('pkTitle').textContent=T.quizResult;
+    $('pkDesc').textContent='';
+    const g=$('pkGrid'); g.className='center-col';
+    g.innerHTML=`
+      <div class="res-av">${av(top.id)}</div>
+      <div class="res-name">${top.name}</div>
+      <div class="res-line">${MATCH[top.id]}</div>
+      <div class="res-cap">${T.recCombo}</div>
+      <div class="res-trio">${trio.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
+      <div class="res-line" style="margin-top:8px">${trio.map(id=>P(id).name).join(' · ')}</div>`;
+    const go=$('pkGo'); go.style.display=''; go.disabled=false;
+    go.textContent=T.backToCube;
+    go.onclick=()=>mainOnboard(trio,T.quizNote);
+  };
+  step(0);
+}
+
+/* --- 추천 조합: 선택하면 큐브에 표시만 --- */
+function showTeams(prevSel){
+  resetOv(); backTo(()=>mainOnboard(prevSel));
+  $('pkTitle').textContent=T.teamsTitle;
+  $('pkDesc').textContent=T.teamsDesc;
+  const g=$('pkGrid');
+  TEAMS.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='team';
+    b.innerHTML=`<div class="t-avs">${t.m.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
+      <div><div class="t-name">${t.name}</div><div class="t-desc">${t.desc}</div></div>`;
+    b.onclick=()=>mainOnboard([...t.m],T.teamNote(t.name));
+    g.appendChild(b);
+  });
+}
+
+function showGrid({title,desc,pool,max,min,btn,onDone,onCancel,pre}){
+  const sel=new Set(pre||[]);
+  $('pkTitle').textContent=title; $('pkDesc').textContent=desc;
+  const grid=$('pkGrid'); grid.className='grid'; grid.innerHTML='';
+  $('pkInfo').style.display=''; 
+  const info=$('pkInfo'); info.innerHTML=T.tapIntro;
+  const go=$('pkGo'); go.style.display='';
+  const cl=$('pkClose');
+  cl.style.display=onCancel?'':'none';
+  cl.onclick=()=>{ $('picker').classList.remove('on'); if(onCancel) onCancel(); };
+  pool.forEach(p=>{
+    const b=document.createElement('button');
+    b.className='gcell'+(sel.has(p.id)?' on':'');
+    b.innerHTML=`<span class="dot${presence(p,now()).active?'':' off'}"></span><div class="avatar">${av(p.id)}</div><div class="gname">${p.name}</div>`;
+    b.onclick=()=>{
+      info.innerHTML=`<b>${p.name}</b> — ${p.desc}<div class="gi-sched">${schedText(p).replace(/\n/g,' · ')}</div>`;
+      if(sel.has(p.id)) sel.delete(p.id);
+      else{ if(sel.size>=max){ b.classList.remove('on'); updateGo(); return; } sel.add(p.id); }
+      b.classList.toggle('on',sel.has(p.id));
+      updateGo();
+    };
+    grid.appendChild(b);
+  });
+  function updateGo(){ go.disabled=sel.size<min; go.textContent=btn(sel.size); }
+  updateGo();
+  go.onclick=()=>{ if(sel.size>=min){ $('picker').classList.remove('on'); onDone([...sel]); } };
+  $('picker').classList.add('on');
+}
+function addFriends(){
+  const pool=PHILOSOPHERS.filter(p=>!state.friends.includes(p.id));
+  if(!pool.length) return;
+  showGrid({
+    title:T.addTitle,desc:T.addDesc,
+    pool,max:pool.length,min:1,
+    btn:n=>n?T.addBtn(n):T.pickPlease,
+    onDone:ids=>{ state.friends.push(...ids); save(); renderFriends(); },
+    onCancel:()=>{}
+  });
+}
+function makeGroup(){
+  const pool=PHILOSOPHERS.filter(p=>state.friends.includes(p.id));
+  if(pool.length<2) return;
+  showGrid({
+    title:T.groupTitle,desc:T.groupDesc,
+    pool,max:3,min:2,
+    btn:n=>n>=2?T.groupBtn(n):T.pick2,
+    onDone:ids=>{
+      const dup=state.groups.find(g=>g.members.length===ids.length&&ids.every(i=>g.members.includes(i)));
+      if(dup){ alert(T.dupRoom); openChat('g:'+dup.id); return; }
+      const g={id:'g'+now(),members:ids,msgs:[]};
+      state.groups.push(g); save(); renderFriends(); openChat('g:'+g.id);
+    },
+    onCancel:()=>{}
+  });
+}
+
+function openGroupManage(gid){
+  const g=getGroup(gid); if(!g) return;
+  const pool=PHILOSOPHERS.filter(p=>state.friends.includes(p.id));
+  showGrid({
+    title:T.manageTitle,desc:T.manageDesc,
+    pool,max:3,min:2,pre:g.members.slice(),
+    btn:n=>n>=2?T.manageBtn(n):T.pick2,
+    onDone:ids=>{
+      const added=ids.filter(i=>!g.members.includes(i));
+      const removed=g.members.filter(i=>!ids.includes(i));
+      if(!added.length&&!removed.length) return;
+      g.members=ids;
+      removed.forEach(i=>g.msgs.push({who:'sys',content:T.sysLeft(dispName(P(i))),t:now()}));
+      added.forEach(i=>g.msgs.push({who:'sys',content:T.sysJoined(dispName(P(i))),t:now()}));
+      save(); renderFriends();
+      if(state.current==='g:'+gid) openChat('g:'+gid);
+      if(added.length){
+        const key='g:'+gid, tok=bumpToken(key), np=P(added[0]);
+        later(key,rnd(2500,6000),async()=>{
+          if(tok!==state.token[key]) return;
+          if(!presence(np,now()).active) return;
+          showTyping(key,np.id);
+          const tShown=now();
+          try{
+            const txt=await groupAPI(g,np,'(방금 이 단톡방에 처음 초대되었다. 이전 대화 내용, 예전 멤버, 누가 나갔는지 전혀 알지 못한다 — 그런 것을 아는 척하거나 언급하는 것 절대 금지. 캐릭터답게 짧은 첫인사만 해라. 말풍선 1개.)',true);
+            if(tok!==state.token[key]) return;
+            await zzz(Math.max(0,typeDelay(txt.split('|||')[0])-(now()-tShown)));
+            if(tok!==state.token[key]) return;
+            hideTyping();
+            const gm={who:np.id,content:txt.split('|||')[0].trim(),t:now(),reads:mkReadsFor(g,np.id)};
+            g.msgs.push(gm);
+            Object.values(gm.reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
+            if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
+            renderFriends(); save();
+          }catch(e){ hideTyping(); }
+        });
+      }
+    },
+    onCancel:()=>{}
+  });
+}
+
+/* ================= 프로필 ================= */
+function timelineHTML(p){
+  const C=60,R=44,W=14;
+  const pt=(min,r)=>{ const a=(min/1440)*2*Math.PI-Math.PI/2; return [C+r*Math.cos(a),C+r*Math.sin(a)]; };
+  const arc=(s,e,color)=>{
+    s=((s%1440)+1440)%1440; e=((e%1440)+1440)%1440;
+    const parts=(s<e)?[[s,e]]:[[s,1440],[0,e]];
+    return parts.map(([a,b])=>{
+      const [x1,y1]=pt(a,R),[x2,y2]=pt(b,R),lg=(b-a)>720?1:0;
+      return `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${R} 0 ${lg} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="${W}" stroke-linecap="butt"/>`;
+    }).join('');
+  };
+  let segs=arc(p.sleep[0],p.sleep[1],'#39415c');
+  p.aways.forEach(w=>segs+=arc(w.s,w.e,'#d9a05b'));
+  let nums='';
+  [[0,'0'],[360,'6'],[720,'12'],[1080,'18']].forEach(([m,l])=>{
+    const [x,y]=pt(m,R+11.5);
+    nums+=`<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="rgba(239,232,218,.55)">${l}</text>`;
+  });
+  let ticks='';
+  for(let h=3;h<24;h+=3){
+    if(h%6===0) continue;
+    const [x1,y1]=pt(h*60,R+8),[x2,y2]=pt(h*60,R+11);
+    ticks+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(239,232,218,.25)" stroke-width="1"/>`;
+  }
+  const d0=new Date(), nowMin=d0.getHours()*60+d0.getMinutes();
+  const [bx,by]=pt(nowMin,R);
+  const ball=`<circle class="tl-ball" cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="4.2" fill="#efe8da" stroke="#12141d" stroke-width="0.8"/>`;
+  return `<svg viewBox="0 0 120 120" class="tl-clock" role="img">
+    <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#4f7d63" stroke-width="${W}"/>
+    ${segs}${ticks}${nums}${ball}
+  </svg>
+  <div class="tl-legend"><span><i style="background:#4f7d63"></i>${T.lgActive}</span><span><i style="background:#d9a05b"></i>${T.lgAway}</span><span><i style="background:#39415c"></i>${T.lgSleep}</span></div>
+  <div class="tl-legend tl-legend2"><span><i style="background:#efe8da;border-radius:50%"></i>${T.lgNow}</span></div>`;
+}
+let profileFrom=null;
+function openProfile(pid,from){
+  profileFrom=from||null;
+  const p=P(pid), pr=presence(p,now());
+  $('prAvatar').innerHTML=av(pid);
+  $('prDot').className='dot'+(pr.active?'':' off');
+  $('prName').textContent=dispName(p);
+  $('prStatus').textContent=statusText(p);
+  $('prDesc').textContent=p.desc;
+  $('prTimeline').innerHTML=timelineHTML(p);
+  $('prSched').textContent=schedText(p);
+  $('prChat').dataset.pid=pid;
+  $('profile').classList.add('on');
+}
+$('prClose').onclick=()=>$('profile').classList.remove('on');
+$('prNick').onclick=()=>{
+  const pid=$('prChat').dataset.pid, p=P(pid);
+  const n=prompt(T.nickPrompt(p.name), state.nicks[pid]||'');
+  if(n===null) return;
+  if(n.trim()) state.nicks[pid]=n.trim(); else delete state.nicks[pid];
+  $('prName').textContent=dispName(p);
+  renderFriends(); save();
+};
+$('prChat').onclick=()=>{
+  const pid=$('prChat').dataset.pid;
+  $('profile').classList.remove('on');
+  if(state.current!=='d:'+pid) openChat('d:'+pid);
+};
+
+/* ================= 목록 (친구 탭) ================= */
+function renderFriends(){
+  const el=$('friends'); el.innerHTML='';
+  if(!state.friends) return;
+  const mkRow=(html,onclick)=>{ const b=document.createElement('button'); b.className='friend'; b.innerHTML=html; b.onclick=onclick; el.appendChild(b); return b; };
+
+  // 개인톡+단톡 통합, 고정(★) 우선 → 최신 메시지순
+  const items=[];
+  state.friends.forEach((id,idx)=>{
+    const h=state.chats[id]||[], last=h[h.length-1];
+    items.push({kind:'d',id,key:'d:'+id,last,t:last?last.t:-idx});
+  });
+  state.groups.forEach((g,idx)=>{
+    const last=g.msgs[g.msgs.length-1];
+    items.push({kind:'g',g,key:'g:'+g.id,last,t:last?last.t:-1000-idx});
+  });
+  items.sort((a,b)=>{
+    const pa=state.pins[a.key]?1:0, pb=state.pins[b.key]?1:0;
+    if(pa!==pb) return pb-pa;
+    return b.t-a.t;
+  });
+  const pinHTML=key=>`<span class="pinbtn${state.pins[key]?' on':''}" data-pin="${key}">${state.pins[key]?'★':'☆'}</span>`;
+  items.forEach(it=>{
+    let rowEl;
+    if(it.kind==='d'){
+      const id=it.id, p=P(id), last=it.last, pr=presence(p,now()), key=it.key;
+      rowEl=mkRow(`<div class="avwrap"><div class="avatar">${av(id)}</div><span class="dot${pr.active?'':' off'}"></span></div>
+      <div class="f-mid"><div class="f-name">${dispName(p)}</div>
+        <div class="f-status">${escapeH(statusText(p))}</div>
+        ${last?`<div class="f-preview">${escapeH((last.content.split('|||').pop()||'').slice(0,34))}</div>`:''}</div>
+      <div class="f-right">${last?`<div class="f-time">${fmtT(last.t)}</div>`:''}
+        ${state.unread[key]?`<div class="badge">${state.unread[key]}</div>`:''}</div>${pinHTML(key)}`,
+      ()=>openChat(key));
+      const aw=rowEl.querySelector('.avwrap'); if(aw) aw.onclick=e=>{e.stopPropagation();openProfile(id);};
+    }else{
+      const g=it.g, last=it.last, key=it.key;
+      const names=g.name||g.members.map(id=>dispName(P(id))).join(', ');
+      rowEl=mkRow(`<div class="g-avatar"><div class="avatar">${av(g.members[0])}</div><div class="avatar">${av(g.members[1])}</div></div>
+        <div class="f-mid"><div class="f-name">${names}</div>
+          ${last?`<div class="f-preview">${escapeH((last.content.split('|||').pop()||'').slice(0,34))}</div>`:('<div class="f-status">'+T.startConv+'</div>')}</div>
+        <div class="f-right">${last?`<div class="f-time">${fmtT(last.t)}</div>`:''}
+          ${state.unread[key]?`<div class="badge">${state.unread[key]}</div>`:''}</div>${pinHTML(key)}`,
+        ()=>openChat(key));
+    }
+    const pb=rowEl.querySelector('.pinbtn');
+    if(pb) pb.onclick=e=>{
+      e.stopPropagation();
+      const k=pb.dataset.pin;
+      if(state.pins[k]) delete state.pins[k]; else state.pins[k]=true;
+      save(); renderFriends();
+    };
+  });
+
+  const row=document.createElement('div'); row.className='action-row';
+  const canAdd=state.friends.length<PHILOSOPHERS.length;
+  row.innerHTML=`${canAdd?('<button class="action-btn" id="btnAdd">'+T.btnAdd+'</button>'):''}
+    ${state.friends.length>=2?('<button class="action-btn" id="btnGroup">'+T.btnGroup+'</button>'):''}`;
+  el.appendChild(row);
+  const a=$('btnAdd'); if(a) a.onclick=addFriends;
+  const gbt=$('btnGroup'); if(gbt) gbt.onclick=makeGroup;
+}
+
+/* ================= 채팅방 ================= */
+let typingEl=null;
+function curKind(){ return state.current?state.current[0]:null; }
+function curId(){ return state.current?state.current.slice(2):null; }
+function getGroup(id){ return state.groups.find(g=>g.id===id); }
+
+function groupStatusText(g){
+  const a=g.members.filter(id=>presence(P(id),now()).active).length;
+  return T.nMembers(g.members.length+1)+' · '+T.gActive(a);
+}
+function openChat(key){
+  state.current=key; state.unread[key]=0;
+  if(key[0]==='d'){
+    const p=P(curId()), pr=presence(p,now());
+    $('chatAvatar').innerHTML=av(p.id);
+    $('chatDot').style.display='';
+    $('chatDot').className='dot'+(pr.active?'':' off');
+    $('chatName').textContent=dispName(p);
+    updateHeadStatus();
+    $('chatAvWrap').onclick=()=>openProfile(p.id,'chat');
+    $('chatTitle').onclick=()=>openProfile(p.id,'chat');
+  }else{
+    const g=getGroup(curId());
+    $('chatAvatar').innerHTML=av(g.members[0]);
+    $('chatDot').style.display='none';
+    $('chatName').textContent=g.name||g.members.map(id=>dispName(P(id))).join(', ');
+    $('chatStatus').textContent=groupStatusText(g);
+    $('chatAvWrap').onclick=null;
+    $('chatTitle').onclick=()=>{
+      const n=prompt(T.roomNamePrompt, g.name||'');
+      if(n===null) return;
+      g.name=n.trim()||null;
+      $('chatName').textContent=g.name||g.members.map(id=>dispName(P(id))).join(', ');
+      renderFriends(); save();
+    };
+  }
+  $('chatMenuBtn').style.display = key[0]==='g' ? '' : 'none';
+  $('chatMenu').classList.remove('on');
+  renderMsgs();
+  renderChips();
+  $('chat').classList.add('open');
+  renderFriends();
+  setTimeout(()=>$('input').focus(),300);
+}
+$('cmLeave').onclick=()=>{
+  $('chatMenu').classList.remove('on');
+  if(curKind()!=='g') return;
+  const gid=curId();
+  if(!confirm(T.leaveConfirm)) return;
+  bumpToken('g:'+gid);
+  state.groups=state.groups.filter(g=>g.id!==gid);
+  delete state.unread['g:'+gid];
+  $('chat').classList.remove('open'); state.current=null;
+  renderFriends(); save();
+};
+$('chatMenuBtn').onclick=e=>{ e.stopPropagation(); $('chatMenu').classList.toggle('on'); };
+$('cmManage').onclick=()=>{ $('chatMenu').classList.remove('on'); if(curKind()==='g') openGroupManage(curId()); };
+$('cmRename').onclick=()=>{
+  $('chatMenu').classList.remove('on');
+  if(curKind()!=='g') return;
+  const g=getGroup(curId()); if(!g) return;
+  const n=prompt(T.roomNamePrompt, g.name||'');
+  if(n===null) return;
+  g.name=n.trim()||null;
+  $('chatName').textContent=g.name||g.members.map(id=>dispName(P(id))).join(', ');
+  renderFriends(); save();
+};
+document.addEventListener('click',e=>{
+  const mn=$('chatMenu');
+  if(mn&&mn.classList.contains('on')&&!(e.target.closest&&(e.target.closest('#chatMenu')||e.target.closest('#chatMenuBtn')))) mn.classList.remove('on');
+});
+function updateHeadStatus(){
+  if(curKind()==='d'){
+    const p=P(curId()), pr=presence(p,now());
+    $('chatStatus').textContent=statusText(p);
+    $('chatDot').className='dot'+(pr.active?'':' off');
+  }else if(curKind()==='g'){
+    const g=getGroup(curId());
+    if(g) $('chatStatus').textContent=groupStatusText(g);
   }
 }
+setInterval(()=>{ if(state.current){ updateHeadStatus(); updateGroupReads(); } else renderFriends(); },30000);
+$('backBtn').onclick=()=>{ $('chatMenu').classList.remove('on'); $('chat').classList.remove('open'); state.current=null; renderFriends(); };
+
+function renderMsgs(){
+  const el=$('msgs'); el.innerHTML='';
+  if(curKind()==='d'){
+    const pid=curId(), h=state.chats[pid]||[];
+    if(!h.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(pid)}</div>${T.emptyDM(dispName(P(pid)))}</div>`; return; }
+    h.forEach(m=>{
+      if(m.role==='user') addMsg(el,'me',[m.content],m.t,{read:m.read});
+      else addMsg(el,'them',m.content.split('|||'),m.t,{pid});
+    });
+  }else{
+    const g=getGroup(curId());
+    if(!g){ return; }
+    if(!g.msgs.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(g.members[0])}</div>${T.emptyGroup}</div>`; return; }
+    let lastWho=null;
+    g.msgs.forEach(m=>{
+      if(m.who==='me') addMsg(el,'me',[m.content],m.t,{read:true,reads:m.reads,gt:m.t});
+      else if(m.who==='sys'){ const d=document.createElement('div'); d.className='sysmsg'; d.textContent=m.content; el.appendChild(d); }
+      else addMsg(el,'them',m.content.split('|||'),m.t,{pid:m.who,name:lastWho===m.who?null:dispName(P(m.who)),reads:m.reads,gt:m.t});
+      lastWho=m.who;
+    });
+  }
+  el.scrollTop=el.scrollHeight;
+  updateGroupReads();
+}
+function addMsg(el,side,texts,t,o={}){
+  texts.forEach((txt,i)=>{
+    const row=document.createElement('div');
+    row.className='mrow '+side+(i>0?' cont':'');
+    const avEl= side==='them' ? `<div class="avwrap"><div class="avatar" data-pid="${o.pid}">${av(o.pid)}</div><span class="dot${presence(P(o.pid),now()).active?'':' off'}"></span></div>` : '';
+    const nameEl= (side==='them'&&o.name&&i===0)?`<div class="who">${o.name}</div>`:'';
+    const meta=`<div class="meta">${side==='me'&&o.read===false?'<span class="unread1">1</span>':''}${o.reads?`<span class="gunread" data-gt="${o.gt}"></span>`:''}${i===texts.length-1?`<span>${fmtT(t)}</span>`:''}</div>`;
+    row.innerHTML=`${avEl}<div class="bcol">${nameEl}<div class="bubble">${escapeH(txt.trim())}</div></div>${meta}`;
+    if(side==='them'&&i===0){ const a=row.querySelector('.avatar'); if(a) a.onclick=()=>openProfile(o.pid,'chat'); }
+    el.appendChild(row);
+  });
+  el.scrollTop=el.scrollHeight;
+}
+function renderChips(){
+  const el=$('chips'); el.innerHTML='';
+  if(!state.current) return;
+  let chips=[];
+  if(curKind()==='d'){
+    const p=P(curId());
+    chips=[...T.chipsDM,p.starter];
+  }else{
+    chips=T.chipsGroup.slice();
+  }
+  chips.filter(Boolean).forEach(c=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.textContent=c;
+    b.onclick=()=>{
+      const inp=$('input');
+      inp.value=(inp.value.trim()? inp.value.trim()+' ':'')+c;
+      inp.focus();
+    };
+    el.appendChild(b);
+  });
+}
+function updateGroupReads(){
+  if(curKind()!=='g') return;
+  const g=getGroup(curId()); if(!g) return;
+  document.querySelectorAll('.gunread').forEach(el=>{
+    const m=g.msgs.find(x=>x.reads&&String(x.t)===el.dataset.gt);
+    if(!m||!m.reads){ el.textContent=''; return; }
+    const cnt=Object.values(m.reads).filter(ts=>ts>now()).length;
+    el.textContent=cnt||'';
+  });
+}
+function showTyping(key,pid){
+  if(state.current!==key) return;
+  hideTyping();
+  const el=$('msgs');
+  typingEl=document.createElement('div');
+  typingEl.className='mrow them';
+  typingEl.innerHTML=`<div class="avatar">${av(pid)}</div><div class="typing"><i></i><i></i><i></i></div>`;
+  el.appendChild(typingEl); el.scrollTop=el.scrollHeight;
+}
+function hideTyping(){ if(typingEl){typingEl.remove();typingEl=null;} }
+
+/* ================= 전송 ================= */
+$('sendBtn').onclick=send;
+$('input').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
+
+function bumpToken(key){ state.token[key]=(state.token[key]||0)+1; clearTimers(key); hideTyping(); state.stage[key]='idle'; return state.token[key]; }
+function clearTimers(key){ (state.timers[key]||[]).forEach(clearTimeout); state.timers[key]=[]; }
+function later(key,ms,fn){ const id=setTimeout(fn,ms); (state.timers[key]=state.timers[key]||[]).push(id); }
+
+function send(){
+  const v=$('input').value.trim(); if(!v||!state.current) return;
+  $('input').value='';
+  const key=state.current;
+  if(key[0]==='d'){
+    const pid=curId(), p=P(pid);
+    (state.chats[pid]=state.chats[pid]||[]).push({role:'user',content:v,t:now(),read:false});
+    renderMsgs(); renderChips(); save();
+    if(state.stage[key]==='gen'){ state.pendingAfter[key]=true; return; }
+    delete state.sched[pid];
+    const tok=bumpToken(key);
+    const wait=Math.random()<p.patience?DEBOUNCE:rnd(1500,3200);
+    state.stage[key]='wait';
+    later(key,wait,()=>{ if(tok===state.token[key]) dmFlowStart(pid,key,tok); });
+  }else{
+    const g=getGroup(curId());
+    const reads={}, tNow=now();
+    g.members.forEach(id=>{
+      const pp=P(id), pr=presence(pp,tNow);
+      const lastM=[...g.msgs].reverse().find(m=>m.who===id);
+      const hot=pr.active&&lastM&&(tNow-lastM.t<10*60000);
+      reads[id]= hot? tNow+rnd(150,600) : pr.active? tNow+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+    });
+    g.msgs.push({who:'me',content:v,t:now(),reads});
+    renderMsgs(); renderChips(); save();
+    if(state.stage[key]==='gen'){ state.pendingAfter[key]=true; return; }
+    const tok=bumpToken(key);
+    state.stage[key]='wait';
+    Object.values(reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
+    later(key,5000,()=>{ if(tok===state.token[key]) groupFlow(g,key,tok); });
+  }
+}
+
+/* ================= 개인방 답장 ================= */
+function dmFlowStart(pid,key,tok){
+  const p=P(pid), t=now(); let pr=presence(p,t); const q=p.quirks||{};
+  const histH=state.chats[pid]||[];
+  const lastA=[...histH].reverse().find(m=>m.role==='assistant');
+  const hotBase=!!(lastA&&(t-lastA.t<10*60000));
+  const punc=PUNCT[pid]!==undefined?PUNCT[pid]:.5;
+  let note='';
+  // 대화가 한창인데 일정이 막 시작됐다면, 느긋한 성격은 잠깐 미룬다 (수면 제외)
+  if(!pr.active&&hotBase&&pr.key!=='sleep'&&pr.since&&(t-pr.since<15*60000)&&Math.random()>punc){
+    note=`(원래 지금은 '${pr.label}' 시간인데, 대화가 이어지는 중이라 조금 미루고 있다. 그런 티를 살짝 내도 좋다.)`;
+    pr={active:true,key:'def'};
+  }
+  const hot=!!(pr.active&&hotBase); // 방금까지 대화 중이면 폰을 보고 있는 상태
+  let mode='normal';
+  if(pr.active&&!hot){
+    const r=Math.random();
+    if(r<(q.busy||0)) mode='busy';
+    else if(r<(q.busy||0)+(q.ghost||0)) mode='ghost';
+    else if(r<(q.busy||0)+(q.ghost||0)+(q.ignore||0)) mode='ignore';
+  }
+  let readAt,replyAt;
+  if(!pr.active){ readAt=pr.back+rnd(...p.read)+rnd(0,60000); replyAt=readAt+rnd(...p.reply); }
+  else if(mode==='ghost'){ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply)*rnd(2.5,4); }
+  else if(mode==='ignore'){ readAt=t+rnd(45000,110000); replyAt=readAt+rnd(...p.reply); }
+  else if(hot){ readAt=t+rnd(150,600); replyAt=readAt+rnd(...p.reply)*0.55; }
+  else{ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply); }
+
+  if(mode==='busy'){
+    // 양해 후 답장 시점: 임박한 일정이 있으면 그 일정이 끝난 뒤, 아니면 확률 티어(1~2분/3~8분/10~25분)
+    const up=nextEvent(p,t);
+    let realAtCalc, busyNote;
+    if(up && up.start-t<40*60000){
+      realAtCalc=()=>up.end+rnd(60000,240000);
+      busyNote=`(곧 '${up.t}' 시간이라 지금 제대로 답하기 어렵다. 캐릭터답게 아주 짧게 양해를 구하고, 끝나고 답하겠다고 해라. 말풍선 1개.)`;
+    }else{
+      const r2=Math.random();
+      realAtCalc=()=>now()+(r2<.5?rnd(50000,140000):r2<.8?rnd(180000,480000):rnd(600000,1500000));
+      busyNote='(지금 하던 일이 있어 제대로 답하기 어렵다. 캐릭터답게 아주 짧게 양해만 구하고, 이따 답하겠다고 해라. 말풍선 1개.)';
+    }
+    state.sched[pid]={readAt,replyAt:readAt+4000}; save();
+    later(key,Math.max(0,readAt-now()),async()=>{
+      if(tok!==state.token[key])return;
+      markRead(pid,now());
+      showTyping(key,pid);
+      const tShown=now();
+      let bt=null;
+      try{ bt=await dmAPI(p,busyNote); }
+      catch(e){ bt=null; } // API 실패 시 가짜 양해 문구를 보내지 않는다
+      if(tok!==state.token[key])return;
+      if(bt){
+        await zzz(Math.max(0,typeDelay(bt.split('|||')[0])-(now()-tShown)));
+        if(tok!==state.token[key])return;
+        hideTyping();
+        pushDM(p,bt.split('|||')[0].trim(),now(),key);
+      }else{
+        hideTyping();
+      }
+      const realAt=realAtCalc();
+      state.sched[pid]={readAt:now(),replyAt:realAt}; save();
+      dmDeliver(pid,key,tok,realAt);
+    });
+    return;
+  }
+  // 대화 중 + 곧 일정이면 미리 예고 (성격 따라 아쉬워하거나 미룰까 고민)
+  if(pr.active&&hot&&!note){
+    const up=nextEvent(p,t);
+    if(up&&up.start>t&&up.start-t<12*60000){
+      const mins=Math.max(1,Math.round((up.start-t)/60000));
+      note=(Math.random()<punc)
+        ?`(참고: 약 ${mins}분 뒤에 '${up.t}' 일정이 있다. 대화 중이니 이번 답장에서 자연스럽게 곧 가봐야 한다는 언질을 짧게 섞어라.)`
+        :`(참고: 약 ${mins}분 뒤에 '${up.t}' 일정이 있다. 아쉬워하거나 미룰까 고민하는 티를 짧게 내도 좋다.)`;
+    }
+  }
+  state.sched[pid]={readAt,replyAt}; save();
+  later(key,Math.max(0,readAt-now()),()=>{ if(tok===state.token[key]) markRead(pid,now()); });
+  dmDeliver(pid,key,tok,replyAt,note||undefined);
+}
+const INTERRUPT_NOTE='(중요: 너는 방금 답장을 쓰던 도중이었는데, 그 사이 상대의 새 메시지가 끼어들었다. 하던 말의 남은 생각과 새 메시지에 대한 반응을 자연스럽게 하나로 합쳐 보내라. 화제가 완전히 바뀌었다면 하던 말은 접고 새 화제를 따라가도 된다. 평소보다 짧게.)';
+const AFTERSEND_NOTE='(네 직전 답장이 끝나기 전에 상대의 새 메시지가 이미 도착해 있었다. 이제 그 메시지에 자연스럽게 이어서 반응하라. 짧게.)';
+function dmDeliver(pid,key,tok,replyAt,extraNote){
+  const p=P(pid);
+  later(key,Math.max(0,replyAt-now()-2500),async()=>{
+    if(tok!==state.token[key])return;
+    state.stage[key]='gen';
+    showTyping(key,pid);
+    const tShown=now();
+    let text;
+    try{ text=await dmAPI(p,extraNote); }
+    catch(e){ if(tok===state.token[key]){hideTyping();state.stage[key]='idle';pushDM(p,T.lostReply,now(),key);} return; }
+    if(tok!==state.token[key])return;
+    const bubbles=text.split('|||').map(s=>s.trim()).filter(Boolean);
+    await zzz(Math.max(0,typeDelay(bubbles[0]||'')-(now()-tShown)));
+    if(tok!==state.token[key])return;
+    let committed=false;
+    const interruptRegen=async()=>{ // 하던 말을 접고, 끼어든 메시지까지 반영해 다시 쓴다
+      state.pendingAfter[key]=false;
+      markRead(pid,now());
+      await zzz(rnd(800,1600));   // 새 메시지를 읽으며 잠깐 더 쓰는 듯하다가…
+      hideTyping();               // 멈추고 (지우는 중)
+      const t2=bumpToken(key); state.stage[key]='wait';
+      later(key,rnd(800,1600),()=>{ if(t2===state.token[key]) dmDeliver(pid,key,t2,now(),INTERRUPT_NOTE); });
+    };
+    if(state.pendingAfter[key]){
+      markRead(pid,now());
+      if(Math.random()<0.6){ interruptRegen(); return; }
+      committed=true; // 이번엔 하던 말을 그대로 보내고, 끝나고 반응
+    }
+    hideTyping();
+    const arr=state.chats[pid]=state.chats[pid]||[];
+    let msg={role:'assistant',content:bubbles[0]||'…',t:Math.max(replyAt,now())};
+    arr.push(msg);
+    localNotify(dispName(p),bubbles[0]||'…');
+    if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
+    renderFriends(); save();
+    for(let i=1;i<bubbles.length;i++){
+      showTyping(key,pid);
+      await zzz(typeDelay(bubbles[i]));
+      if(tok!==state.token[key]){ save(); return; }
+      if(state.pendingAfter[key]&&!committed){
+        markRead(pid,now());
+        if(Math.random()<0.6){ interruptRegen(); return; }
+        committed=true;
+      }
+      hideTyping();
+      if(arr[arr.length-1]===msg){ msg.content+='|||'+bubbles[i]; }
+      else{ msg={role:'assistant',content:bubbles[i],t:now()}; arr.push(msg); } // 상대 메시지가 끼어든 경우: 항상 그 아래에
+      if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
+      renderFriends(); save();
+    }
+    state.stage[key]='idle'; delete state.sched[pid]; save();
+    if(state.pendingAfter[key]){
+      state.pendingAfter[key]=false;
+      markRead(pid,now());
+      const t2=bumpToken(key); state.stage[key]='wait';
+      later(key,rnd(1500,3000),()=>{ if(t2===state.token[key]) dmDeliver(pid,key,t2,now(),AFTERSEND_NOTE); });
+    }
+  });
+}
+function markRead(pid,cutoff){
+  (state.chats[pid]||[]).forEach(m=>{ if(m.role==='user'&&m.t<=cutoff) m.read=true; });
+  if(state.current==='d:'+pid) renderMsgs();
+  save();
+}
+function pushDM(p,text,t,key){
+  state.chats[p.id]=state.chats[p.id]||[];
+  state.chats[p.id].push({role:'assistant',content:text,t});
+  localNotify(dispName(p),text);
+  if(state.current===key) renderMsgs();
+  else state.unread[key]=(state.unread[key]||0)+text.split('|||').length;
+  renderFriends(); save();
+}
+
+/* ================= 단톡방 답장 ================= */
+function mkReadsFor(g,senderId){
+  const reads={}, tn=now();
+  g.members.forEach(id=>{
+    if(id===senderId) return;
+    const pp=P(id), pr=presence(pp,tn);
+    const lastM=[...g.msgs].reverse().find(m=>m.who===id);
+    const hot=pr.active&&lastM&&(tn-lastM.t<10*60000);
+    reads[id]= hot? tn+rnd(150,600) : pr.active? tn+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
+  });
+  return reads;
+}
+async function groupFlow(g,key,tok,extraOnly){
+  const lastMe=[...g.msgs].reverse().find(m=>m.who==='me');
+  const lcMsg=lastMe?lastMe.content.toLowerCase():'';
+  const mentioned=lastMe?g.members.filter(id=>[...ALIAS[id],state.nicks[id]||'',P(id).name].filter(Boolean).some(a=>lcMsg.includes(String(a).toLowerCase()))):[];
+  const mAct=mentioned.filter(id=>presence(P(id),now()).active).map(P);
+  const mAway=mentioned.filter(id=>!presence(P(id),now()).active).map(P);
+  let members=g.members.map(P).filter(p=>presence(p,now()).active&&!mentioned.includes(p.id));
+  members.sort(()=>Math.random()-.5);
+  let responders;
+  const lastPhil=[...g.msgs].reverse().find(m=>m.who!=='me'&&m.who!=='sys');
+  if(extraOnly){ const cand=(mAct.length?mAct:members).filter(p=>!lastPhil||p.id!==lastPhil.who); responders=cand.slice(0,1); }
+  else if(mAct.length) responders=[...mAct,...(Math.random()<.5?members.slice(0,1):[])];
+  else responders=members.slice(0,Math.min(2,members.length));
+  if(!responders.length){ state.stage[key]='idle'; return; }
+  const absentNote=mAway.length?` (참고: 상담자가 ${mAway.map(p=>p.name).join(', ')}를 불렀지만 지금 자리에 없다. 절대 그를 대신해 대답하거나 흉내내지 마라. 자리에 없음을 알려주거나 네 입장에서만 말하라.)`:'';
+  state.stage[key]='gen';
+  for(let ri=0;ri<responders.length;ri++){
+    const p=responders[ri];
+    let extra='';
+    if(extraOnly) extra='(직전 발언에 대해 짧게 한마디만 얹어라. 말풍선 1개. 상담자에게 질문 금지.)';
+    else if(mAct.includes(p)) extra='(상담자가 방금 너를 지목해서 불렀다. 네가 답할 차례다.)';
+    else if(ri>0) extra='(방금 다른 철학자가 이미 발언했다. 상담자에게 새 질문을 던지지 말고, 직전 발언에 반응하거나 네 관점을 짧게 얹어라.)';
+    extra+=absentNote;
+    const upN=nextEvent(p,now()), prN=presence(p,now());
+    if(prN.active&&upN&&upN.start>now()&&upN.start-now()<12*60000&&Math.random()<0.6){
+      const minsN=Math.max(1,Math.round((upN.start-now())/60000));
+      extra+=` (참고: 약 ${minsN}분 뒤 '${upN.t}' 일정이 있다. 자연스럽게 곧 가봐야 한다는 언질을 짧게 섞어도 좋다.)`;
+    }
+    await zzz(rnd(2000,5000)); if(tok!==state.token[key])return;
+    showTyping(key,p.id);
+    const tShown=now();
+    let text;
+    try{ text=await groupAPI(g,p,extra); }
+    catch(e){ hideTyping(); continue; }
+    if(tok!==state.token[key])return;
+    const bb=text.split('|||').map(s=>s.trim()).filter(Boolean);
+    await zzz(Math.max(600,typeDelay(bb[0]||'')-(now()-tShown))); if(tok!==state.token[key])return;
+    hideTyping();
+    g.msgs.forEach(m=>{ if(m.who!==p.id&&m.reads&&m.reads[p.id]>now()) m.reads[p.id]=now()-1; });
+    let gm={who:p.id,content:bb[0]||'…',t:now(),reads:mkReadsFor(g,p.id)};
+    Object.values(gm.reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
+    g.msgs.push(gm);
+    localNotify(dispName(p),bb[0]||'…');
+    updateGroupReads();
+    if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
+    renderFriends(); save();
+    for(let bi=1;bi<bb.length;bi++){
+      showTyping(key,p.id);
+      await zzz(typeDelay(bb[bi]));
+      if(tok!==state.token[key]){ save(); return; }
+      hideTyping();
+      if(g.msgs[g.msgs.length-1]===gm){ gm.content+='|||'+bb[bi]; }
+      else{
+        gm={who:p.id,content:bb[bi],t:now(),reads:mkReadsFor(g,p.id)};
+        Object.values(gm.reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
+        g.msgs.push(gm);
+      }
+      if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
+      renderFriends(); save();
+    }
+  }
+  state.stage[key]='idle';
+  if(state.pendingAfter[key]){
+    state.pendingAfter[key]=false;
+    const t2=bumpToken(key); state.stage[key]='wait';
+    later(key,rnd(1500,3000),()=>{ if(t2===state.token[key]) groupFlow(g,key,t2); });
+  }else if(!extraOnly && g.members.length>1 && Math.random()<0.4){
+    const t2=state.token[key];
+    later(key,rnd(2500,5000),()=>{ if(t2===state.token[key]) groupFlow(g,key,t2,true); });
+  }
+}
+
+/* ================= 교차 기억 컨텍스트 ================= */
+function dmTranscript(pid,n){
+  return (state.chats[pid]||[]).slice(-n).map(m=>
+    (m.role==='user'?'상담자: ':'너: ')+m.content.replace(/\|\|\|/g,' / ')).join('\n');
+}
+function groupTranscript(g,n){
+  return g.msgs.slice(-n).map(m=>
+    (m.who==='me'?'상담자: ':m.who==='sys'?'[안내] ':P(m.who).name+': ')+m.content.replace(/\|\|\|/g,' / ')).join('\n');
+}
+function dmMemoryForGroup(pid){
+  const t=dmTranscript(pid,10);
+  return t?`\n[기억 — 상담자와 너의 개인 대화 (최근)]\n${t}`:'';
+}
+function groupMemoryForDM(pid){
+  const parts=state.groups.filter(g=>g.members.includes(pid)&&g.msgs.length)
+    .map(g=>`(단톡방: ${g.members.map(id=>P(id).name).join(', ')})\n${groupTranscript(g,12)}`);
+  return parts.length?`\n[기억 — 네가 참여한 단톡방의 최근 대화]\n${parts.join('\n\n')}`:'';
+}
+
+/* ================= API ================= */
+function buildDM(pid,extra){
+  const out=[];
+  (state.chats[pid]||[]).forEach(m=>{
+    if(out.length&&out[out.length-1].role===m.role) out[out.length-1].content+='\n'+m.content;
+    else out.push({role:m.role,content:m.content});
+  });
+  if(extra){
+    if(out.length&&out[out.length-1].role==='user') out[out.length-1].content+='\n'+extra;
+    else out.push({role:'user',content:extra});
+  }
+  if(!out.length||out[out.length-1].role!=='user') out.push({role:'user',content:'(상대는 아직 아무 말이 없다)'});
+  return out;
+}
+async function callClaude(system,messages){
+  const res=await fetch('/api/chat',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({system,messages})
+  });
+  if(!res.ok) throw new Error('api');
+  const data=await res.json();
+  if(!data.text) throw new Error('empty');
+  return data.text.trim();
+}
+const dmAPI=(p,extra)=>callClaude(p.prompt+COMMON+selfLine(p)+bondLine(p)+nickLine(p)+groupMemoryForDM(p.id), buildDM(p.id,extra));
+function groupAPI(g,p,extra,noHist){
+  const others=g.members.filter(id=>id!==p.id).map(id=>P(id).name).join(', ');
+  const sys=p.prompt+COMMON+GROUP_RULES+`\n[이 단톡방의 다른 철학자]: ${others}`+selfLine(p)+bondLine(p)+nickLine(p)+dmMemoryForGroup(p.id);
+  const hist=noHist?'(너는 방금 입장해서 이전 대화 내용을 볼 수 없다)':(groupTranscript(g,20)||'(아직 아무 말 없음)');
+  const user=`[단톡방 대화]\n${hist}\n\n(이제 '${p.name}' 너의 차례다. 너는 ${p.name} 본인으로만 말하고, 다른 철학자의 대사를 대신 쓰지 마라.${extra?' '+extra:''})`;
+  return callClaude(sys,[{role:'user',content:user}]);
+}
+
+/* ================= 부재중 답장 + 선톡 ================= */
+async function catchUp(){
+  if(!state.friends) return;
+  let followCandidates=[];
+  for(const pid of state.friends){
+    const p=P(pid); if(!p) continue;
+    const h=state.chats[pid]||[], key='d:'+pid;
+    if(!h.length) continue;
+    const last=h[h.length-1];
+    if(last.role==='user'){
+      const tok=bumpToken(key);
+      let sc=state.sched[pid];
+      if(!sc){
+        const t0=last.t+DEBOUNCE, pr=presence(p,t0);
+        const readAt=pr.active? t0+rnd(...p.read) : pr.back+rnd(...p.read)+rnd(0,120000);
+        sc={readAt,replyAt:readAt+rnd(...p.reply)};
+        state.sched[pid]=sc;
+      }
+      if(sc.replyAt<=now()){
+        markRead(pid,sc.readAt);
+        try{
+          const text=await dmAPI(p);
+          if(tok!==state.token[key])continue;
+          delete state.sched[pid];
+          pushDM(p,text,sc.replyAt,key);
+        }catch(e){}
+      }else{
+        if(sc.readAt<=now()) markRead(pid,sc.readAt);
+        else later(key,sc.readAt-now(),()=>{ if(tok===state.token[key]) markRead(pid,now()); });
+        dmDeliver(pid,key,tok,sc.replyAt);
+      }
+    }else if(now()-last.t>FOLLOWUP_MS && presence(p,now()).active){
+      followCandidates.push(p);
+    }
+  }
+  for(const g of state.groups){
+    const last=g.msgs[g.msgs.length-1];
+    if(last&&last.who==='me'){
+      const key='g:'+g.id, tok=bumpToken(key);
+      later(key,rnd(2000,5000),()=>{ if(tok===state.token[key]) groupFlow(g,key,tok); });
+    }
+  }
+  // ===== 선제 이벤트 =====
+  // 발동 기준: ①이용이 뜸할 때만(내 마지막 메시지 후 5시간+) ②이벤트끼리 최소 8시간 간격 ③한 번에 1건
+  // 내용 기준: 80%는 일상 안부·시시콜콜, 20%만 철학 화두 / 새 방 개설은 갈 곳이 정말 없을 때만
+  const dormantGroups=state.groups.filter(g=>{
+    const last=g.msgs[g.msgs.length-1];
+    if(last&&last.who==='me') return false;
+    if(last&&now()-last.t<3*3600*1000) return false;
+    return g.members.filter(id=>presence(P(id),now()).active).length>=2;
+  });
+  const lastMine=(()=>{ let m=0;
+    Object.values(state.chats).forEach(a=>(a||[]).forEach(x=>{ if(x.role==='user'&&x.t>m) m=x.t; }));
+    state.groups.forEach(g=>g.msgs.forEach(x=>{ if(x.who==='me'&&x.t>m) m=x.t; }));
+    return m; })();
+  const quiet=!lastMine||now()-lastMine>5*3600*1000;
+  const cooled=!state.lastEvent||now()-state.lastEvent>8*3600*1000;
+  if(quiet&&cooled&&Math.random()<0.65){
+    const opts=[];
+    if(followCandidates.length) opts.push('dm','dm','dm');
+    if(dormantGroups.length) opts.push('debate','debate');
+    if(!followCandidates.length&&!dormantGroups.length&&state.friends.length>=2&&state.groups.length<2) opts.push('invite');
+    if(opts.length){
+      state.lastEvent=now();
+      const ev=opts[Math.floor(Math.random()*opts.length)];
+      const casual=Math.random()<0.8;
+      if(ev==='dm'){
+        const p=followCandidates[Math.floor(Math.random()*followCandidates.length)];
+        const extra=casual
+          ?'(오랜만에 네가 먼저 짧게 연락한다. 철학 얘기 금지 — 그냥 친구처럼: 안부를 묻거나, 지난 대화에서 그 일이 어떻게 됐는지 궁금해하거나, 네 소소한 일상(오늘 본 것, 먹은 것 등)을 시시콜콜 전해라. 말풍선 1~2개.)'
+          :'(오랜만에 네가 먼저 연락한다. 너다운 화두나 사고실험 하나를 일상의 언어로 슬며시 던져 보라. 가르치려 들지 말고 호기심을 자극하는 톤으로. 말풍선 1~2개.)';
+        try{ const text=await dmAPI(p,extra); pushDM(p,text,now(),'d:'+p.id); }catch(e){}
+      }else if(ev==='debate'){
+        const g=dormantGroups[Math.floor(Math.random()*dormantGroups.length)];
+        const key='g:'+g.id;
+        const act=g.members.filter(id=>presence(P(id),now()).active).sort(()=>Math.random()-.5);
+        const a=P(act[0]), b=P(act[1]);
+        try{
+          const t1=await groupAPI(g,a,casual
+            ?'(대화가 뜸한 이 방에서 네가 먼저 가볍게 입을 뗀다. 철학 화두 금지 — 다른 철학자에게 시시콜콜한 안부나 근황을 묻거나, 실없는 일상 티키타카를 시작해라. 상담자가 부담 없이 끼어들 수 있는 편한 분위기로. 말풍선 1~2개.)'
+            :'(대화가 뜸한 이 방에서 네가 먼저 새로운 철학적 화두를 꺼내 판을 깔아라. 지난 대화와 달라도 좋다. 말풍선 1~2개.)');
+          g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
+          state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
+          const t2=await groupAPI(g,b,casual
+            ?'(직전 말에 친구처럼 가볍게 반응하고, 이어서 상담자에게도 짧게 안부를 물어라. 말풍선 1~2개.)'
+            :'(직전 화두에 네 입장에서 반응하고, 상담자의 생각도 짧게 물어라. 말풍선 1~2개.)');
+          g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
+          state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
+          renderFriends();
+        }catch(e){}
+      }else if(ev==='invite'){
+        const act=state.friends.filter(id=>presence(P(id),now()).active&&(state.chats[id]||[]).length>=2);
+        if(act.length>=2){
+          const pick=act.sort(()=>Math.random()-.5).slice(0,2);
+          const dup=state.groups.find(g=>pick.every(i=>g.members.includes(i))); // 두 명이 같이 있는 방이 이미 있으면 새로 만들지 않는다
+          if(!dup){
+            const g={id:'g'+now(),members:pick,msgs:[]};
+            state.groups.push(g);
+            const key='g:'+g.id, a=P(pick[0]), b=P(pick[1]);
+            try{
+              const t1=await groupAPI(g,a,`(네가 방금 이 단톡방을 만들어 상담자와 ${b.name}를 초대했다. 거창한 이유는 없다 — 그냥 같이 수다 떨고 싶어서다. 철학 화두 말고, 가볍게 안부부터 물어라. 말풍선 1~2개.)`);
+              g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
+              state.unread[key]=(state.unread[key]||0)+t1.split('|||').length;
+              const t2=await groupAPI(g,b,'(방금 초대받았다. 친구처럼 가볍게 등장 인사를 하고 직전 말에 반응해라. 말풍선 1개.)');
+              g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
+              state.unread[key]=(state.unread[key]||0)+t2.split('|||').length;
+              renderFriends();
+            }catch(e){ state.groups=state.groups.filter(x=>x.id!==g.id); }
+          }
+        }
+      }
+    }
+  }
+  save();
+}
+
+/* ================= 큐브 탭 ================= */
+const ROW_CAPS=LANG==='en'?['🔥 Tough-love row — hits & sorts you out','🤲 Warmth row — accepts & asks','🌙 Calm row — settles you down']:['🔥 팩폭 라인 — 때리고 정리하는 줄','🤲 온기 라인 — 받아주고 묻는 줄','🌙 고요 라인 — 가라앉히는 줄'];
+const COL_CAPS=LANG==='en'?['Way of living','Inner reflection','Duty & order']:['삶의 태도','내면 성찰','규율과 도리'];
+function traits(p){
+  const out=[];
+  const mid=(p.reply[0]+p.reply[1])/2;
+  out.push(mid<6000?T.trFast:mid<15000?T.trMid:T.trSlow);
+  const q=p.quirks||{};
+  if(q.ghost>=.2) out.push(T.trGhost);
+  if(q.ignore>=.1) out.push(T.trVanish);
+  if(q.busy>=.1) out.push(T.trBusy);
+  if(p.patience<.4) out.push(T.trCut);
+  else if(p.patience>.9) out.push(T.trListen);
+  return out;
+}
+function renderCube(){
+  const rows=$('cubeRows'); rows.innerHTML='';
+  for(let r=0;r<3;r++){
+    const cap=document.createElement('div'); cap.className='row-cap'; cap.textContent=ROW_CAPS[r];
+    rows.appendChild(cap);
+    const grid=document.createElement('div'); grid.className='grid';
+    for(let c=0;c<3;c++){
+      const p=PHILOSOPHERS[r*3+c], pr=presence(p,now());
+      const b=document.createElement('button');
+      b.className='gcell';
+      b.innerHTML=`<span class="dot${pr.active?'':' off'}"></span><div class="avatar">${av(p.id)}</div><div class="gname">${dispName(p)}</div>`;
+      b.onclick=()=>{
+        const tags=traits(p).map(t=>`<span class="trait">${t}</span>`).join('');
+        $('cubeInfo').innerHTML=`<b>${dispName(p)}</b> · ${ROW_CAPS[r].split(' — ')[0]} × ${COL_CAPS[c]}<br>${p.desc}<br>${tags}<span class="trait">🕐 ${schedText(p).split('\n')[0].replace(T.activeTime+' · ',T.activeShort+' ')}</span><br><button class="cube-pr" onclick="openProfile('${p.id}')">${T.profileChat}</button>`;
+      };
+      grid.appendChild(b);
+    }
+    rows.appendChild(grid);
+  }
+}
+function showTab(t){
+  $('tabChat').classList.toggle('on',t==='chat');
+  $('tabCube').classList.toggle('on',t==='cube');
+  $('friends').style.display=t==='chat'?'':'none';
+  $('cubeView').style.display=t==='cube'?'':'none';
+  if(t==='cube') renderCube();
+}
+$('tabChat').onclick=()=>showTab('chat');
+$('tabCube').onclick=()=>showTab('cube');
+
+/* ================= 대화 백업/복원 ================= */
+$('stExport').onclick=()=>{
+  const payload={app:'cheolkk',ver:1,date:new Date().toISOString(),
+    friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks};
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+  const a=document.createElement('a');
+  const d=new Date(), ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  a.href=URL.createObjectURL(blob); a.download='cheolkk_backup_'+ymd+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+};
+$('stImport').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(d.app!=='cheolkk'||!d.friends) throw 0;
+      if(!confirm(T.importConfirm)) return;
+      state.friends=d.friends; state.chats=d.chats||{}; state.groups=d.groups||[]; state.nicks=d.nicks||{};
+      state.sched={};
+      save().then(()=>location.reload());
+    }catch(err){ alert(T.badBackup); }
+  };
+  r.readAsText(f);
+  e.target.value='';
+};
+
+/* ================= 계정 · 동기화 (Supabase) ================= */
+let sb=null,sbUser=null,authReady=false,syncTimer=null;
+const syncState={err:'',last:0};
+try{ if(window.supabase) sb=window.supabase.createClient('https://kbkypprqxiqitdrombbg.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtia3lwcHJxeGlxaXRkcm9tYmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDYyODIsImV4cCI6MjEwMDIyMjI4Mn0.9TNNbA_s-tWwLQc-6rNqsOXCKLlKLzDgbh4kPWWZHG4'); }catch(e){}
+function dataScore(d){let n=0;try{Object.values((d&&d.chats)||{}).forEach(a=>n+=(a||[]).length);((d&&d.groups)||[]).forEach(g=>n+=((g&&g.msgs)||[]).length);}catch(e){}return n;}
+async function initialSync(){
+  if(!sb||!sbUser||window.storage) return;
+  try{
+    const {data:row,error}=await sb.from('user_data').select('data').eq('user_id',sbUser.id).maybeSingle();
+    if(error) throw error;
+    const cloud=row&&row.data?row.data:null;
+    let local=null;
+    try{ const raw=localStorage.getItem('philo-messenger-v6'); local=raw?JSON.parse(raw):null; }catch(e){}
+    if(cloud&&dataScore(cloud)>=dataScore(local)){
+      try{ localStorage.setItem('philo-messenger-v6',JSON.stringify(cloud)); }catch(e){}
+    }else if(local){
+      const {error:e2}=await sb.from('user_data').upsert({user_id:sbUser.id,data:local,updated_at:new Date().toISOString()});
+      if(e2) throw e2;
+    }
+    syncState.err=''; syncState.last=now();
+  }catch(e){ syncState.err=(e&&e.message)||String(e); }
+}
+async function cloudPush(){
+  if(!sb||!sbUser) return;
+  try{
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks,pins:state.pins||{}},updated_at:new Date().toISOString()});
+    if(error) throw error;
+    syncState.err=''; syncState.last=now();
+  }catch(e){ syncState.err=(e&&e.message)||String(e); }
+  if($('settings').classList.contains('on')) renderSettingsAccount();
+}
+function queueCloudPush(){ if(!sb||!sbUser) return; clearTimeout(syncTimer); syncTimer=setTimeout(cloudPush,2500); }
+async function initAuth(){
+  if(!sb) return;
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    sbUser=(session&&session.user)||null;
+    if(sbUser) await initialSync();
+  }catch(e){ syncState.err=(e&&e.message)||String(e); }
+  authReady=true;
+  try{
+    sb.auth.onAuthStateChange((ev,session)=>{
+      const u=(session&&session.user)||null;
+      const wasNull=!sbUser;
+      sbUser=u;
+      if(u&&wasNull&&ev==='SIGNED_IN'&&authReady){ initialSync().then(()=>location.reload()); }
+      else if($('settings').classList.contains('on')) renderSettingsAccount();
+    });
+  }catch(e){}
+}
+
+/* ================= 푸시 알림 ================= */
+const VAPID_PUBLIC='BMhdB0ke6w-J7SttyTCHZBxKZxzXOcmfISPpFSfo_fj6auPvConJzZMkRZbKGNFuVS8HXNHVIvqLmi7dsOU1-oM';
+const ICON_CHAT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 11.5c0 4.14-4.03 7.5-9 7.5-1.02 0-2-.14-2.91-.4L4 20l1.2-3.6C3.83 15.09 3 13.37 3 11.5 3 7.36 7.03 4 12 4s9 3.36 9 7.5z"/></svg>';
+const ICON_GRID='<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="vertical-align:-1.5px;margin-right:6px"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>';
+function urlB64ToU8(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(s);const a=new Uint8Array(r.length);for(let i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a;}
+async function getPushSub(){
+  try{
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)) return null;
+    const reg=await navigator.serviceWorker.getRegistration();
+    if(!reg) return null;
+    return await reg.pushManager.getSubscription();
+  }catch(e){ return null; }
+}
+async function renderPushRow(){
+  const b=$('stPush'); if(!b) return;
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    b.textContent=T.pushUnsupported; b.classList.add('dim'); b.onclick=null; return;
+  }
+  b.classList.remove('dim');
+  const sub=await getPushSub();
+  b.textContent=sub?T.pushOff:T.pushOn;
+  b.onclick=togglePush;
+}
+async function togglePush(){
+  try{
+    const sub=await getPushSub();
+    if(sub){
+      if(sb){ try{ await sb.from('push_subscriptions').delete().eq('endpoint',sub.endpoint); }catch(e){} }
+      await sub.unsubscribe();
+    }else{
+      if(!sb||!sbUser){ alert(T.pushNeedLogin); return; }
+      const perm=await Notification.requestPermission();
+      if(perm!=='granted'){ alert(T.pushDenied); return; }
+      let reg=await navigator.serviceWorker.getRegistration();
+      if(!reg){ try{ reg=await navigator.serviceWorker.register('/sw.js'); }catch(e){} }
+      const readyReg=await Promise.race([navigator.serviceWorker.ready,zzz(8000).then(()=>null)]);
+      reg=readyReg||reg;
+      if(!reg){ alert(T.pushErr+': service worker — sw.js 파일이 업로드됐는지 확인해 주세요.'); return; }
+      const ns=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});
+      const {error}=await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG});
+      if(error){ try{ await ns.unsubscribe(); }catch(e){} throw error; }
+      alert(T.pushEnabled);
+    }
+  }catch(e){ alert(T.pushErr+': '+((e&&e.message)||e)); }
+  renderPushRow();
+}
+
+/* ================= 설정 화면 ================= */
+function applyLangUI(){
+  document.documentElement.lang=LANG;
+  document.title=T.docTitle;
+  $('headEyebrow').textContent=T.eyebrow;
+  document.querySelector('.list-head h1').textContent=T.brand;
+  document.querySelector('.sp-eyebrow').textContent=T.eyebrow;
+  document.querySelector('.sp-title').textContent=T.brand;
+  $('tabChat').innerHTML=ICON_CHAT+T.tabChat; $('tabCube').innerHTML=ICON_GRID+T.tabCube;
+  document.querySelector('.cube-cap').textContent=T.cubeCap;
+  $('cubeInfo').textContent=T.cubeDefault;
+  document.querySelector('.cube-foot').innerHTML=T.cubeFoot;
+  $('input').placeholder=T.inputPh;
+  $('cmManage').textContent=T.menuManage;
+  $('cmRename').textContent=T.menuRename;
+  $('cmLeave').textContent=T.menuLeave;
+  $('prNick').textContent=T.nickBtn;
+  $('prChat').textContent=T.chatBtn;
+  $('pkInfo').textContent=T.tapIntro;
+  $('stTitle').textContent=T.stTitle;
+  $('stSecAcc').textContent=T.secAcc;
+  $('stSecData').textContent=T.secData;
+  $('stSecInfo').textContent=T.secInfo;
+  $('stExport').textContent=T.exportBtn;
+  $('stImport').textContent=T.importBtn;
+  $('stReset').textContent=T.resetBtn;
+  $('stPrivacy').textContent=T.privacyLink;
+  $('stDisclaimer').innerHTML=T.disclaimer;
+  $('stVersion').textContent=T.version;
+  $('langKo').classList.toggle('on',LANG==='ko');
+  $('langEn').classList.toggle('on',LANG==='en');
+}
+function renderSettingsAccount(){
+  const info=$('stAccInfo'), sub=$('stSyncInfo'), err=$('stSyncErr'), btn=$('stLogin');
+  if(!sb){ info.textContent=T.accGuest; sub.textContent=T.noSb; btn.style.display='none'; return; }
+  btn.style.display='';
+  if(sbUser){ info.textContent=sbUser.email||sbUser.id; sub.textContent=syncState.last?T.syncedAt(syncState.last):T.syncOn; btn.textContent=T.logout; }
+  else{ info.textContent=T.accGuest; sub.textContent=T.syncOff; btn.textContent=T.login; }
+  if(syncState.err){ err.style.display=''; err.textContent=T.syncErr+': '+syncState.err; }
+  else err.style.display='none';
+}
+$('btnSettings').onclick=()=>{ renderSettingsAccount(); renderPushRow(); $('settings').classList.add('on'); };
+$('stClose').onclick=()=>$('settings').classList.remove('on');
+$('langKo').onclick=()=>setLang('ko');
+$('langEn').onclick=()=>setLang('en');
+function setLang(l){ if(l===LANG) return; try{ localStorage.setItem('cheolkk-lang',l); }catch(e){} location.reload(); }
+$('stLogin').onclick=async()=>{
+  if(!sb) return;
+  if(sbUser){
+    if(!confirm(T.logoutConfirm)) return;
+    try{ await sb.auth.signOut(); }catch(e){}
+    sbUser=null; renderSettingsAccount();
+  }else{
+    try{ await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}}); }
+    catch(e){ alert(T.loginFail); }
+  }
+};
+$('stReset').onclick=async()=>{
+  if(!confirm(T.resetConfirm)) return;
+  if(!confirm(T.resetConfirm2)) return;
+  try{ if(window.storage) await window.storage.delete('philo-messenger-v6'); }catch(e){}
+  try{ localStorage.removeItem('philo-messenger-v6'); }catch(e){}
+  if(sb&&sbUser){ try{ await sb.from('user_data').delete().eq('user_id',sbUser.id); }catch(e){} }
+  location.reload();
+};
+
+/* ================= 시작 ================= */
+(async()=>{
+  applyLangUI();
+  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(e){} }
+  $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
+  const t0=now();
+  await initAuth();
+  await load();
+  if(!state.friends){ onboarding(); }
+  else{ renderFriends(); catchUp(); }
+  const wait=Math.max(0,1100-(now()-t0));
+  setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
+})();
+</script>
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script>
+</body>
+</html>
