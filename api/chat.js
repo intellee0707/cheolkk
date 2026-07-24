@@ -202,6 +202,39 @@
   .tl-legend span{white-space:nowrap}
   .tl-legend2{margin-top:3px}
 
+  /* ===== 우편함 ===== */
+  .mail-view{flex:1;overflow-y:auto;padding:6px 16px 90px}
+  .mail-card{width:100%;background:rgba(239,232,218,.04);border:1px solid var(--ink-line);border-radius:16px;padding:15px 16px;margin-bottom:10px;cursor:pointer;text-align:left;color:var(--paper);font-family:var(--sans)}
+  .mail-card:hover{border-color:var(--candle)}
+  .mail-card.unread{border-color:rgba(217,160,91,.5)}
+  .mc-top{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+  .mc-top .mdot{width:7px;height:7px;border-radius:50%;background:var(--candle);flex:none}
+  .mc-teaser{font-size:12.5px;color:var(--paper-dim);margin-top:6px;line-height:1.6}
+  .mail-hint{font-size:12px;color:rgba(239,232,218,.4);line-height:1.8;text-align:center;padding:26px 20px;white-space:pre-line}
+  .maildot{position:absolute;top:8px;right:14px;width:7px;height:7px;border-radius:50%;background:var(--candle)}
+  .tab{position:relative}
+  /* 편지 본문 */
+  .lt-body{flex:1;overflow-y:auto;padding:18px 24px calc(30px + env(safe-area-inset-bottom))}
+  .lt-eyebrow{font-size:11px;letter-spacing:.2em;color:var(--paper-dim);margin-top:8px}
+  .lt-title{font-family:var(--serif);font-size:22px;color:var(--candle);margin:6px 0 4px}
+  .lt-date{font-size:11.5px;color:rgba(239,232,218,.4);margin-bottom:18px}
+  .lt-greet{font-family:var(--serif);font-size:15.5px;line-height:2;white-space:pre-line}
+  .lt-sec{font-size:11px;letter-spacing:.16em;color:rgba(239,232,218,.45);margin:26px 0 10px}
+  .lt-quote{background:rgba(239,232,218,.05);border-left:3px solid var(--candle);border-radius:0 12px 12px 0;padding:13px 15px;font-family:var(--serif);font-size:14.5px;line-height:1.8}
+  .lt-why{font-size:13px;color:var(--paper-dim);line-height:1.8;margin-top:9px}
+  .lt-para{font-size:13.5px;line-height:1.95;white-space:pre-line}
+  .lt-rec{font-size:13px;color:var(--paper-dim);line-height:2.1}
+  .lt-gift{background:linear-gradient(135deg,rgba(217,160,91,.14),rgba(217,160,91,.05));border:1px solid rgba(217,160,91,.4);border-radius:16px;padding:20px 18px;text-align:center;font-family:var(--serif);font-size:15.5px;line-height:1.9;color:#efe3ce}
+  .lt-ps{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+  .lt-ps .avatar{width:30px;height:30px;border-radius:11px;overflow:hidden;flex:none}
+  .lt-ps .avatar svg{width:100%;height:100%}
+  .lt-ps-txt{font-size:13px;line-height:1.7;background:rgba(239,232,218,.05);border-radius:12px;padding:9px 13px}
+  .lt-ps-nm{font-size:11px;color:var(--paper-dim);margin-bottom:3px}
+  .lt-reply{width:100%;box-sizing:border-box;background:rgba(239,232,218,.05);border:1px solid var(--ink-line);border-radius:14px;color:var(--paper);font-family:var(--sans);font-size:13.5px;line-height:1.7;padding:13px;min-height:86px;resize:vertical}
+  .lt-reply:focus{outline:none;border-color:var(--candle)}
+  .lt-savebtn{width:100%;margin-top:10px;background:rgba(217,160,91,.14);border:1px solid var(--candle);border-radius:12px;color:var(--candle);font-family:var(--sans);font-size:13.5px;font-weight:700;padding:12px;cursor:pointer}
+  .lt-saved{color:#7fae8f;font-size:12.5px;text-align:center;margin-top:9px}
+
   /* ===== 즐겨찾기 핀 ===== */
   .friend{position:relative}
   .pinbtn{position:absolute;right:10px;bottom:8px;font-size:13px;color:rgba(239,232,218,.28);padding:5px 7px;cursor:pointer;line-height:1;z-index:2}
@@ -243,9 +276,14 @@
     <div class="cube-info" id="cubeInfo">철학자를 눌러 서로 비교해 보세요.</div>
     <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
   </div>
+  <div class="mail-view" id="mailView" style="display:none">
+    <div id="mailList"></div>
+    <div class="mail-hint" id="mailHint"></div>
+  </div>
   <div class="tabbar">
-    <button class="tab on" id="tabChat">💬 채팅</button>
     <button class="tab" id="tabCube">▦ 큐브</button>
+    <button class="tab on" id="tabChat">💬 채팅</button>
+    <button class="tab" id="tabMail">✉<span class="maildot" id="mailDot" style="display:none"></span></button>
   </div>
 
   <div class="chat" id="chat">
@@ -288,6 +326,11 @@
       <div class="pr-sched" id="prSched"></div>
     </div>
     <div class="pr-foot"><button class="ov-go" id="prChat">채팅하기</button></div>
+  </div>
+
+  <div class="overlay" id="letter">
+    <button class="ov-close" id="ltClose" aria-label="닫기">✕</button>
+    <div class="lt-body" id="ltBody"></div>
   </div>
 
   <div class="overlay" id="settings">
@@ -471,7 +514,7 @@ if(LANG==='en'){
 
 const T=LANG==='en'?{
  docTitle:'CheolKK — Group Chat of Dead Philosophers',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
- tabChat:'Chats',tabCube:'Philosophers',inputPh:'Type a message',leave:'Leave',
+ tabChat:'Chats',tabCube:'Profiles',tabMail:'Mail',inputPh:'Type a message',leave:'Leave',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
  cubeDefault:'Tap philosophers to compare them.',
@@ -497,6 +540,11 @@ const T=LANG==='en'?{
  trFast:'⚡ Instant replies',trMid:'💬 Normal pace',trSlow:'🐢 Slow & easy',trGhost:'👀 Leaves you on read',trVanish:'🫥 Sometimes vanishes',trBusy:'📅 Schedule first',trCut:'✂️ Interrupts you',trListen:'🙇 Hears you out',
  profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
  gActive:n=>`${n} active now`,
+ mailEmpty:'No letters yet.',mailHint:'On the 1st of each month, the philosopher you talked with most\nwrites you a letter looking back on your month together.',
+ mailWriting:'✍️ A letter is being written…',firstLabel:'The First Letter',monthLabel:m=>`Letter of ${['January','February','March','April','May','June','July','August','September','October','November','December'][m]}`,
+ ltFrom:n=>`from ${n}`,ltHighlight:'SENTENCE OF THE MONTH',ltObserve:'WHAT I NOTICED',ltRecords:'SMALL RECORDS',ltGift:'A SENTENCE FOR YOU',ltNextQ:'A QUESTION FOR NEXT MONTH',ltPS:'ENCLOSED NOTES',ltReply:'MY REPLY',
+ ltReplyPh:'Leave a reply to this letter — it will reach the next one.',ltReplySave:'Keep this reply',ltReplySaved:'✓ Kept — it will be delivered to the next letter',
+ recTotal:n=>`${n} conversations`,recNight:n=>`${n} late-night talks`,recBusy:(d,n)=>`Busiest day: ${d} (${n} messages)`,recWith:n=>`${n} philosophers by your side`,
  menuManage:'Manage members',menuRename:'Rename room',menuLeave:'Leave room',
  resetConfirm2:'Final check — really delete everything? This cannot be undone.',lgNow:'Now',
  pushOn:'🔔 Turn on push notifications',pushOff:'🔕 Turn off push notifications',pushUnsupported:'🔔 Push is not supported in this browser',
@@ -519,7 +567,7 @@ const T=LANG==='en'?{
  version:'CheolKK v7 · Sign-in & Sync · 한/EN'
 }:{
  docTitle:'철크크 — 죽은 철학자들의 단톡방',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
- tabChat:'채팅',tabCube:'철학자',inputPh:'메시지 보내기',leave:'나가기',
+ tabChat:'채팅',tabCube:'프로필',tabMail:'우편함',inputPh:'메시지 보내기',leave:'나가기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
  cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
@@ -545,6 +593,11 @@ const T=LANG==='en'?{
  trFast:'⚡ 즉답형',trMid:'💬 답장 보통',trSlow:'🐢 느긋한 답장',trGhost:'👀 읽씹 장인',trVanish:'🫥 가끔 잠수',trBusy:'📅 일과 우선',trCut:'✂️ 말 끊고 들어옴',trListen:'🙇 끝까지 듣는 편',
  profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
  gActive:n=>`${n}명 활동 중`,
+ mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
+ mailWriting:'✍️ 편지를 쓰고 있어요…',firstLabel:'첫 편지',monthLabel:m=>`${m+1}월의 편지`,
+ ltFrom:n=>`${n}(으)로부터`,ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
+ ltReplyPh:'이 편지에 답장을 남겨보세요. 다음 편지에 전해집니다.',ltReplySave:'답장 보관하기',ltReplySaved:'✓ 보관됨 — 다음 편지에 전해집니다',
+ recTotal:n=>`${n}번의 대화`,recNight:n=>`새벽의 대화 ${n}번`,recBusy:(d,n)=>`가장 붐볐던 날 ${d} (메시지 ${n}개)`,recWith:n=>`곁에 있던 철학자 ${n}명`,
  menuManage:'멤버 관리',menuRename:'방 이름 바꾸기',menuLeave:'단톡방 나가기',
  resetConfirm2:'마지막 확인입니다. 정말로 전부 삭제할까요? 되돌릴 수 없어요.',lgNow:'현재 시각',
  pushOn:'🔔 푸시 알림 켜기',pushOff:'🔕 푸시 알림 끄기',pushUnsupported:'🔔 이 브라우저는 푸시를 지원하지 않아요',
@@ -601,7 +654,7 @@ const GROUP_RULES=`
 
 /* ================= 상태/유틸 ================= */
 const DEBOUNCE=6500, FOLLOWUP_MS=1000*60*60*4;
-const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{}};
+const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[]};
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const now=()=>Date.now();
@@ -693,7 +746,7 @@ const selfLine=p=>{
 };
 
 async function save(){
-  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,pins:state.pins||{}});
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,pins:state.pins||{},mail:state.mail||[]});
   try{
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
@@ -709,7 +762,7 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; }
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; state.mail=d.mail||[]; }
   }catch(e){}
 }
 
@@ -1800,12 +1853,174 @@ function renderCube(){
 function showTab(t){
   $('tabChat').classList.toggle('on',t==='chat');
   $('tabCube').classList.toggle('on',t==='cube');
+  $('tabMail').classList.toggle('on',t==='mail');
   $('friends').style.display=t==='chat'?'':'none';
   $('cubeView').style.display=t==='cube'?'':'none';
+  $('mailView').style.display=t==='mail'?'':'none';
   if(t==='cube') renderCube();
+  if(t==='mail') renderMail();
 }
 $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
+$('tabMail').onclick=()=>showTab('mail');
+
+/* ================= 우편함 (철학자의 편지) ================= */
+const VOICE={
+ nietzsche:'반말, 짧은 문장 연타, 느낌표, 열혈 도발',
+ schopenhauer:'건조한 반말, 한숨, 츤데레 독설, 푸들 아트만',
+ kant:'단정한 너드 반말, 번호 매기기, 규칙 애호',
+ epicurus:'온기 있는 반존대("괜찮아요? 많이 힘들었겠다"), 빵 이야기',
+ socrates:'능청 반말, 되묻는 물음표, 장난기',
+ confucius:'따뜻한 하게체, 밥 챙김, 어른의 격려',
+ zhuangzi:'한가한 반말, 나비🦋, 엉뚱한 비유, 여백',
+ kierkegaard:'소설 문체 반말, 말줄임표…, (괄호 속마음), 일지도..?',
+ aurelius:'극단적 단문, 군더더기 없음, 무심한 든든함'};
+let mailGen=false;
+function ymd(t){const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate();}
+function collectStats(fromT,toT){
+  const perPid={}, myMsgs=[], perDay={};
+  let total=0, night=0;
+  const addMine=(pid,m)=>{
+    total++;
+    const h=new Date(m.t).getHours(); const isN=(h>=22||h<6); if(isN) night++;
+    const dk=ymd(m.t); perDay[dk]=(perDay[dk]||0)+1;
+    perPid[pid]=perPid[pid]||{mine:0,theirs:0,night:0}; perPid[pid].mine++; if(isN) perPid[pid].night=(perPid[pid].night||0)+1;
+    const tx=(m.content||'').trim();
+    if(tx.length>=5&&tx.length<=90&&!/^[ㄱ-ㅎㅏ-ㅣ\s~!?.,;…ㅠㅜzZ0-9]+$/.test(tx)&&!myMsgs.some(x=>x.text===tx)) myMsgs.push({t:m.t,text:tx});
+  };
+  state.friends&&state.friends.forEach(pid=>{
+    (state.chats[pid]||[]).forEach(m=>{
+      if(m.t<fromT||m.t>=toT) return;
+      if(m.role==='user') addMine(pid,m);
+      else { total++; perPid[pid]=perPid[pid]||{mine:0,theirs:0}; perPid[pid].theirs++; }
+    });
+  });
+  state.groups.forEach(g=>{
+    g.msgs.forEach(m=>{
+      if(m.t<fromT||m.t>=toT) return;
+      if(m.who==='me'){ g.members.forEach(pid=>{ perPid[pid]=perPid[pid]||{mine:0,theirs:0}; perPid[pid].mine+=0.5; }); total++; const h=new Date(m.t).getHours(); if(h>=22||h<6) night++; const dk=ymd(m.t); perDay[dk]=(perDay[dk]||0)+1; const tx=(m.content||'').trim(); if(tx.length>=5&&tx.length<=90&&!/^[ㄱ-ㅎㅏ-ㅣ\s~!?.,;…ㅠㅜzZ0-9]+$/.test(tx)&&!myMsgs.some(x=>x.text===tx)) myMsgs.push({t:m.t,text:tx}); }
+      else if(m.who!=='sys'){ total++; perPid[m.who]=perPid[m.who]||{mine:0,theirs:0}; perPid[m.who].theirs++; }
+    });
+  });
+  let busiest=['-',0];
+  Object.entries(perDay).forEach(([d,n])=>{ if(n>busiest[1]) busiest=[d,n]; });
+  const pids=Object.keys(perPid).filter(p=>perPid[p].mine>=1).sort((a,b)=>perPid[b].mine-perPid[a].mine);
+  const sample=myMsgs.sort(()=>Math.random()-.5).slice(0,30).sort((a,b)=>a.t-b.t);
+  return {perPid,pids,authorPid:pids[0]||null,myMsgs:sample,myCount:myMsgs.length,total,night,busiest,withN:pids.length};
+}
+async function makeLetter(id,label,st){
+  if(mailGen||!st.authorPid) return;
+  mailGen=true; if($('mailView').style.display!=='none') renderMail();
+  try{
+    const p=P(st.authorPid);
+    const others=st.pids.filter(x=>x!==st.authorPid&&st.perPid[x].mine>=2).slice(0,5);
+    const prevWithReply=[...state.mail].reverse().find(m=>m.myReply&&m.myReply.trim());
+    const sys=p.prompt+COMMON+`\n\n[특별 임무: 월간 편지]\n너는 지금 상담자에게 보내는 '한 달을 돌아보는 편지'를 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 한 달의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음 달을 여는 질문 하나","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 우편함을 확인해보라는 뉘앙스)","ps":[${others.length?'{"id":"철학자id","text":"그 철학자 말투의 1문장 쪽지"}':''}]}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩, 그들의 말투로 짧은 쪽지를 써라(목록이 비었으면 빈 배열).\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 우편함의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라.`;
+    const user=`[기간] ${label}\n[통계] 대화 ${st.total}회, 심야(밤10시~새벽6시) 대화 ${st.night}회, 가장 붐빈 날 ${st.busiest[0]}(${st.busiest[1]}개), 함께한 철학자 ${st.withN}명\n[너와의 통계] 상담자와 너의 대화 ${Math.round((st.perPid[st.authorPid]||{}).mine||0)}회, 그중 심야 ${(st.perPid[st.authorPid]||{}).night||0}회\n[철학자별 대화량] ${st.pids.map(x=>P(x).name+':'+Math.round(st.perPid[x].mine)).join(', ')}\n[상담자의 문장들]\n${st.myMsgs.map(m=>'- '+m.text).join('\n')}\n${prevWithReply?'[지난 편지에 남긴 상담자의 답장] '+prevWithReply.myReply.slice(0,300):''}\n[쪽지 철학자 목록] ${others.map(x=>P(x).name+'('+x+') 말투: '+(VOICE[x]||'')).join(' / ')||'(없음)'}`;
+    let text=await callClaude(sys,[{role:'user',content:user}]);
+    text=text.replace(/```json|```/g,'').trim();
+    const s0=text.indexOf('{'), s1=text.lastIndexOf('}');
+    const data=JSON.parse(text.slice(s0,s1+1));
+    if(!data.greeting||!data.aphorism) throw new Error('bad letter');
+    data.ps=(data.ps||[]).filter(x=>x&&x.id&&x.text&&ALIAS[x.id]).slice(0,5);
+    state.mail.push({id,label,author:st.authorPid,t:now(),read:false,myReply:'',
+      data,stats:{total:st.total,night:st.night,busiest:st.busiest,withN:st.withN}});
+    save(); updateMailDot();
+    localNotify(dispName(p),(LANG==='en'?'A letter has arrived for you.':'너에게 편지가 도착했어.'));
+    if(data.dm_note){ setTimeout(()=>{ try{ pushDM(p,String(data.dm_note).slice(0,160),now(),'d:'+st.authorPid); }catch(e){} }, 2500); }
+  }catch(e){}
+  mailGen=false;
+  if($('mailView').style.display!=='none') renderMail();
+}
+async function checkMail(){
+  try{
+    state.mail=state.mail||[];
+    const nd=new Date();
+    const pm=new Date(nd.getFullYear(),nd.getMonth()-1,1);
+    const prevYm=pm.getFullYear()+'-'+String(pm.getMonth()+1).padStart(2,'0');
+    const prevStart=pm.getTime(), prevEnd=new Date(nd.getFullYear(),nd.getMonth(),1).getTime();
+    if(!state.mail.find(m=>m.id===prevYm)){
+      const st=collectStats(prevStart,prevEnd);
+      if(st.myCount>=10){ await makeLetter(prevYm,T.monthLabel(pm.getMonth()),st); return; }
+    }
+    if(!state.mail.length){
+      const st=collectStats(now()-30*86400000,now()+1);
+      if(st.myCount>=20) await makeLetter('first',T.firstLabel,st);
+    }
+  }catch(e){}
+}
+function updateMailDot(){
+  const anyUnread=(state.mail||[]).some(m=>!m.read);
+  const d=$('mailDot'); if(d) d.style.display=anyUnread?'':'none';
+}
+function renderMail(){
+  const el=$('mailList'); el.innerHTML='';
+  const arr=[...(state.mail||[])].sort((a,b)=>b.t-a.t);
+  if(mailGen){
+    const w=document.createElement('div'); w.className='mail-card'; w.textContent=T.mailWriting; el.appendChild(w);
+  }
+  arr.forEach(l=>{
+    const b=document.createElement('button');
+    b.className='mail-card'+(l.read?'':' unread');
+    const teaser=(l.data.greeting||'').replace(/\n/g,' ').slice(0,64);
+    b.innerHTML=`<div class="mc-top">${l.read?'':'<span class="mdot"></span>'}<span>✉️ ${escapeH(l.label)}</span><span style="font-weight:400;color:var(--paper-dim);font-size:12px">· ${escapeH(T.ltFrom(dispName(P(l.author))))}</span></div>
+      <div class="mc-teaser">${escapeH(teaser)}…</div>`;
+    b.onclick=()=>openLetter(l.id);
+    el.appendChild(b);
+  });
+  $('mailHint').textContent=(arr.length||mailGen)?'':(T.mailEmpty+'\n'+T.mailHint);
+  updateMailDot();
+}
+function openLetter(id){
+  const l=(state.mail||[]).find(m=>m.id===id); if(!l) return;
+  l.read=true; save(); updateMailDot();
+  const p=P(l.author), d=l.data, st=l.stats;
+  const recs=[T.recTotal(st.total)];
+  if(st.night>0) recs.push(T.recNight(st.night));
+  if(st.busiest&&st.busiest[1]>0) recs.push(T.recBusy(st.busiest[0],st.busiest[1]));
+  recs.push(T.recWith(st.withN));
+  const psHTML=(d.ps&&d.ps.length)?`<div class="lt-sec">${T.ltPS}</div>`+d.ps.map(n=>`
+    <div class="lt-ps"><div class="avatar">${av(n.id)}</div><div><div class="lt-ps-nm">${escapeH(dispName(P(n.id)))}</div><div class="lt-ps-txt">${escapeH(n.text)}</div></div></div>`).join(''):'';
+  $('ltBody').innerHTML=`
+    <div class="lt-eyebrow">CHEOLKK LETTERS</div>
+    <div class="lt-title">${escapeH(l.label)}</div>
+    <div class="lt-date">${fmtT(l.t)} · ${escapeH(T.ltFrom(dispName(p)))}</div>
+    <div class="lt-greet">${escapeH(d.greeting)}</div>
+    ${d.highlight&&d.highlight.quote?`<div class="lt-sec">${T.ltHighlight}</div>
+      <div class="lt-quote">“${escapeH(d.highlight.quote)}”</div>
+      <div class="lt-why">${escapeH(d.highlight.why||'')}</div>`:''}
+    ${d.observation?`<div class="lt-sec">${T.ltObserve}</div><div class="lt-para">${escapeH(d.observation)}</div>`:''}
+    <div class="lt-sec">${T.ltRecords}</div>
+    <div class="lt-rec">${recs.map(escapeH).join('<br>')}</div>
+    ${d.records_comment?`<div class="lt-why">${escapeH(d.records_comment)}</div>`:''}
+    <div class="lt-sec">${T.ltGift}</div>
+    <div class="lt-gift">${escapeH(d.aphorism)}</div>
+    ${d.next_question?`<div class="lt-sec">${T.ltNextQ}</div><div class="lt-para">${escapeH(d.next_question)}</div>`:''}
+    ${psHTML}
+    <div class="lt-sec">${T.ltReply}</div>
+    <textarea class="lt-reply" id="ltReplyBox" placeholder="${escapeH(T.ltReplyPh)}">${escapeH(l.myReply||'')}</textarea>
+    <button class="lt-savebtn" id="ltReplySave">${T.ltReplySave}</button>
+    <div class="lt-saved" id="ltSavedMsg" style="display:${l.myReply?'':'none'}">${T.ltReplySaved}</div>`;
+  $('ltReplySave').onclick=()=>{
+    l.myReply=$('ltReplyBox').value.trim();
+    save();
+    $('ltSavedMsg').style.display=l.myReply?'':'none';
+    if(l.myReply&&!l.replyAcked){
+      l.replyAcked=true; save();
+      const rp=P(l.author), rTxt=l.myReply.slice(0,200);
+      setTimeout(async()=>{
+        try{
+          if(!presence(rp,now()).active) return;
+          const txt=await dmAPI(rp,`(상담자가 네가 보낸 월간 편지에 방금 이런 답장을 남겼다: "${rTxt}" — 그 답장을 읽은 직후다. 짧고 캐릭터답게 반응해라. 답장 내용을 그대로 복창하지 말고, 마음에 남은 부분 하나만 건드려라. 말풍선 1~2개.)`);
+          pushDM(rp,txt,now(),'d:'+l.author);
+        }catch(e){}
+      },rnd(20000,90000));
+    }
+  };
+  $('letter').classList.add('on');
+  renderMail();
+}
+$('ltClose').onclick=()=>$('letter').classList.remove('on');
 
 /* ================= 대화 백업/복원 ================= */
 $('stExport').onclick=()=>{
@@ -1839,7 +2054,7 @@ $('importFile').onchange=e=>{
 let sb=null,sbUser=null,authReady=false,syncTimer=null;
 const syncState={err:'',last:0};
 try{ if(window.supabase) sb=window.supabase.createClient('https://kbkypprqxiqitdrombbg.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtia3lwcHJxeGlxaXRkcm9tYmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDYyODIsImV4cCI6MjEwMDIyMjI4Mn0.9TNNbA_s-tWwLQc-6rNqsOXCKLlKLzDgbh4kPWWZHG4'); }catch(e){}
-function dataScore(d){let n=0;try{Object.values((d&&d.chats)||{}).forEach(a=>n+=(a||[]).length);((d&&d.groups)||[]).forEach(g=>n+=((g&&g.msgs)||[]).length);}catch(e){}return n;}
+function dataScore(d){let n=0;try{Object.values((d&&d.chats)||{}).forEach(a=>n+=(a||[]).length);((d&&d.groups)||[]).forEach(g=>n+=((g&&g.msgs)||[]).length);n+=((d&&d.mail)||[]).length*5;}catch(e){}return n;}
 async function initialSync(){
   if(!sb||!sbUser||window.storage) return;
   try{
@@ -1860,7 +2075,7 @@ async function initialSync(){
 async function cloudPush(){
   if(!sb||!sbUser) return;
   try{
-    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks,pins:state.pins||{}},updated_at:new Date().toISOString()});
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks,pins:state.pins||{},mail:state.mail||[]},updated_at:new Date().toISOString()});
     if(error) throw error;
     syncState.err=''; syncState.last=now();
   }catch(e){ syncState.err=(e&&e.message)||String(e); }
@@ -1890,6 +2105,7 @@ async function initAuth(){
 const VAPID_PUBLIC='BMhdB0ke6w-J7SttyTCHZBxKZxzXOcmfISPpFSfo_fj6auPvConJzZMkRZbKGNFuVS8HXNHVIvqLmi7dsOU1-oM';
 const ICON_CHAT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 11.5c0 4.14-4.03 7.5-9 7.5-1.02 0-2-.14-2.91-.4L4 20l1.2-3.6C3.83 15.09 3 13.37 3 11.5 3 7.36 7.03 4 12 4s9 3.36 9 7.5z"/></svg>';
 const ICON_GRID='<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="vertical-align:-1.5px;margin-right:6px"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>';
+const ICON_MAIL='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5 l8 6 8 -6"/></svg>';
 function urlB64ToU8(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(s);const a=new Uint8Array(r.length);for(let i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a;}
 async function getPushSub(){
   try{
@@ -1942,6 +2158,8 @@ function applyLangUI(){
   document.querySelector('.sp-eyebrow').textContent=T.eyebrow;
   document.querySelector('.sp-title').textContent=T.brand;
   $('tabChat').innerHTML=ICON_CHAT+T.tabChat; $('tabCube').innerHTML=ICON_GRID+T.tabCube;
+  $('tabMail').innerHTML=ICON_MAIL+T.tabMail+'<span class="maildot" id="mailDot" style="display:none"></span>';
+  $('mailHint').textContent=T.mailEmpty+'\n'+T.mailHint;
   document.querySelector('.cube-cap').textContent=T.cubeCap;
   $('cubeInfo').textContent=T.cubeDefault;
   document.querySelector('.cube-foot').innerHTML=T.cubeFoot;
@@ -2008,7 +2226,7 @@ $('stReset').onclick=async()=>{
   await initAuth();
   await load();
   if(!state.friends){ onboarding(); }
-  else{ renderFriends(); catchUp(); }
+  else{ renderFriends(); catchUp(); setTimeout(()=>checkMail(),4000); }
   const wait=Math.max(0,1100-(now()-t0));
   setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
 })();
