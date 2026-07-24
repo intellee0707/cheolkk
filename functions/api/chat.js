@@ -3,13 +3,14 @@
 // 브라우저에서 /api/chat?test=1 을 열면 상태를 알려줍니다.
 
 export async function onRequestGet(context) {
-  const key = context.env.GEMINI_API_KEY;
+  const key = (context.env.GEMINI_API_KEY || '').trim();
   const model = context.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
   const info = {
     ok: true,
     functionAlive: true,
     keySet: !!key,
     keyLength: key ? key.length : 0,
+    keyPrefix: key ? key.slice(0, 5) : '',
     model
   };
 
@@ -17,10 +18,10 @@ export async function onRequestGet(context) {
   if (url.searchParams.get('test') === '1' && key) {
     try {
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
           body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: '안녕이라고 한 단어로만 답해' }] }] })
         }
       );
@@ -37,7 +38,7 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   try {
     const { system, messages } = await context.request.json();
-    const key = context.env.GEMINI_API_KEY;
+    const key = (context.env.GEMINI_API_KEY || '').trim();
     const model = context.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
     if (!key) return json({ error: 'GEMINI_API_KEY missing' }, 500);
 
@@ -53,8 +54,8 @@ export async function onRequestPost(context) {
     };
 
     const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) }
     );
 
     if (!r.ok) {
