@@ -9,136 +9,108 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#12141d; --ink-soft:#1b1e2b; --ink-line:rgba(239,232,218,.12);
     --paper:#efe8da; --paper-dim:#b9b2a2; --candle:#d9a05b; --on:#4caf7d;
-    --serif:'Noto Serif KR',serif; --sans:'Noto Sans KR',sans-serif;
-    --handwriting:'Nanum Pen Script', 'Gowun Batang', cursive;
+    --serif:'Gowun Batang', 'Noto Serif KR', serif;
+    --sans:'Gowun Dodum', 'Noto Sans KR', sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{background:var(--ink);color:var(--paper);font-family:var(--sans);height:100dvh;overflow:hidden}
   .app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--ink);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.5)}
 
-  .list-head{padding:22px 20px 14px;border-bottom:1px solid var(--ink-line)}
+  .list-head{padding:22px 20px 14px;border-bottom:1px solid var(--ink-line);position:relative}
   .list-head .eyebrow{font-size:10px;letter-spacing:.35em;color:var(--candle);margin-bottom:6px}
   .list-head h1{font-family:var(--serif);font-size:22px;font-weight:700}
+  .gear{position:absolute;top:20px;right:18px;background:none;border:none;color:var(--paper-dim);font-size:19px;cursor:pointer}
+
   .friends{flex:1;overflow-y:auto;padding:6px 0 20px}
   .sec{font-size:11px;letter-spacing:.14em;color:rgba(239,232,218,.4);padding:14px 20px 6px}
-  .friend{display:flex;align-items:center;gap:14px;padding:13px 20px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:var(--paper);transition:background .15s;position:relative}
+  .friend{display:flex;align-items:center;gap:14px;padding:13px 20px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:var(--paper);transition:background .15s}
   .friend:hover{background:rgba(239,232,218,.04)}
-  .friend:focus-visible{outline:2px solid var(--candle);outline-offset:-2px}
+  
   .avwrap{position:relative;flex-shrink:0}
-  .avatar{width:52px;height:52px;border-radius:20px;overflow:hidden}
+  .avatar{width:52px;height:52px;border-radius:18px;overflow:hidden;background:#232736;display:flex;align-items:center;justify-content:center;border:1px solid rgba(239,232,218,.1)}
   .avatar svg{width:100%;height:100%;display:block}
-  .dot{position:absolute;right:-2px;bottom:-2px;width:14px;height:14px;border-radius:50%;border:3px solid var(--ink);background:var(--on)}
-  .dot.off{background:#7a756a}
-  .f-mid{flex:1;min-width:0;padding-right:26px}
-  .f-name{font-size:15.5px;font-weight:700}
-  .f-status{font-size:11px;color:rgba(217,160,91,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .dot{position:absolute;right:-2px;bottom:-2px;width:13px;height:13px;border-radius:50%;border:2px solid var(--ink);background:var(--on)}
+
+  .f-mid{flex:1;min-width:0}
+  .f-name{font-size:15.5px;font-weight:700;font-family:var(--serif)}
   .f-preview{font-size:12.5px;color:rgba(239,232,218,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
-  .f-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-  .f-time{font-size:10.5px;color:rgba(239,232,218,.35)}
-  .badge{min-width:19px;height:19px;border-radius:10px;background:#c25b4e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px}
 
   .tabbar{display:flex;border-top:1px solid var(--ink-line);background:var(--ink)}
-  .tab{flex:1;background:none;border:none;color:var(--paper-dim);font-family:var(--sans);font-size:13.5px;padding:13px 0 calc(13px + env(safe-area-inset-bottom));cursor:pointer;position:relative}
+  .tab{flex:1;background:none;border:none;color:var(--paper-dim);font-family:var(--sans);font-size:13.5px;padding:13px 0 calc(13px + env(safe-area-inset-bottom));cursor:pointer}
   .tab.on{color:var(--candle);font-weight:700}
 
-  .cube-view{flex:1;overflow-y:auto;padding:16px 18px 8px}
-  .cube-cap{font-size:11.5px;color:rgba(239,232,218,.45);margin-bottom:6px;line-height:1.7}
-  .cube-info{margin-top:16px;padding:13px 2px 4px;border-top:1px solid var(--ink-line);font-size:12.5px;color:var(--paper-dim);line-height:1.75;min-height:96px}
-  .cube-foot{font-size:10.5px;color:rgba(239,232,218,.3);text-align:center;line-height:1.6;padding:18px 0 10px}
-
-  .splash{position:absolute;inset:0;z-index:50;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s}
-  .splash.hide{opacity:0;pointer-events:none}
-  .sp-grid{display:grid;grid-template-columns:repeat(3,54px);gap:9px;margin-bottom:22px}
-  .sp-grid .avatar{width:54px;height:54px;border-radius:18px}
-  .sp-eyebrow{font-size:10px;letter-spacing:.35em;color:var(--paper-dim);margin-bottom:6px}
-  .sp-title{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--candle)}
-
-  .chat{position:absolute;inset:0;background:var(--ink);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;z-index:5}
-  .chat.open{transform:none}
-  .chat-head{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--ink-line);background:var(--ink)}
-  .back{background:none;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:6px 8px;line-height:1}
-  .chat-head .avatar{width:38px;height:38px;border-radius:14px}
-  .chat-head .c-name{font-size:15px;font-weight:700}
-  .chat-head .c-status{font-size:11px;color:var(--paper-dim);margin-top:1px}
-  .msgs{flex:1;overflow-y:auto;padding:18px 14px 10px;display:flex;flex-direction:column;gap:4px}
-  .mrow{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
-  .mrow.me{flex-direction:row-reverse}
-  .mrow .avatar{width:34px;height:34px;border-radius:13px;align-self:flex-start;cursor:pointer}
-  .bcol{display:flex;flex-direction:column;max-width:72%}
-  .who{font-size:10.5px;color:var(--paper-dim);margin:0 0 3px 2px}
-  .bubble{padding:9px 13px;border-radius:16px;font-size:14.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
-  .them .bubble{background:var(--paper);color:#1d1f28;border-top-left-radius:4px;font-family:var(--serif);font-weight:600;font-size:14px}
-  .me .bubble{background:var(--candle);color:#1d1f28;border-top-right-radius:4px;max-width:100%}
-  .me .bcol{align-items:flex-end}
-  .meta{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:10px;color:rgba(239,232,218,.4);flex-shrink:0}
-
-  .inputbar{display:flex;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--ink-line);background:var(--ink)}
-  .inputbar textarea{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);border-radius:20px;padding:10px 16px;color:var(--paper);font-family:var(--sans);font-size:14px;resize:none;outline:none;max-height:90px;line-height:1.5}
-  .inputbar textarea:focus{border-color:var(--candle)}
-  .send{width:42px;height:42px;border-radius:50%;border:none;background:var(--candle);color:var(--ink);font-size:17px;cursor:pointer;flex-shrink:0}
-
-  /* ===== 독립형 퀘스트 카드 ===== */
-  .quest-card{margin:10px 12px 4px;padding:12px 14px;background:rgba(217,160,91,.08);border:1px dashed rgba(217,160,91,.4);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .quest-txt{font-size:13px;color:var(--paper);line-height:1.4}
-  .quest-txt span{display:block;font-size:10.5px;color:var(--candle);font-weight:700;margin-bottom:2px}
-  .dy-done{background:none;border:1px solid var(--candle);color:var(--candle);border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .2s}
+  /* ===== 철학자 미션 카드 ===== */
+  .quest-card{margin:10px 14px 4px;padding:12px 14px;background:rgba(217,160,91,.08);border:1px dashed rgba(217,160,91,.4);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .quest-txt{font-size:12.5px;color:var(--paper);line-height:1.4}
+  .quest-txt span{display:block;font-size:11px;color:var(--candle);font-weight:700;margin-bottom:2px}
+  .dy-done{background:none;border:1px solid var(--candle);color:var(--candle);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .2s}
   .dy-done.is-done{background:var(--candle);color:var(--ink);font-weight:700}
 
-  /* ===== 오늘 한 줄 / 서랍장 일기 노란 노트 카드 ===== */
-  .dy-card{margin:6px 12px 10px;padding:14px 16px;border:1px solid rgba(217,160,91,.3);border-radius:16px;background:radial-gradient(circle at top left, rgba(239,232,218,.08), rgba(27,30,43,.95));box-shadow:0 4px 12px rgba(0,0,0,.25);position:relative}
-  .dy-head{font-size:12.5px;color:var(--paper-dim);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border-bottom:1px dashed var(--ink-line);padding-bottom:6px}
-  .dy-desc{font-size:11.5px;color:var(--paper-dim);line-height:1.5;background:rgba(239,232,218,.04);padding:8px 10px;border-radius:8px;border-left:2px solid var(--candle);margin-bottom:10px}
-  .dy-row{display:flex;gap:7px;margin-bottom:8px}
-  .dy-in{flex:1;background:var(--ink);border:1px solid var(--ink-line);border-radius:9px;color:var(--paper);padding:9px 12px;font-size:14px;font-family:var(--handwriting);outline:none;letter-spacing:.5px}
+  /* ===== 오늘 한 줄 카드 ===== */
+  .dy-card{margin:8px 14px 12px;padding:16px;border:1px solid rgba(217,160,91,.3);border-radius:16px;background:radial-gradient(circle at top left, rgba(239,232,218,.07), rgba(27,30,43,.95));box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .dy-head{font-size:12px;color:var(--paper-dim);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px dashed var(--ink-line);padding-bottom:6px}
+  .dy-desc{font-size:12px;color:var(--paper-dim);line-height:1.6;background:rgba(239,232,218,.04);padding:9px 11px;border-radius:9px;border-left:3px solid var(--candle);margin-bottom:12px;font-family:var(--serif)}
+  .dy-row{display:flex;gap:8px;margin-bottom:8px}
+  .dy-in{flex:1;background:var(--ink);border:1px solid var(--ink-line);border-radius:10px;color:var(--paper);padding:10px 12px;font-size:14px;font-family:var(--serif);outline:none}
   .dy-in:focus{border-color:var(--candle)}
-  .dy-go{background:var(--candle);color:var(--ink);border:0;border-radius:9px;padding:0 14px;font-weight:700;font-size:13px;cursor:pointer}
+  .dy-go{background:var(--candle);color:var(--ink);border:0;border-radius:10px;padding:0 14px;font-weight:700;font-size:13px;cursor:pointer}
   
-  .dy-mine-box{background:rgba(239,232,218,.03);padding:10px 12px;border-radius:10px;border:1px solid rgba(239,232,218,.08);margin-top:6px}
-  .dy-mine-line{font-family:var(--handwriting);font-size:20px;line-height:1.5;color:#efe8da;word-break:break-word;letter-spacing:.5px}
+  .dy-mine-box{background:rgba(239,232,218,.03);padding:12px;border-radius:10px;border:1px solid rgba(239,232,218,.08);margin-top:6px}
+  .dy-mine-line{font-family:var(--serif);font-size:15px;line-height:1.6;color:#efe8da;word-break:break-word}
   
   .dy-comments-area{margin-top:10px;padding-top:8px;border-top:1px dashed var(--ink-line)}
   .dy-toggle-btn{background:none;border:none;color:var(--candle);font-size:12px;cursor:pointer;padding:4px 0;display:flex;align-items:center;gap:4px;font-family:var(--sans)}
   .dy-re-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-  .dy-re{display:flex;gap:8px;align-items:flex-start;background:rgba(239,232,218,.03);padding:8px 10px;border-radius:10px}
-  .dy-re .avatar{width:28px;height:28px;flex:none;border-radius:9px;overflow:hidden}
-  .dy-re-txt{font-size:13px;line-height:1.55;color:var(--paper)}
+  .dy-re{display:flex;gap:10px;align-items:flex-start;background:rgba(239,232,218,.03);padding:10px;border-radius:10px}
+  .dy-re .avatar{width:32px;height:32px;flex:none;border-radius:12px;overflow:hidden}
+  .dy-re-txt{font-size:13px;line-height:1.55;color:var(--paper);font-family:var(--serif)}
   .dy-re-txt b{color:var(--candle);font-weight:700;margin-right:4px}
 
   /* ===== 서랍장 & 캘린더 ===== */
-  .mail-view{flex:1;overflow-y:auto;padding:6px 16px 90px}
-  .dr-seg{display:flex;gap:8px;padding:10px 14px 4px}
-  .dr-seg button{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);color:var(--paper-dim);border-radius:10px;padding:8px 0;font-size:13.5px;font-family:var(--sans);cursor:pointer}
+  .mail-view{flex:1;overflow-y:auto;padding:10px 16px 90px}
+  .dr-seg{display:flex;gap:8px;margin-bottom:14px}
+  .dr-seg button{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);color:var(--paper-dim);border-radius:10px;padding:9px 0;font-size:13.5px;font-family:var(--sans);cursor:pointer}
   .dr-seg button.on{color:var(--ink);background:var(--candle);border-color:var(--candle);font-weight:700}
   
-  .cal-head{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 0 6px}
-  .cal-nav{background:none;border:0;color:var(--candle);font-size:22px;cursor:pointer;padding:0 8px}
+  .cal-head{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 0 10px}
+  .cal-nav{background:none;border:0;color:var(--candle);font-size:20px;cursor:pointer;padding:0 6px}
   .cal-selects{display:flex;align-items:center;gap:6px}
-  .cal-selects select{background:var(--ink-soft);color:var(--candle);border:1px solid var(--ink-line);border-radius:8px;padding:4px 8px;font-size:14px;font-family:var(--serif);font-weight:700;outline:none;cursor:pointer}
+  .cal-selects select{background:var(--ink-soft);color:var(--candle);border:1px solid var(--ink-line);border-radius:8px;padding:5px 8px;font-size:14px;font-family:var(--serif);font-weight:700;outline:none;cursor:pointer}
   
-  .month-progress{text-align:center;font-size:11.5px;color:var(--paper-dim);margin-bottom:10px}
-  .progress-bar-bg{width:75%;height:6px;background:var(--ink-soft);border-radius:3px;margin:4px auto 0;overflow:hidden;border:1px solid var(--ink-line)}
+  .month-progress{text-align:center;font-size:12px;color:var(--paper-dim);margin-bottom:14px}
+  .progress-bar-bg{width:80%;height:6px;background:var(--ink-soft);border-radius:3px;margin:6px auto 0;overflow:hidden;border:1px solid var(--ink-line)}
   .progress-bar-fill{height:100%;background:linear-gradient(90deg, var(--candle), #e8c07d);border-radius:3px;transition:width .3s ease}
 
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 8px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 4px}
   .cal-wd{text-align:center;font-size:11px;color:var(--paper-dim);padding:4px 0}
-  .cal-cell{position:relative;aspect-ratio:1;background:none;border:1px solid transparent;border-radius:10px;color:var(--paper-dim);font-family:var(--sans);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:default;font-size:12.5px}
-  .cal-cell.has{color:#fff;cursor:pointer;background:rgba(217,160,91,.22);border:1px solid var(--candle);box-shadow:0 0 8px rgba(217,160,91,.2);font-weight:700}
+  .cal-cell{position:relative;aspect-ratio:1;background:none;border:1px solid transparent;border-radius:10px;color:var(--paper-dim);font-family:var(--sans);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:12.5px}
+  .cal-cell.has{color:#fff;cursor:pointer;background:rgba(217,160,91,.2);border:1px solid var(--candle);font-weight:700}
   .cal-cell.today{border-color:#fff}
-  .cal-n{line-height:1}
-  .cal-mk{font-size:10px;line-height:1;min-height:11px}
 
-  .dy-h-item{margin-bottom:12px}
-  .dy-h-date{font-size:12px;color:var(--candle);margin-bottom:6px;font-weight:700}
+  /* 프로필 / 세부 채팅 */
+  .chat{position:absolute;inset:0;background:var(--ink);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;z-index:10}
+  .chat.open{transform:none}
+  .chat-head{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--ink-line);background:var(--ink)}
+  .back{background:none;border:none;color:var(--paper);font-size:22px;cursor:pointer;padding:4px 8px}
+  .chat-head .avatar{width:38px;height:38px;border-radius:14px}
+  .chat-head .c-name{font-size:15px;font-weight:700;font-family:var(--serif)}
+  .chat-head .c-status{font-size:11px;color:var(--paper-dim)}
+  .msgs{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px}
+  .mrow{display:flex;align-items:flex-end;gap:8px}
+  .mrow .avatar{width:34px;height:34px;border-radius:12px;align-self:flex-start}
+  .bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.6;background:var(--paper);color:#1d1f28;font-family:var(--serif);border-top-left-radius:4px}
+  
+  .inputbar{display:flex;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--ink-line);background:var(--ink)}
+  .inputbar textarea{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);border-radius:20px;padding:10px 16px;color:var(--paper);font-family:var(--sans);font-size:14px;resize:none;outline:none}
+  .send{width:42px;height:42px;border-radius:50%;border:none;background:var(--candle);color:var(--ink);font-size:17px;cursor:pointer}
 
-  .overlay{position:absolute;inset:0;background:var(--ink);z-index:20;display:none;flex-direction:column}
-  .overlay.on{display:flex}
-  .ov-close{position:absolute;top:18px;right:12px;background:none;border:none;color:var(--paper-dim);font-size:17px;cursor:pointer;padding:10px;z-index:1}
-  .gear{position:absolute;top:16px;right:10px;background:none;border:none;color:var(--paper-dim);font-size:19px;cursor:pointer;padding:10px;z-index:2}
+  .splash{position:absolute;inset:0;z-index:50;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s}
+  .splash.hide{opacity:0;pointer-events:none}
 </style>
 </head>
 <body>
@@ -147,21 +119,14 @@
   <div class="list-head">
     <div class="eyebrow">죽은 철학자들의 단톡방</div>
     <h1>철크크</h1>
-    <button class="gear" id="btnSettings" aria-label="설정">⚙️</button>
+    <button class="gear" id="btnSettings">⚙️</button>
   </div>
 
   <div class="friends" id="friends"></div>
 
-  <div class="cube-view" id="cubeView" style="display:none">
-    <div class="cube-cap">가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 정중앙엔 질문이 삽니다.</div>
-    <div id="cubeRows"></div>
-    <div class="cube-info" id="cubeInfo">철학자를 눌러 소개를 확인해보세요.</div>
-    <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
-  </div>
-
   <div class="mail-view" id="mailView" style="display:none">
     <div class="dr-seg">
-      <button id="segDiary" class="on">일기 서랍장</button>
+      <button id="segDiary" class="on">일기</button>
       <button id="segMail">우편함</button>
     </div>
     
@@ -176,7 +141,7 @@
       </div>
 
       <div class="month-progress" id="monthProgress">
-        <div id="progressTxt">이번 달 채운 날: 0일 (0%)</div>
+        <div id="progressTxt">이달의 사유 기록: 0일 / 30일 (0%)</div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div></div>
       </div>
 
@@ -185,40 +150,39 @@
     </div>
 
     <div id="mailPane" style="display:none">
-      <div class="mail-hint" style="text-align:center;padding:30px;color:var(--paper-dim);">
+      <div style="text-align:center;padding:30px;color:var(--paper-dim);font-size:13px;line-height:1.6;">
         매월 1일, 나눈 대화가 가장 많았던 철학자가 한 달을 돌아보는 편지를 보냅니다.
       </div>
     </div>
   </div>
 
   <div class="tabbar">
-    <button class="tab" id="tabCube">▦ 프로필</button>
     <button class="tab on" id="tabChat">💬 채팅</button>
     <button class="tab" id="tabMail">🗄 서랍장</button>
   </div>
 
   <div class="chat" id="chat">
     <div class="chat-head">
-      <button class="back" id="backBtn" aria-label="뒤로">‹</button>
-      <div class="avwrap" id="chatAvWrap"><div class="avatar" id="chatAvatar"></div></div>
-      <div id="chatTitle"><div class="c-name" id="chatName"></div><div class="c-status" id="chatStatus"></div></div>
+      <button class="back" id="backBtn">‹</button>
+      <div class="avatar" id="chatAvatar"></div>
+      <div><div class="c-name" id="chatName"></div><div class="c-status" id="chatStatus"></div></div>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="inputbar">
       <textarea id="input" rows="1" placeholder="메시지 보내기"></textarea>
-      <button class="send" id="sendBtn" aria-label="전송">↑</button>
+      <button class="send" id="sendBtn">↑</button>
     </div>
   </div>
 
   <div class="splash" id="splash">
-    <div class="sp-eyebrow">죽은 철학자들의 단톡방</div>
-    <div class="sp-title">철크크</div>
+    <div style="font-size:10px;letter-spacing:.35em;color:var(--paper-dim);margin-bottom:6px;">죽은 철학자들의 단톡방</div>
+    <div style="font-family:var(--serif);font-size:30px;font-weight:700;color:var(--candle);">철크크</div>
   </div>
 
 </div>
 
 <script>
-/* ================= 철학자 데이터 (9인) ================= */
+/* ================= 철학자 9인 고유 SVG 아바타 복원 ================= */
 const PHILOSOPHERS = [
   { id: 'socrates', name: '소크라테스', desc: '질문으로 생각을 파헤치는 할아버지' },
   { id: 'nietzsche', name: '니체', desc: '망치를 들고 나를 극복하라는 열혈남' },
@@ -232,30 +196,38 @@ const PHILOSOPHERS = [
 ];
 
 function getAvatarSvg(id) {
-  const colors = {
-    socrates: '#7d8a5c', nietzsche: '#a2402f', kant: '#3f5573',
-    epicurus: '#c9944a', zhuangzi: '#4e7d6b', schopenhauer: '#5a5561',
-    confucius: '#9c7135', aurelius: '#6b4e8a', kierkegaard: '#37474f'
-  };
-  const bg = colors[id] || '#7d8a5c';
-  return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-    <rect width="80" height="80" fill="${bg}"/>
-    <circle cx="40" cy="36" r="20" fill="#f0e6d3"/>
-    <circle cx="33" cy="35" r="2" fill="#1d1f28"/>
-    <circle cx="47" cy="35" r="2" fill="#1d1f28"/>
-    <path d="M35 46 q5 4 10 0" stroke="#1d1f28" stroke-width="2" fill="none"/>
-  </svg>`;
+  // 철학자별 고유 이목구비 및 스타일 완벽 구현
+  switch(id) {
+    case 'socrates':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#4d5940"/><circle cx="40" cy="38" r="19" fill="#f4e7d3"/><path d="M22 36 c2-12 34-12 36 0" fill="#d9d0c1"/><circle cx="33" cy="36" r="2" fill="#2b261f"/><circle cx="47" cy="36" r="2" fill="#2b261f"/><path d="M24 42 c0 15 32 15 32 0" fill="#e3dad0"/></svg>`;
+    case 'nietzsche':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#7a2e22"/><circle cx="40" cy="38" r="19" fill="#f8ece0"/><path d="M20 28 c5-10 35-10 40 0" fill="#3a2518"/><path d="M26 33 q8-4 14 0" stroke="#3a2518" stroke-width="2.5" fill="none"/><path d="M40 33 q8-4 14 0" stroke="#3a2518" stroke-width="2.5" fill="none"/><path d="M25 41 q15 8 30 0 c2 6-32 6-30 0" fill="#21130b"/><circle cx="33" cy="36" r="2" fill="#21130b"/><circle cx="47" cy="36" r="2" fill="#21130b"/></svg>`;
+    case 'kant':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#2b3e59"/><circle cx="40" cy="38" r="18" fill="#f9ebd8"/><path d="M20 26 c-4 10 0 20 5 20 c5 0 2-16 15-16 s10 16 15 16 c5 0 9-10 5-20" fill="#e6e1da"/><circle cx="33" cy="37" r="2" fill="#1b212b"/><circle cx="47" cy="37" r="2" fill="#1b212b"/><path d="M35 46 q5 3 10 0" stroke="#1b212b" stroke-width="2" fill="none"/></svg>`;
+    case 'epicurus':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#8c622b"/><circle cx="40" cy="38" r="19" fill="#f7eae0"/><path d="M22 28 q18-8 36 0" stroke="#486e38" stroke-width="4" fill="none"/><path d="M23 40 c0 12 34 12 34 0" fill="#5c4938"/><circle cx="33" cy="36" r="2" fill="#291c10"/><circle cx="47" cy="36" r="2" fill="#291c10"/><path d="M34 44 q6 5 12 0" stroke="#291c10" stroke-width="2" fill="none"/></svg>`;
+    case 'zhuangzi':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#325446"/><circle cx="40" cy="40" r="18" fill="#f9e8d2"/><path d="M34 16 h12 v8 h-12 z" fill="#1f1a17"/><circle cx="40" cy="16" r="4" fill="#1f1a17"/><circle cx="33" cy="37" r="2" fill="#1f1a17"/><circle cx="47" cy="37" r="2" fill="#1f1a17"/><path d="M26 44 c0 10 28 10 28 0" fill="#2e2520"/></svg>`;
+    case 'schopenhauer':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#423e4a"/><circle cx="40" cy="40" r="18" fill="#faede1"/><path d="M16 26 c12 2 12 18 12 18" stroke="#ded8d0" stroke-width="6" fill="none"/><path d="M64 26 c-12 2-12 18-12 18" stroke="#ded8d0" stroke-width="6" fill="none"/><circle cx="33" cy="38" r="2" fill="#1d1a21"/><circle cx="47" cy="38" r="2" fill="#1d1a21"/><path d="M35 47 q5-4 10 0" stroke="#1d1a21" stroke-width="2" fill="none"/></svg>`;
+    case 'confucius':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#734f24"/><circle cx="40" cy="40" r="18" fill="#f7e4ce"/><path d="M24 20 h32 v12 h-32 z" fill="#241911"/><path d="M20 30 h40 v4 h-40 z" fill="#d9a05b"/><circle cx="33" cy="38" r="2" fill="#241911"/><circle cx="47" cy="38" r="2" fill="#241911"/><path d="M26 42 c0 14 28 14 28 0" fill="#e8ded1"/></svg>`;
+    case 'aurelius':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#4d3563"/><circle cx="40" cy="38" r="19" fill="#faebd7"/><path d="M21 30 q19-6 38 0" stroke="#d9a05b" stroke-width="4" fill="none"/><path d="M22 38 c0 14 36 14 36 0" fill="#4a3728"/><circle cx="33" cy="36" r="2" fill="#211710"/><circle cx="47" cy="36" r="2" fill="#211710"/></svg>`;
+    case 'kierkegaard':
+      return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#2c383f"/><circle cx="40" cy="38" r="18" fill="#fcf0e3"/><path d="M22 28 c8-12 28-12 36 0 c-8-4-28-4-36 0" fill="#523d2d"/><circle cx="33" cy="37" r="2" fill="#1c1611"/><circle cx="47" cy="37" r="2" fill="#1c1611"/><path d="M36 45 q4 2 8 0" stroke="#1c1611" stroke-width="2" fill="none"/></svg>`;
+    default:
+      return `<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="20" fill="#d9a05b"/></svg>`;
+  }
 }
 
-/* ================= 상태 관리 & 앱 로직 ================= */
-let diaryState = JSON.parse(localStorage.getItem('cheolkk-diary-v3') || '{}');
-let activeTab = 'chat';
+/* ================= 앱 상태 관리 ================= */
+let diaryState = JSON.parse(localStorage.getItem('cheolkk-diary-v4') || '{}');
 let isCommentsExpanded = false;
-let isLinesExpanded = false;
 let currentCalDate = new Date();
 
 function saveDiaryState() {
-  localStorage.setItem('cheolkk-diary-v3', JSON.stringify(diaryState));
+  localStorage.setItem('cheolkk-diary-v4', JSON.stringify(diaryState));
 }
 
 function getTodayKey() {
@@ -263,22 +235,16 @@ function getTodayKey() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-/* 철학자 댓글 자동 생성 (하루 9명 1인 1회 제한) */
+/* 철학자 댓글 자동 생성 */
 function generatePhilosopherReply(userLine, dateKey) {
-  if (!diaryState[dateKey]) {
-    diaryState[dateKey] = { lines: [], replies: [], questDone: false };
-  }
-
+  if (!diaryState[dateKey]) diaryState[dateKey] = { lines: [], replies: [], questDone: false };
   const todayData = diaryState[dateKey];
   const usedIds = (todayData.replies || []).map(r => r.philosopherId);
 
-  // 아직 안 한 철학자 추출
   const available = PHILOSOPHERS.filter(p => !usedIds.includes(p.id));
-  if (available.length === 0) return; // 이미 9명 모두 댓글 작성 완료
+  if (available.length === 0) return;
 
-  // 무작위로 1명 선정
   const selected = available[Math.floor(Math.random() * available.length)];
-
   const sampleReplies = {
     socrates: `"${userLine}"… 거기에 네 진짜 마음이 담겨 있는가?`,
     nietzsche: `좋다! "${userLine}"라는 진통을 딛고 오늘을 뛰어넘어라!`,
@@ -291,18 +257,14 @@ function generatePhilosopherReply(userLine, dateKey) {
     kierkegaard: `불안 속에서도 나직이 써 내려간 한 줄… (멋진 기록이다.)`
   };
 
-  const text = sampleReplies[selected.id] || `오늘 그 한 줄이 마음에 울림을 주네.`;
-
   todayData.replies.push({
     philosopherId: selected.id,
-    text: text,
-    time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    text: sampleReplies[selected.id] || `오늘 그 한 줄이 마음에 울림을 주네.`
   });
-
   saveDiaryState();
 }
 
-/* UI 업데이트 */
+/* 메인 뷰 렌더링 */
 function renderFriendsList() {
   const friendsEl = document.getElementById('friends');
   const todayKey = getTodayKey();
@@ -310,12 +272,12 @@ function renderFriendsList() {
 
   let html = '';
 
-  // 1. 독립된 퀘스트 카드 (오늘 한 줄 위 배치)
+  // 1. 철학자가 전하는 오늘의 미션
   html += `
     <div class="quest-card">
       <div class="quest-txt">
-        <span>MISSION · 오늘의 작은 미션</span>
-        오늘 나 자신에게 솔직한 한마디를 건네보셨나요?
+        <span>📜 오늘의 철학자 미션 (소크라테스)</span>
+        “오늘 나 자신에게 솔직한 한마디를 건네보셨나요?”
       </div>
       <button class="dy-done ${todayData.questDone ? 'is-done' : ''}" id="btnQuestDone">
         ${todayData.questDone ? '완료됨 ✓' : '했어요 ✓'}
@@ -323,7 +285,7 @@ function renderFriendsList() {
     </div>
   `;
 
-  // 2. 사각사각 노란 노트 스타일의 '오늘 한 줄' 카드
+  // 2. 오늘 한 줄 카드 (요청하신 완벽한 문구 적용)
   const hasLines = todayData.lines && todayData.lines.length > 0;
   const replyCount = (todayData.replies || []).length;
 
@@ -335,41 +297,21 @@ function renderFriendsList() {
       </div>
       <div class="dy-desc">
         💡 <b>오늘 한 줄이란?</b><br>
-        오늘 있었던 일, 감정, 생각 등 무엇이든 한 줄씩 가볍게 적어보세요. 철학자들이 하루에 한 번씩 다정한 한 마디를 남겨줍니다.
+        오늘 해내고 싶은 목표와 다짐, 혹은 하루를 돌아보며 남기는 솔직한 일기까지... 마음속 한 줄을 가볍게 적어보세요. 사각사각 적어 내린 당신의 하루에 철학자들이 다정한 이정표를 놓아줍니다.
       </div>
       <div class="dy-row">
-        <input type="text" class="dy-in" id="dyInput" placeholder="사각사각, 오늘을 한 줄로 남겨보세요..." />
+        <input type="text" class="dy-in" id="dyInput" placeholder="오늘의 다짐이나 일기를 한 줄로 남겨보세요..." />
         <button class="dy-go" id="dySaveBtn">남기기</button>
       </div>
   `;
 
   if (hasLines) {
-    const latestLine = todayData.lines[todayData.lines.length - 1];
-    
-    html += `
-      <div class="dy-mine-box">
-        <div class="dy-mine-line">"${latestLine}"</div>
-      </div>
-    `;
+    html += `<div class="dy-mine-box">`;
+    todayData.lines.forEach(line => {
+      html += `<div class="dy-mine-line">• "${line}"</div>`;
+    });
+    html += `</div>`;
 
-    // 오늘 작성한 모든 줄 보기 버튼
-    if (todayData.lines.length > 1) {
-      html += `
-        <button class="dy-toggle-btn" id="btnToggleLines">
-          ${isLinesExpanded ? '▲ 오늘의 이전 한 줄 접기' : `▼ 오늘 남긴 모든 줄 보기 (${todayData.lines.length}개)`}
-        </button>
-      `;
-
-      if (isLinesExpanded) {
-        html += `<div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">`;
-        todayData.lines.forEach((line, idx) => {
-          html += `<div class="dy-mine-line" style="font-size:16px;opacity:.85;">• ${line}</div>`;
-        });
-        html += `</div>`;
-      }
-    }
-
-    // 철학자 댓글 (접기/펼치기)
     if (replyCount > 0) {
       html += `
         <div class="dy-comments-area">
@@ -399,7 +341,7 @@ function renderFriendsList() {
 
   html += `</div>`; // .dy-card 끝
 
-  // 3. 단톡방 / 철학자 대화방 리스트
+  // 3. 단톡방 리스트 (프로필 완벽 복원)
   html += `<div class="sec">철학자 단톡방 목록</div>`;
   PHILOSOPHERS.forEach(p => {
     html += `
@@ -418,7 +360,7 @@ function renderFriendsList() {
 
   friendsEl.innerHTML = html;
 
-  // 이벤트 바인딩
+  // 이벤트 연결
   document.getElementById('btnQuestDone')?.addEventListener('click', () => {
     if (!diaryState[todayKey]) diaryState[todayKey] = { lines: [], replies: [], questDone: false };
     diaryState[todayKey].questDone = !diaryState[todayKey].questDone;
@@ -433,21 +375,13 @@ function renderFriendsList() {
 
     if (!diaryState[todayKey]) diaryState[todayKey] = { lines: [], replies: [], questDone: false };
     diaryState[todayKey].lines.push(val);
-    
-    // 철학자 댓글 추가 (최대 9명)
     generatePhilosopherReply(val, todayKey);
-    
     saveDiaryState();
     renderFriendsList();
   });
 
   document.getElementById('btnToggleComments')?.addEventListener('click', () => {
     isCommentsExpanded = !isCommentsExpanded;
-    renderFriendsList();
-  });
-
-  document.getElementById('btnToggleLines')?.addEventListener('click', () => {
-    isLinesExpanded = !isLinesExpanded;
     renderFriendsList();
   });
 }
@@ -457,27 +391,26 @@ function renderCalendar() {
   const yearSelect = document.getElementById('calYearSelect');
   const monthSelect = document.getElementById('calMonthSelect');
   const grid = document.getElementById('calGrid');
-  const list = document.getElementById('diaryHistList');
 
   const curYear = currentCalDate.getFullYear();
   const curMonth = currentCalDate.getMonth();
 
-  // 드롭다운 옵션 구성
-  yearSelect.innerHTML = [2024, 2025, 2026, 2027].map(y => `<option value="${y}" ${y===curYear?'selected':''}>${y}년</option>`).join('');
+  // 2026년부터 선택 가능하도록 연도 드롭다운 구성
+  let yearOpts = '';
+  for (let y = 2026; y <= 2035; y++) {
+    yearOpts += `<option value="${y}" ${y === curYear ? 'selected' : ''}>${y}년</option>`;
+  }
+  yearSelect.innerHTML = yearOpts;
   monthSelect.innerHTML = Array.from({length:12}, (_,i) => `<option value="${i}" ${i===curMonth?'selected':''}>${i+1}월</option>`).join('');
 
-  // 요일 헤더
   const days = ['일','월','화','수','목','금','토'];
   let gridHtml = days.map(d => `<div class="cal-wd">${d}</div>`).join('');
 
   const firstDay = new Date(curYear, curMonth, 1).getDay();
   const lastDate = new Date(curYear, curMonth + 1, 0).getDate();
-
   let filledCount = 0;
 
-  for (let i = 0; i < firstDay; i++) {
-    gridHtml += `<div class="cal-cell"></div>`;
-  }
+  for (let i = 0; i < firstDay; i++) gridHtml += `<div class="cal-cell"></div>`;
 
   for (let d = 1; d <= lastDate; d++) {
     const dateStr = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -487,25 +420,23 @@ function renderCalendar() {
     if (hasEntry) filledCount++;
 
     gridHtml += `
-      <div class="cal-cell ${hasEntry ? 'has' : ''}" onclick="showDiaryDetail('${dateStr}')">
-        <span class="cal-n">${d}</span>
-        <span class="cal-mk">${hasEntry ? '🔥' : ''}</span>
+      <div class="cal-cell ${hasEntry ? 'has' : ''}">
+        <span>${d}</span>
+        <span style="font-size:10px;">${hasEntry ? '🔥' : ''}</span>
       </div>
     `;
   }
 
   grid.innerHTML = gridHtml;
 
-  // 진척도 프로그레스 바
+  // 개선된 달성도 문구
   const fillPercent = Math.round((filledCount / lastDate) * 100);
-  document.getElementById('progressTxt').innerText = `이번 달 채운 날: ${filledCount}일 / ${lastDate}일 (${fillPercent}%)`;
+  document.getElementById('progressTxt').innerText = `이달의 사유 기록: ${filledCount}일 / ${lastDate}일 (${fillPercent}%)`;
   document.getElementById('progressBarFill').style.width = `${fillPercent}%`;
 
-  // 서랍장 내 동일 카드 스타일로 일기 리스트 표시
   renderDiaryHistoryCards(curYear, curMonth);
 }
 
-/* 서랍장 일기 카드 렌더링 (오늘 한 줄 카드 디자인과 완전 동일) */
 function renderDiaryHistoryCards(year, month) {
   const list = document.getElementById('diaryHistList');
   const monthPrefix = `${year}-${String(month+1).padStart(2,'0')}`;
@@ -519,8 +450,7 @@ function renderDiaryHistoryCards(year, month) {
     return;
   }
 
-  let html = `<div style="font-size:13px;font-weight:700;color:var(--candle);margin-bottom:8px;padding-left:4px;">📜 이 달의 기록들</div>`;
-
+  let html = `<div style="font-size:13px;font-weight:700;color:var(--candle);margin-bottom:8px;">📜 이 달의 기록들</div>`;
   keys.forEach(k => {
     const data = diaryState[k];
     html += `
@@ -549,14 +479,12 @@ function renderDiaryHistoryCards(year, month) {
       });
       html += `</div>`;
     }
-
     html += `</div>`;
   });
 
   list.innerHTML = html;
 }
 
-/* 채팅창 열기 */
 function openChat(id) {
   const p = PHILOSOPHERS.find(x => x.id === id);
   if (!p) return;
@@ -565,64 +493,41 @@ function openChat(id) {
   document.getElementById('chatStatus').innerText = p.desc;
   document.getElementById('chatAvatar').innerHTML = getAvatarSvg(p.id);
 
-  const msgs = document.getElementById('msgs');
-  msgs.innerHTML = `
-    <div class="mrow them">
+  document.getElementById('msgs').innerHTML = `
+    <div class="mrow">
       <div class="avatar">${getAvatarSvg(p.id)}</div>
-      <div class="bcol">
-        <div class="who">${p.name}</div>
-        <div class="bubble">어서 오게. 오늘 어떤 질문이 그대의 마음을 두드리고 있는가?</div>
-      </div>
+      <div class="bubble">어서 오게. 오늘 어떤 질문이 그대의 마음을 두드리고 있는가?</div>
     </div>
   `;
 
   document.getElementById('chat').classList.add('open');
 }
 
-/* 초기화 & 이벤트 연동 */
+/* 실행 및 이벤트 바인딩 */
 document.addEventListener('DOMContentLoaded', () => {
-  // 스플래시 종료
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hide');
-  }, 500);
+  setTimeout(() => document.getElementById('splash').classList.add('hide'), 400);
 
   renderFriendsList();
 
-  // 탭 전환
   document.getElementById('tabChat').addEventListener('click', () => {
     document.getElementById('tabChat').classList.add('on');
-    document.getElementById('tabCube').classList.remove('on');
     document.getElementById('tabMail').classList.remove('on');
     document.getElementById('friends').style.display = 'block';
-    document.getElementById('cubeView').style.display = 'none';
-    document.getElementById('mailView').style.display = 'none';
-  });
-
-  document.getElementById('tabCube').addEventListener('click', () => {
-    document.getElementById('tabCube').classList.add('on');
-    document.getElementById('tabChat').classList.remove('on');
-    document.getElementById('tabMail').classList.remove('on');
-    document.getElementById('friends').style.display = 'none';
-    document.getElementById('cubeView').style.display = 'block';
     document.getElementById('mailView').style.display = 'none';
   });
 
   document.getElementById('tabMail').addEventListener('click', () => {
     document.getElementById('tabMail').classList.add('on');
     document.getElementById('tabChat').classList.remove('on');
-    document.getElementById('tabCube').classList.remove('on');
     document.getElementById('friends').style.display = 'none';
-    document.getElementById('cubeView').style.display = 'none';
     document.getElementById('mailView').style.display = 'block';
     renderCalendar();
   });
 
-  // 뒤로가기
   document.getElementById('backBtn').addEventListener('click', () => {
     document.getElementById('chat').classList.remove('open');
   });
 
-  // 캘린더 연도/월 네비게이션
   document.getElementById('calPrev').addEventListener('click', () => {
     currentCalDate.setMonth(currentCalDate.getMonth() - 1);
     renderCalendar();
@@ -643,7 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCalendar();
   });
 
-  // 서랍장 서브 탭
   document.getElementById('segDiary').addEventListener('click', () => {
     document.getElementById('segDiary').classList.add('on');
     document.getElementById('segMail').classList.remove('on');
