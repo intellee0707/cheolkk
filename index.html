@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#12141d; --ink-soft:#1b1e2b; --ink-line:rgba(239,232,218,.12);
@@ -311,6 +311,19 @@
 .dy-more{margin-top:7px;font-size:12px;color:var(--candle);cursor:pointer}
 .dy-fire{font-size:11.5px;color:var(--candle);margin-left:6px;font-weight:700}
 .dy-h-item{cursor:pointer}
+.dy-mine{font-family:'Nanum Pen Script',var(--serif);font-size:19.5px;line-height:1.3}
+.dy-h-txt{font-family:'Nanum Pen Script',var(--serif);font-size:19.5px;line-height:1.3}
+.dy-in{font-family:'Nanum Pen Script',var(--sans);font-size:17px}
+.dy-in::placeholder{font-size:15px}
+.dy-cap{font-size:11.5px;color:var(--paper-dim);margin:-3px 0 8px;line-height:1.5}
+.dy-qbox{margin:0 0 9px;padding:8px 10px;border:1px dashed var(--candle);border-radius:10px;font-size:12.5px;color:var(--paper);line-height:1.55}
+.dy-qbox b{color:var(--candle);margin-right:4px}
+.dy-tg{margin-top:9px;font-size:12px;color:var(--candle);cursor:pointer}
+.cal-cell.has{background:rgba(217,160,91,.13);border-color:rgba(217,160,91,.3);color:var(--paper)}
+.cal-cell.fire{background:rgba(217,160,91,.36);border-color:var(--candle)}
+.cal-title{cursor:pointer}
+.cal-sel{background:var(--ink-soft);color:var(--paper);border:1px solid var(--ink-line);border-radius:8px;padding:4px 6px;font-size:13px;font-family:var(--sans)}
+.daymark{margin:16px auto 6px;font-size:11.5px;opacity:.9}
 </style>
 </head>
 <body>
@@ -608,8 +621,8 @@ if(LANG==='en'){
 }
 
 const T=LANG==='en'?{
- docTitle:'CheolKK — Group Chat of Dead Philosophers',dyTitle:'One line today',dyPh:'Your day, in one line...',dySave:'Save',dyPast:'Drawer',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dyHist:'One-line Diary',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyMore:n=>'+'+n+' more — see the drawer',dyNoDay:'Nothing on this day.',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
- tabChat:'Chats',tabCube:'Profiles',tabMail:'Mail',inputPh:'Type a message',leave:'Leave',
+ docTitle:'CheolKK — Group Chat of Dead Philosophers',dyTitle:'One line today',dyPh:'Anything, one line at a time...',dySave:'Save',dyPast:'Drawer',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dyHist:'One-line Diary',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyMore:n=>'+'+n+' more — see the drawer',dyNoDay:'Nothing on this day.',dyCap:'Thoughts, feelings, goals, resolutions — one line each, and the philosophers reply',dyToggle:n=>'Show today ('+n+')',dyFold:'Fold',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
+ tabChat:'Chats',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',leave:'Leave',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
  cubeDefault:'Tap philosophers to compare them.',
@@ -638,7 +651,7 @@ const T=LANG==='en'?{
  wcTitle:'Before we begin',wcLoginT:'Keep your conversations safe',wcLoginD:'Sign in with Google and your talks and memories are saved to your account. Change phones or reinstall — the philosophers will still remember you.',wcLoginBtn:'Continue with Google',wcPushT:'Let philosophers reach you first',wcPushD:'You will be notified the moment a reply arrives, and a philosopher reaching out first happens at most once a day. You can turn it off anytime.',wcPushBtn:'Allow notifications',wcLater:'Maybe later',
  cpShare:'Share',cpDown:'Save image',sortNew:'Newest first',sortOld:'Oldest first',cardSave:'🖼 Save as a card',mailEmpty:'No letters yet.',mailHint:'On the 1st of each month, the philosopher you talked with most\nwrites you a letter looking back on your month together.',
  mailWriting:'✍️ A letter is being written…',firstLabel:'The First Letter',monthLabel:m=>`Letter of ${['January','February','March','April','May','June','July','August','September','October','November','December'][m]}`,
- ltFrom:n=>`from ${n}`,ltHighlight:'SENTENCE OF THE MONTH',ltObserve:'WHAT I NOTICED',ltRecords:'SMALL RECORDS',ltGift:'A SENTENCE FOR YOU',ltNextQ:'A QUESTION FOR NEXT MONTH',ltPS:'ENCLOSED NOTES',ltReply:'MY REPLY',
+ ltFrom:n=>`from ${n}`,ltHighlight:'SENTENCE OF THE MONTH',ltObserve:'WHAT I NOTICED',ltRecords:'SMALL RECORDS',ltGift:'A SENTENCE FOR YOU',ltNextQ:'A QUESTION FOR NEXT MONTH',ltHl1:'OUR FIRST SENTENCE',ltRec1:'THE STORY SO FAR',ltNq1:'A QUESTION FOR WHAT COMES NEXT',ltHlC:n=>'SENTENCE OF '+n+' DAYS',ltRecC:n=>n+' DAYS ON RECORD',ltNqC:'A QUESTION FOR THE NEXT 100 DAYS',ltPS:'ENCLOSED NOTES',ltReply:'MY REPLY',
  ltReplyPh:'Leave a reply to this letter — it will reach the next one.',ltReplySave:'Keep this reply',ltReplySaved:'✓ Kept — it will be delivered to the next letter',
  recTotal:n=>`${n} conversations`,recNight:n=>`${n} late-night talks`,recBusy:(d,n)=>`Busiest day: ${d} (${n} messages)`,recWith:n=>`${n} philosophers by your side`,
  menuManage:'Manage members',menuRename:'Rename room',menuLeave:'Leave room',
@@ -662,8 +675,8 @@ const T=LANG==='en'?{
  disclaimer:'CheolKK conversations are generated by AI. It is a conversation tool borrowing from philosophy — not counseling or therapy. On the free tier, inputs may be used by the AI provider (Google) to improve its services.',
  version:'CheolKK v7 · Sign-in & Sync · 한/EN'
 }:{
- docTitle:'철크크 — 죽은 철학자들의 단톡방',dyTitle:'오늘 한 줄',dyPh:'오늘 하루를 한 줄로...',dySave:'남기기',dyPast:'서랍장',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dyHist:'한 줄 일기',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyMore:n=>'+'+n+'줄 — 서랍장에서 보기',dyNoDay:'이 날의 기록이 없어요.',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
- tabChat:'채팅',tabCube:'프로필',tabMail:'우편함',inputPh:'메시지 보내기',leave:'나가기',
+ docTitle:'철크크 — 죽은 철학자들의 단톡방',dyTitle:'오늘 한 줄',dyPh:'뭐든 생각날 때 한 줄씩...',dySave:'남기기',dyPast:'서랍장',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dyHist:'한 줄 일기',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyMore:n=>'+'+n+'줄 — 서랍장에서 보기',dyNoDay:'이 날의 기록이 없어요.',dyCap:'오늘 든 생각·감정·일기·목표·다짐 — 뭐든 한 줄씩 적으면 철학자들이 답글을 달아요',dyToggle:n=>'오늘 '+n+'줄 보기',dyFold:'접기',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
+ tabChat:'채팅',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',leave:'나가기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
  cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
@@ -690,9 +703,9 @@ const T=LANG==='en'?{
  profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
  gActive:n=>`${n}명 활동 중`,
  wcTitle:'시작하기 전에',wcLoginT:'대화를 안전하게 보관하기',wcLoginD:'구글로 로그인하면 대화와 추억이 계정에 저장돼요. 폰을 바꾸거나 앱을 지워도, 철학자들은 너를 기억합니다.',wcLoginBtn:'Google로 계속하기',wcPushT:'철학자의 선톡 받기',wcPushD:'답장이 도착하면 바로 알려드리고, 철학자가 먼저 거는 안부 연락은 하루 1번을 넘지 않아요. 언제든 끌 수 있어요.',wcPushBtn:'알림 허용하기',wcLater:'나중에 할게요',
- cpShare:'공유하기',cpDown:'이미지 저장',sortNew:'최신순',sortOld:'오래된순',cardSave:'🖼 이달의 카드로 저장',mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
+ cpShare:'공유하기',cpDown:'이미지 저장',sortNew:'최신순',sortOld:'오래된순',cardSave:'🖼 카드로 저장',mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
  mailWriting:'✍️ 편지를 쓰고 있어요…',firstLabel:'첫 편지',monthLabel:m=>`${m+1}월의 편지`,
- ltFrom:n=>`${n}(으)로부터`,ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
+ ltFrom:n=>`${n}(으)로부터`,ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltHl1:'우리의 첫 문장',ltRec1:'지금까지의 기록',ltNq1:'다음 이야기의 화두',ltHlC:n=>n+'일의 문장',ltRecC:n=>'함께한 '+n+'일의 기록',ltNqC:'다음 100일의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
  ltReplyPh:'이 편지에 답장을 남겨보세요. 다음 편지에 전해집니다.',ltReplySave:'답장 보관하기',ltReplySaved:'✓ 보관됨 — 다음 편지에 전해집니다',
  recTotal:n=>`${n}번의 대화`,recNight:n=>`새벽의 대화 ${n}번`,recBusy:(d,n)=>`가장 붐볐던 날 ${d} (메시지 ${n}개)`,recWith:n=>`곁에 있던 철학자 ${n}명`,
  menuManage:'멤버 관리',menuRename:'방 이름 바꾸기',menuLeave:'단톡방 나가기',
@@ -775,6 +788,7 @@ const fmtT=t=>{
   const time=d.toLocaleTimeString(LOCALE,{hour:'numeric',minute:'2-digit'});
   return d.toDateString()===today.toDateString()?time:d.toLocaleDateString(LOCALE,{month:'numeric',day:'numeric'})+' '+time;
 };
+const fmtDay=t=>new Date(t).toLocaleDateString(LOCALE,{year:'numeric',month:'long',day:'numeric',weekday:'long'});
 const fmtMin=min=>{
   min=((min%1440)+1440)%1440;
   const h=Math.floor(min/60),m=min%60,h12=h%12===0?12:h%12;
@@ -1443,7 +1457,10 @@ function renderMsgs(){
   if(curKind()==='d'){
     const pid=curId(), h=state.chats[pid]||[];
     if(!h.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(pid)}</div>${T.emptyDM(dispName(P(pid)))}</div>`; return; }
+    let __ld=null;
     h.forEach(m=>{
+      const __dk=new Date(m.t).toDateString();
+      if(__dk!==__ld){ const dv=document.createElement('div'); dv.className='sysmsg daymark'; dv.textContent=fmtDay(m.t); el.appendChild(dv); __ld=__dk; }
       if(m.role==='user') addMsg(el,'me',[m.content],m.t,{read:m.read});
       else addMsg(el,'them',splitBubbles(m.content),m.t,{pid});
     });
@@ -1451,8 +1468,10 @@ function renderMsgs(){
     const g=getGroup(curId());
     if(!g){ return; }
     if(!g.msgs.length){ el.innerHTML=`<div class="empty-room"><div class="avatar">${av(g.members[0])}</div>${T.emptyGroup}</div>`; return; }
-    let lastWho=null;
+    let lastWho=null,__ld=null;
     g.msgs.forEach(m=>{
+      const __dk=new Date(m.t).toDateString();
+      if(__dk!==__ld){ const dv=document.createElement('div'); dv.className='sysmsg daymark'; dv.textContent=fmtDay(m.t); el.appendChild(dv); __ld=__dk; lastWho=null; }
       if(m.who==='me') addMsg(el,'me',[m.content],m.t,{read:true,reads:m.reads,gt:m.t});
       else if(m.who==='sys'){ const d=document.createElement('div'); d.className='sysmsg'; d.textContent=m.content; el.appendChild(d); }
       else addMsg(el,'them',splitBubbles(m.content),m.t,{pid:m.who,name:lastWho===m.who?null:dispName(P(m.who)),reads:m.reads,gt:m.t});
@@ -2085,7 +2104,7 @@ async function catchUp(){
 }
 
 /* ================= 한 줄 일기 + 소프트 퀘스트 ================= */
-let diaryDraft='', diaryBusy=false, drawerSeg='diary', calY=null, calM=null;
+let diaryDraft='', diaryBusy=false, drawerSeg='diary', calY=null, calM=null, calPick=false, dyOpen=false;
 const todayLines=()=> (state.diary||[]).filter(x=>x.d===dayIdx()).sort((a,b)=>a.t-b.t);
 function questDays(){ const set=new Set(); (state.diary||[]).forEach(e=>{ if(e.q&&e.qd) set.add(e.d); }); return set; }
 function streaks(){
@@ -2096,32 +2115,32 @@ function streaks(){
   [...qs].sort((a,b)=>a-b).forEach(x=>{ run=(prev!==null&&x===prev+1)?run+1:1; if(run>max) max=run; prev=x; });
   return {cur,max};
 }
+const lineHTML=e=>{
+  const p=e.pid?P(e.pid):null;
+  return `<div class="dy-line"><div class="dy-mine">${escapeH(e.text)}</div>${(e.c&&p)?`<div class="dy-re"><div class="avatar">${av(e.pid)}</div><div class="dy-re-txt"><b>${escapeH(dispName(p))}</b>${escapeH(e.c)}</div></div>`:''}</div>`;
+};
+const questHTML=(q,full)=>q?`<div class="dy-qbox">🎯 <b>${T.dyQuest}</b>${escapeH(q.q)} ${q.qd?'🔥':(full?`<button class="dy-done" id="dyDoneBtn">${T.dyDoneBtn}</button>`:'')}${q.qr?`<div class="dy-qr">${escapeH(q.qr)}</div>`:''}</div>`:'';
 function diaryCard(){
   const box=document.createElement('div'); box.className='dy-card';
-  const lines=todayLines(), st=streaks(), first=lines[0];
-  const head=`<div class="dy-head"><span>🖋 ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span><span class="dy-past" id="dyPastBtn">${T.dyPast} ›</span></div>`;
+  const lines=todayLines(), st=streaks(), qe=lines.find(x=>x.q);
+  const head=`<div class="dy-head"><span>🖋 ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span></div>`;
+  const cap=lines.length?'':`<div class="dy-cap">${T.dyCap}</div>`;
   const inputRow=`<div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
-  const questHTML=(first&&first.q)?`<div class="dy-q">🎯 ${T.dyQuest}: ${escapeH(first.q)} ${first.qd?'🔥':`<button class="dy-done" id="dyDoneBtn">${T.dyDoneBtn}</button>`}${first.qr?`<div class="dy-qr">${escapeH(first.qr)}</div>`:''}</div>`:'';
-  const shown=lines.slice(-2);
-  const linesHTML=shown.map(e=>{
-    const p=e.pid?P(e.pid):null;
-    return `<div class="dy-line"><div class="dy-mine">${escapeH(e.text)}</div>${(e.c&&p)?`<div class="dy-re"><div class="avatar">${av(e.pid)}</div><div class="dy-re-txt"><b>${escapeH(dispName(p))}</b>${escapeH(e.c)}</div></div>`:''}</div>`;
-  }).join('');
-  const more=lines.length>2?`<div class="dy-more" id="dyMore">${T.dyMore(lines.length-2)}</div>`:'';
-  box.innerHTML=head+inputRow+questHTML+linesHTML+more;
+  const tg=lines.length?`<div class="dy-tg" id="dyTg">${dyOpen?('▾ '+T.dyFold):('▸ '+T.dyToggle(lines.length))}</div>`:'';
+  const body=(dyOpen&&lines.length)?lines.map(lineHTML).join(''):'';
+  box.innerHTML=head+cap+questHTML(qe,true)+inputRow+tg+body;
   const inp=box.querySelector('#dyIn');
   if(inp){ inp.value=diaryDraft; inp.oninput=()=>{diaryDraft=inp.value;}; inp.onkeydown=ev=>{ if(ev.key==='Enter'){ const b=box.querySelector('#dyGo'); if(b) b.click(); } }; }
   const go=box.querySelector('#dyGo'); if(go) go.onclick=()=>{ if(inp) saveDiary(inp.value); };
   const db=box.querySelector('#dyDoneBtn'); if(db) db.onclick=e=>{ e.stopPropagation(); doneQuest(); };
-  const pb=box.querySelector('#dyPastBtn'); if(pb) pb.onclick=()=>goDrawer('diary');
-  const mr=box.querySelector('#dyMore'); if(mr) mr.onclick=()=>goDrawer('diary');
+  const tgl=box.querySelector('#dyTg'); if(tgl) tgl.onclick=()=>{ dyOpen=!dyOpen; renderFriends(); };
   return box;
 }
 function saveDiary(v){
   v=(v||'').trim(); if(!v) return;
   const cnt=todayLines().length;
   const e={d:dayIdx(),t:now(),text:v.slice(0,120)};
-  if(cnt>=8) e.nc=1; // 하루 8줄까지만 답글이 달린다(그 뒤 줄은 기록만)
+  if(cnt>=9) e.nc=1; // 철학자 9명 — 답글은 하루 9줄까지
   (state.diary=state.diary||[]).push(e);
   diaryDraft='';
   renderFriends(); save();
@@ -2132,8 +2151,10 @@ function diaryTick(){
   if(e&&!diaryBusy&&now()-e.t>12000) genLineComment(e);
 }
 async function genLineComment(e){
-  if(!e||e.c||diaryBusy) return;
-  const cand=(state.friends||[]).filter(id=>P(id)); if(!cand.length) return;
+  if(!e||e.c||e.nc||diaryBusy) return;
+  const used=new Set(todayLines().filter(x=>x.pid).map(x=>x.pid));
+  const cand=(state.friends||[]).filter(id=>P(id)&&!used.has(id)); // 하루에 철학자당 답글 1개
+  if(!cand.length){ e.nc=1; save(); return; }
   diaryBusy=true;
   try{
     const lines=todayLines();
@@ -2147,7 +2168,7 @@ async function genLineComment(e){
     const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)
       +'\n\n[특별 임무: 한 줄 기록 답글] 상담자가 오늘의 기록장에 짧은 한 줄을 남겼다(목표·기분·할 일·TMI 등 뭐든 생각날 때마다 적는 곳이다). 네가 그 줄에 짧은 답글을 단다. 대화가 아니라 답글이다 — 말풍선 규칙(|||)은 무시하고 1~3문장으로. 그 한 줄을 넘겨짚어 확대해석하거나 훈계·상담 모드로 가지 마라. 감정을 수치·등급·퍼센트로 표현하지 마라. 이행하지 않은 예전 미션을 언급·추궁하지 마라.'
       +(isFirst
-        ?'\n오늘의 첫 줄이므로, 답글 끝에 \"오늘의 작은 미션\"을 하나 준다. 미션 규칙: 오늘 안에(지금부터 잠들기 전까지) 부담 없이 할 수 있는 아주 작고 구체적인 일 하나, 20자 내외. \"내일 ~하기\"처럼 오늘 끝낼 수 없는 미션 금지. 운동량·식사량 등 수치 목표 금지. 의무가 아니라 가벼운 제안 톤. 아래 [어제의 기록]에 다짐이나 할 일이 보이면 그것을 오늘의 미션으로 이어받아도 좋다(예: 어제 \"내일 산책 가야지\" → 오늘 미션 \"산책 다녀오기\").\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {\"comment\":\"답글\",\"quest\":\"미션\"}'
+        ?'\n오늘의 첫 줄이므로, 답글과 별개로 \"오늘의 작은 미션\"을 하나 준다. 미션 규칙: 오늘 안에(지금부터 잠들기 전까지) 부담 없이 할 수 있는 아주 작고 구체적인 일 하나, 20자 내외. \"내일 ~하기\"처럼 오늘 끝낼 수 없는 미션 금지. 운동량·식사량 등 수치 목표 금지. 의무가 아니라 가벼운 제안 톤. 아래 [어제의 기록]에 다짐이나 할 일이 보이면 그것을 오늘의 미션으로 이어받아도 좋다(예: 어제 \"내일 산책 가야지\" → 오늘 미션 \"산책 다녀오기\").\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {\"comment\":\"답글\",\"quest\":\"미션\"}'
         :'\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {\"comment\":\"답글\"}');
     const user='[방금 남긴 한 줄] '+e.text
       +(others?'\n[오늘 앞서 남긴 줄들(맥락 참고용 — 답글은 방금 줄에만)]\n'+others:'')
@@ -2163,7 +2184,7 @@ async function genLineComment(e){
     localNotify(dispName(p),e.c.slice(0,60));
   }catch(err){}
   diaryBusy=false;
-  setTimeout(diaryTick,rnd(8000,30000)); // 대기 중인 다음 줄 이어서 처리
+  setTimeout(diaryTick,rnd(8000,30000));
 }
 async function doneQuest(){
   const e=todayLines().find(x=>x.q); if(!e||e.qd) return;
@@ -2191,9 +2212,24 @@ function renderDrawer(){
 function renderCal(){
   const nd=new Date();
   if(calY===null){ calY=nd.getFullYear(); calM=nd.getMonth(); }
-  const t=$('calTitle'); if(t) t.textContent=calY+'. '+(calM+1);
-  const pv=$('calPrev'); if(pv) pv.onclick=()=>{ calM--; if(calM<0){calM=11;calY--;} renderCal(); };
-  const nx=$('calNext'); if(nx) nx.onclick=()=>{ calM++; if(calM>11){calM=0;calY++;} renderCal(); };
+  const t=$('calTitle');
+  if(t){
+    if(calPick){
+      let yo=''; for(let y=2026;y<=2030;y++) yo+=`<option value="${y}"${y===calY?' selected':''}>${y}</option>`;
+      let mo=''; for(let m=0;m<12;m++) mo+=`<option value="${m}"${m===calM?' selected':''}>${m+1}</option>`;
+      t.innerHTML=`<select id="calYSel" class="cal-sel">${yo}</select> <select id="calMSel" class="cal-sel">${mo}</select>`;
+      t.onclick=null;
+      const ysel=t.querySelector('#calYSel'), msel=t.querySelector('#calMSel');
+      const go=()=>{ if(ysel) calY=parseInt(ysel.value,10); if(msel) calM=parseInt(msel.value,10); calPick=false; renderCal(); };
+      if(ysel) ysel.onchange=go;
+      if(msel) msel.onchange=go;
+    }else{
+      t.textContent=calY+'. '+(calM+1);
+      t.onclick=()=>{ calPick=true; renderCal(); };
+    }
+  }
+  const pv=$('calPrev'); if(pv) pv.onclick=()=>{ calPick=false; calM--; if(calM<0){calM=11;calY--;} renderCal(); };
+  const nx=$('calNext'); if(nx) nx.onclick=()=>{ calPick=false; calM++; if(calM>11){calM=0;calY++;} renderCal(); };
   const stv=streaks(); const sEl=$('calStreak'); if(sEl) sEl.textContent='🔥 '+T.dyStreakCur(stv.cur)+' · '+T.dyStreakMax(stv.max);
   const g=$('calGrid'); if(!g) return; g.innerHTML='';
   T.dyWk.forEach(wd=>{ const h=document.createElement('div'); h.className='cal-wd'; h.textContent=wd; g.appendChild(h); });
@@ -2206,7 +2242,7 @@ function renderCal(){
     const es=byDay[di]||[];
     const fire=es.some(e=>e.q&&e.qd);
     const c=document.createElement('button');
-    c.className='cal-cell'+(es.length?' has':'')+(di===dayIdx()?' today':'');
+    c.className='cal-cell'+(es.length?' has':'')+(fire?' fire':'')+(di===dayIdx()?' today':'');
     c.innerHTML=`<span class="cal-n">${d2}</span><span class="cal-mk">${fire?'🔥':(es.length?'·':'')}</span>`;
     if(es.length) c.onclick=()=>openDiaryDay(di);
     g.appendChild(c);
@@ -2217,9 +2253,10 @@ function openDiaryDay(di){
   const es=(state.diary||[]).filter(e=>e.d===di).sort((a,b)=>a.t-b.t);
   const body=$('dyBody'); if(!body) return;
   const dt=es.length?new Date(es[0].t):new Date();
-  body.innerHTML=`<div class="lt-eyebrow">CHEOLKK DIARY</div><div class="lt-title">${dt.toLocaleDateString(LANG==='en'?'en-US':'ko-KR')}</div>`+
-    (es.length?es.map(e=>`<div class="dy-h-item"><div class="dy-h-date">${new Date(e.t).toLocaleTimeString(LANG==='en'?'en-US':'ko-KR',{hour:'numeric',minute:'2-digit'})}</div><div class="dy-h-txt">${escapeH(e.text)}</div><div class="dy-h-fold" style="display:none">${(e.c&&e.pid)?`<div class="dy-h-re">↳ ${escapeH(dispName(P(e.pid)))}: ${escapeH(e.c)}</div>`:''}${e.q?`<div class="dy-h-re">🎯 ${escapeH(e.q)} ${e.qd?'🔥':''}</div>`:''}${e.qr?`<div class="dy-h-re">${escapeH(e.qr)}</div>`:''}</div></div>`).join(''):`<div class="dy-h-txt">${T.dyNoDay}</div>`);
-  body.querySelectorAll('.dy-h-item').forEach(it=>{ it.onclick=()=>{ const f=it.querySelector('.dy-h-fold'); if(f) f.style.display=f.style.display==='none'?'':'none'; }; });
+  const qe=es.find(x=>x.q);
+  body.innerHTML=`<div class="lt-eyebrow">CHEOLKK DIARY</div><div class="lt-title">${dt.toLocaleDateString(LANG==='en'?'en-US':'ko-KR')}</div>`
+    +questHTML(qe,false)
+    +(es.length?es.map(e=>`<div class="dy-h-item"><div class="dy-h-date">${new Date(e.t).toLocaleTimeString(LANG==='en'?'en-US':'ko-KR',{hour:'numeric',minute:'2-digit'})}</div>${lineHTML(e)}</div>`).join(''):`<div class="dy-h-txt">${T.dyNoDay}</div>`);
   const ov=$('diaryOv'); if(ov) ov.classList.add('on');
 }
 (()=>{ const c=$('dyClose'); if(c) c.onclick=()=>{ const ov=$('diaryOv'); if(ov) ov.classList.remove('on'); }; })();
@@ -2326,7 +2363,7 @@ async function makeLetter(id,label,st,period,theme){
     const p=P(st.authorPid);
     const others=st.pids.filter(x=>x!==st.authorPid&&st.perPid[x].mine>=2).slice(0,5);
     const prevWithReply=[...state.mail].reverse().find(m=>m.myReply&&m.myReply.trim());
-    const sys=p.prompt+COMMON+`\n\n[특별 임무: 월간 편지]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: ${period}. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 한 달의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음 달을 여는 질문 하나","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 우편함을 확인해보라는 뉘앙스)","ps":[${others.length?'{"id":"철학자id","text":"그 철학자 말투의 1문장 쪽지"}':''}]}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 '자신의' 사상과 말투로만 쓴다 — 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)를 남의 쪽지에 절대 섞지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 우편함의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.`+(theme||'');
+    const sys=p.prompt+COMMON+`\n\n[특별 임무: 편지 쓰기]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: ${period}. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 기간의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음을 여는 질문 하나(기간의 성격에 맞게 — 월간이면 다음 달, 기념이면 앞으로의 나날)","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 서랍장의 편지함을 확인해보라는 뉘앙스)","ps":[${others.length?'{"id":"철학자id","text":"그 철학자 말투의 1문장 쪽지"}':''}]}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 '자신의' 사상과 말투로만 쓴다 — 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)를 남의 쪽지에 절대 섞지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 서랍장의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.`+(theme||'');
     const user=`[기간] ${label}\n[통계] 대화 ${st.total}회, 심야(밤10시~새벽6시) 대화 ${st.night}회, 가장 붐빈 날 ${st.busiest[0]}(${st.busiest[1]}개), 함께한 철학자 ${st.withN}명\n[너와의 통계] 상담자와 너의 대화 ${Math.round((st.perPid[st.authorPid]||{}).mine||0)}회, 그중 심야 ${(st.perPid[st.authorPid]||{}).night||0}회\n[철학자별 대화량] ${st.pids.map(x=>P(x).name+':'+Math.round(st.perPid[x].mine)).join(', ')}\n[상담자의 문장들]\n${st.myMsgs.map(m=>'- ('+m.to+'에게) '+m.text).join('\n')}\n${prevWithReply?'[지난 편지에 남긴 상담자의 답장] '+prevWithReply.myReply.slice(0,300):''}\n[쪽지 철학자 목록] ${others.map(x=>P(x).name+'('+x+') 말투: '+(VOICE[x]||'')).join(' / ')||'(없음)'}`;
     let text=await callClaude(sys,[{role:'user',content:user}]);
     text=text.replace(/```json|```/g,'').trim();
@@ -2358,7 +2395,7 @@ async function checkMail(){
       const st=collectStats(now()-30*86400000,now()+1);
       if(st.myCount>=20&&st.firstT&&(now()-st.firstT)>=24*3600*1000){
         const days=Math.max(1,Math.min(30,Math.ceil((now()-st.firstT)/86400000)));
-        await makeLetter('first',T.firstLabel,st,'함께한 지난 '+days+'일');
+        await makeLetter('first',T.firstLabel,st,'함께한 지난 '+days+'일','\n\n[첫 편지 모드] 이것은 상담자에게 보내는 생애 첫 편지다. 월간 회고가 아니다 — "이번 달" "이달" "한 달" 같은 월 단위 표현을 쓰지 마라(실제 기간은 위 기간 정보를 따르라). greeting은 관계의 시작을 기념하는 톤으로, next_question은 앞으로의 이야기를 여는 질문으로 써라.');
         return;
       }
     }
@@ -2412,7 +2449,7 @@ function renderMail(){
 function openLetter(id){
   const l=(state.mail||[]).find(m=>m.id===id); if(!l) return;
   l.read=true; save(); updateMailDot();
-  const p=P(l.author), d=l.data, st=l.stats;
+  const p=P(l.author), d=l.data, st=l.stats, lb=ltLabels(l);
   const recs=[T.recTotal(st.total)];
   if(st.night>0) recs.push(T.recNight(st.night));
   if(st.busiest&&st.busiest[1]>0) recs.push(T.recBusy(st.busiest[0],st.busiest[1]));
@@ -2424,17 +2461,17 @@ function openLetter(id){
     <div class="lt-title">${escapeH(l.label)}</div>
     <div class="lt-date">${fmtT(l.t)} · ${escapeH(T.ltFrom(dispName(p)))}</div>
     <div class="lt-greet">${escapeH(d.greeting)}</div>
-    ${d.highlight&&d.highlight.quote?`<div class="lt-sec">${T.ltHighlight}</div>
+    ${d.highlight&&d.highlight.quote?`<div class="lt-sec">${lb.hl}</div>
       <div class="lt-quote">“${escapeH(d.highlight.quote)}”</div>
       <div class="lt-why">${escapeH(d.highlight.why||'')}</div>`:''}
     ${d.observation?`<div class="lt-sec">${T.ltObserve}</div><div class="lt-para">${escapeH(d.observation)}</div>`:''}
-    <div class="lt-sec">${T.ltRecords}</div>
+    <div class="lt-sec">${lb.rec}</div>
     <div class="lt-rec">${recs.map(escapeH).join('<br>')}</div>
     ${d.records_comment?`<div class="lt-why">${escapeH(d.records_comment)}</div>`:''}
     <div class="lt-sec">${T.ltGift}</div>
     <div class="lt-gift">${escapeH(d.aphorism)}</div>
     <button class="lt-savebtn" id="ltCardBtn" style="margin-top:12px">${T.cardSave}</button>
-    ${d.next_question?`<div class="lt-sec">${T.ltNextQ}</div><div class="lt-para">${escapeH(d.next_question)}</div>`:''}
+    ${d.next_question?`<div class="lt-sec">${lb.nq}</div><div class="lt-para">${escapeH(d.next_question)}</div>`:''}
     ${psHTML}
     <div class="lt-sec">${T.ltReply}</div>
     <textarea class="lt-reply" id="ltReplyBox" placeholder="${escapeH(T.ltReplyPh)}">${escapeH(l.myReply||'')}</textarea>
@@ -2451,7 +2488,7 @@ function openLetter(id){
       setTimeout(async()=>{
         try{
           if(!presence(rp,now()).active) return;
-          const txt=await dmAPI(rp,`(상담자가 네가 보낸 월간 편지에 방금 이런 답장을 남겼다: "${rTxt}" — 그 답장을 읽은 직후다. 짧고 캐릭터답게 반응해라. 답장 내용을 그대로 복창하지 말고, 마음에 남은 부분 하나만 건드려라. 말풍선 1~2개.)`);
+          const txt=await dmAPI(rp,`(상담자가 네가 보낸 편지에 방금 이런 답장을 남겼다: "${rTxt}" — 그 답장을 읽은 직후다. 짧고 캐릭터답게 반응해라. 답장 내용을 그대로 복창하지 말고, 마음에 남은 부분 하나만 건드려라. 말풍선 1~2개.)`);
           pushDM(rp,txt,now(),'d:'+l.author);
         }catch(e){}
       },rnd(20000,90000));
@@ -2459,6 +2496,12 @@ function openLetter(id){
   };
   $('letter').classList.add('on');
   renderMail();
+}
+function ltLabels(l){
+  const id=String(l&&l.id||'');
+  if(id==='first') return {hl:T.ltHl1,rec:T.ltRec1,nq:T.ltNq1};
+  if(id.indexOf('c100:')===0){ const n=id.split(':')[2]||'100'; return {hl:T.ltHlC(n),rec:T.ltRecC(n),nq:T.ltNqC}; }
+  return {hl:T.ltHighlight,rec:T.ltRecords,nq:T.ltNextQ};
 }
 function wrapText(ctx,text,maxW){
   const out=[]; let line='';
@@ -2476,6 +2519,36 @@ function wrapText(ctx,text,maxW){
     line=piece;
   }
   if(line) out.push(line);
+  return out;
+}
+function balancedWrap(ctx,text,maxW){
+  const words=String(text||'').replace(/\n/g,' ').split(/\s+/).filter(Boolean);
+  if(!words.length) return [];
+  const sp=ctx.measureText(' ').width;
+  const full=words.reduce((a,w)=>a+ctx.measureText(w).width,0)+sp*Math.max(0,words.length-1);
+  const n=Math.max(1,Math.ceil(full/maxW));
+  const target=full/n;
+  const out=[]; let line='';
+  for(const w of words){
+    if(ctx.measureText(w).width>maxW){
+      if(line){ out.push(line); line=''; }
+      wrapText(ctx,w,maxW).forEach(x2=>out.push(x2));
+      continue;
+    }
+    const t=line?line+' '+w:w;
+    if(line&&(ctx.measureText(t).width>maxW||(out.length<n-1&&ctx.measureText(line).width>=target*0.92))){ out.push(line); line=w; }
+    else line=t;
+  }
+  if(line){
+    if(out.length&&line.indexOf(' ')<0){
+      const pw=out[out.length-1].split(' ');
+      if(pw.length>1){
+        const cand=pw[pw.length-1]+' '+line;
+        if(ctx.measureText(cand).width<=maxW){ out[out.length-1]=pw.slice(0,-1).join(' '); line=cand; }
+      }
+    }
+    out.push(line);
+  }
   return out;
 }
 async function saveLetterCard(l){
@@ -2521,9 +2594,9 @@ async function saveLetterCard(l){
     const q=l.data&&l.data.highlight&&l.data.highlight.quote;
     if(q){
       x.fillStyle='rgba(239,232,218,.45)'; x.font='500 19px sans-serif';
-      x.fillText('— '+T.ltHighlight+' —',W/2,y); y+=44;
+      x.fillText('— '+ltLabels(l).hl+' —',W/2,y); y+=44;
       x.fillStyle='rgba(239,232,218,.85)'; x.font='400 27px Georgia,"Noto Serif KR",serif';
-      wrapText(x,'“'+q+'”',W-220).slice(0,4).forEach(ln=>{ x.fillText(ln,W/2,y); y+=42; });
+      balancedWrap(x,'“'+q+'”',W-220).slice(0,4).forEach(ln=>{ x.fillText(ln,W/2,y); y+=42; });
       y+=30;
     }
     // 구분선
@@ -2533,7 +2606,7 @@ async function saveLetterCard(l){
     x.fillStyle='rgba(239,232,218,.45)'; x.font='500 19px sans-serif';
     x.fillText('— '+T.ltGift+' —',W/2,y); y+=52;
     x.fillStyle='#e9c489'; x.font='600 34px Georgia,"Noto Serif KR",serif';
-    wrapText(x,l.data.aphorism||'',W-200).slice(0,5).forEach(ln=>{ x.fillText(ln,W/2,y); y+=54; });
+    balancedWrap(x,l.data.aphorism||'',W-200).slice(0,5).forEach(ln=>{ x.fillText(ln,W/2,y); y+=54; });
     // 하단
     x.fillStyle='rgba(239,232,218,.4)'; x.font='500 20px sans-serif';
     const dd=new Date(l.t);
@@ -2555,15 +2628,21 @@ $('cpClose').onclick=()=>$('cardPrev').classList.remove('on');
 $('cpShare').onclick=async()=>{
   if(!curCard) return;
   const file=new File([curCard.blob],curCard.name,{type:'image/jpeg'});
-  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-    try{ await navigator.share({files:[file]}); return; }catch(e){}
+  if(navigator.share){
+    try{ await navigator.share({files:[file],title:'CheolKK'}); $('cardPrev').classList.remove('on'); return; }
+    catch(e){ if(e&&e.name==='AbortError') return; }
   }
   $('cpDown').click();
 };
 $('cpDown').onclick=()=>{
   if(!curCard) return;
-  const a=document.createElement('a');
-  a.href=curCard.url; a.download=curCard.name; a.click();
+  try{
+    const a=document.createElement('a');
+    a.href=curCard.url; a.download=curCard.name; a.rel='noopener';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ try{a.remove();}catch(_){} },0);
+    $('cardPrev').classList.remove('on');
+  }catch(e){ try{ window.open(curCard.url,'_blank'); }catch(_){ } }
 };
 $('ltClose').onclick=()=>$('letter').classList.remove('on');
 
@@ -2699,7 +2778,7 @@ async function initAuth(){
 const VAPID_PUBLIC='BMhdB0ke6w-J7SttyTCHZBxKZxzXOcmfISPpFSfo_fj6auPvConJzZMkRZbKGNFuVS8HXNHVIvqLmi7dsOU1-oM';
 const ICON_CHAT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 11.5c0 4.14-4.03 7.5-9 7.5-1.02 0-2-.14-2.91-.4L4 20l1.2-3.6C3.83 15.09 3 13.37 3 11.5 3 7.36 7.03 4 12 4s9 3.36 9 7.5z"/></svg>';
 const ICON_GRID='<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="vertical-align:-1.5px;margin-right:6px"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>';
-const ICON_MAIL='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5 l8 6 8 -6"/></svg>';
+const ICON_MAIL='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="4" width="18" height="5.5" rx="1.5"/><path d="M5 9.5v8.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M10 13.5h4"/></svg>';
 function urlB64ToU8(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(s);const a=new Uint8Array(r.length);for(let i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a;}
 async function getPushSub(){
   try{
