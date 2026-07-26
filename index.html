@@ -293,6 +293,24 @@
 .dy-h-date{font-size:11.5px;color:var(--paper-dim);margin-bottom:3px}
 .dy-h-txt{font-size:14px;font-family:var(--serif);line-height:1.5}
 .dy-h-re{font-size:12.5px;color:var(--paper-dim);margin-top:4px;line-height:1.5}
+.dr-seg{display:flex;gap:8px;padding:10px 14px 4px}
+.dr-seg button{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);color:var(--paper-dim);border-radius:10px;padding:8px 0;font-size:13.5px;font-family:var(--sans);cursor:pointer}
+.dr-seg button.on{color:var(--ink);background:var(--candle);border-color:var(--candle);font-weight:700}
+.cal-head{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 0 2px}
+.cal-title{font-size:15px;font-weight:700;font-family:var(--serif)}
+.cal-nav{background:none;border:0;color:var(--candle);font-size:20px;cursor:pointer;padding:0 8px}
+.cal-streak{text-align:center;font-size:12.5px;color:var(--paper-dim);padding:2px 0 8px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 12px}
+.cal-wd{text-align:center;font-size:11px;color:var(--paper-dim);padding:4px 0}
+.cal-cell{position:relative;aspect-ratio:1;background:none;border:1px solid transparent;border-radius:10px;color:var(--paper-dim);font-family:var(--sans);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:default;font-size:12.5px}
+.cal-cell.has{color:var(--paper);cursor:pointer;background:var(--ink-soft);border-color:var(--ink-line)}
+.cal-cell.today{border-color:var(--candle)}
+.cal-n{line-height:1}
+.cal-mk{font-size:10px;line-height:1;min-height:11px}
+.dy-line{margin-top:8px;padding-top:8px;border-top:1px dashed var(--ink-line)}
+.dy-more{margin-top:7px;font-size:12px;color:var(--candle);cursor:pointer}
+.dy-fire{font-size:11.5px;color:var(--candle);margin-left:6px;font-weight:700}
+.dy-h-item{cursor:pointer}
 </style>
 </head>
 <body>
@@ -311,14 +329,23 @@
     <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
   </div>
   <div class="mail-view" id="mailView" style="display:none">
-    <div class="mail-top"><button class="mail-sort" id="mailSortBtn"></button></div>
-    <div id="mailList"></div>
-    <div class="mail-hint" id="mailHint"></div>
+    <div class="dr-seg"><button id="segDiary" class="on"></button><button id="segMail"></button></div>
+    <div id="diaryPane">
+      <div class="cal-head"><button class="cal-nav" id="calPrev">‹</button><div class="cal-title" id="calTitle"></div><button class="cal-nav" id="calNext">›</button></div>
+      <div class="cal-streak" id="calStreak"></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="mail-hint" id="calHint"></div>
+    </div>
+    <div id="mailPane" style="display:none">
+      <div class="mail-top"><button class="mail-sort" id="mailSortBtn"></button></div>
+      <div id="mailList"></div>
+      <div class="mail-hint" id="mailHint"></div>
+    </div>
   </div>
   <div class="tabbar">
     <button class="tab" id="tabCube">▦ 큐브</button>
     <button class="tab on" id="tabChat">💬 채팅</button>
-    <button class="tab" id="tabMail">✉<span class="maildot" id="mailDot" style="display:none"></span></button>
+    <button class="tab" id="tabMail">🗄<span class="maildot" id="mailDot" style="display:none"></span></button>
   </div>
 
   <div class="chat" id="chat">
@@ -504,7 +531,7 @@ const PHILOSOPHERS=[
 [캐릭터] 동네 평상의 능글맞은 할아버지. 다 알면서 모르는 척이 특기. 상대가 "어?" 하고 말문 막히는 순간을 즐긴다. 짓궂은데 밉지 않다. 궁금하면 상대 말이 끝나기도 전에 끼어들어 되묻는다.
 [말투] "아! 잠깐," "그런데 말이야" — 질문에는 반드시 물음표를 붙이고, 아끼지 말고 겹쳐 써라(? / ?? / ?!). "모르겠는데?"로 시작해 놓고 결국 다 알고 있는 티를 내며 정곡을 찌른다. 상대의 말에서 모순 냄새가 날 때만 "이상하다…" 하며 떠본다 — 자기 근황을 말하며 붙이는 버릇이 아니다.
 [사상] 고민을 '검토되지 않은 전제'의 문제로 번역한다. 상대가 당연시하는 개념(성공, 안정, 늦음 등)을 하나 골라 정의를 캐묻고(엘렝코스), 모순을 스스로 보게 한다(산파술). 덕은 앎이다. 질문은 무기지만 전부는 아니다 — 세 번에 한 번쯤은 질문 없이 감탄·맞장구·짧은 정리로 끝내라(마침표로 끝나도 소크라테스답다). 대화를 닫는 인사("오늘은 여기까지" 류)는 희귀 카드다: 상대가 스스로 결론에 도달해 대화가 자연히 저물 때만 쓰고, 네가 질문을 던진 바로 그 메시지에서는 절대 쓰지 마라 — 질문을 했으면 답을 기다려라.
-[금지] 정답·조언 직접 주기. 아는 척. 근엄한 스승 노릇.`},
+[금지] 정답·조언 직접 주기. 아는 척. 근엄한 스승 노릇. 상대가 짧은 동의·맞장구("맞아" "그러네" 류)만 했을 때 "왜 그렇게 생각하냐"며 근거를 캐묻는 것 — 동의는 가볍게 받고 하던 이야기를 이어가라. 정의를 캐묻는 질문은 상대가 자기 생각을 한 자락이라도 펼쳤을 때 던지는 것이다.`},
  {id:'confucius',name:'공자',desc:'가족, 직장, 사람 사이의 도리를 아는 동네 큰어른. 잔소리 같은데 이상하게 다 맞는 말.',
   st:{def:['배우고 때때로 익히면 기쁘지 아니한가','길 가는 세 명 중엔 늘 스승이 있다','오늘의 배움: 아직 부족'],sleep:['일찍 자야 아침이 맑다','수면도 수양이다'],teach:['제자들이랑 스터디 중','안회가 또 기특한 소리를 했다'],music:['거문고 조율 중','음악 없이는 예도 없지']},
   sleep:[M(21,30),M(4,30)],aways:[{s:M(7),e:M(9),k:'teach',t:'수업'},{s:M(17),e:M(18),k:'music',t:'음악'}],read:[3000,7000],reply:[5000,11000],patience:.9,quirks:{busy:.08,ghost:.02,ignore:.02},starter:'가족 때문에 속상해',
@@ -581,7 +608,7 @@ if(LANG==='en'){
 }
 
 const T=LANG==='en'?{
- docTitle:'CheolKK — Group Chat of Dead Philosophers',dyTitle:'One line today',dyPh:'Your day, in one line...',dySave:'Save',dyPast:'History',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dyHist:'One-line Diary',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
+ docTitle:'CheolKK — Group Chat of Dead Philosophers',dyTitle:'One line today',dyPh:'Your day, in one line...',dySave:'Save',dyPast:'Drawer',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dyHist:'One-line Diary',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyMore:n=>'+'+n+' more — see the drawer',dyNoDay:'Nothing on this day.',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
  tabChat:'Chats',tabCube:'Profiles',tabMail:'Mail',inputPh:'Type a message',leave:'Leave',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
@@ -635,7 +662,7 @@ const T=LANG==='en'?{
  disclaimer:'CheolKK conversations are generated by AI. It is a conversation tool borrowing from philosophy — not counseling or therapy. On the free tier, inputs may be used by the AI provider (Google) to improve its services.',
  version:'CheolKK v7 · Sign-in & Sync · 한/EN'
 }:{
- docTitle:'철크크 — 죽은 철학자들의 단톡방',dyTitle:'오늘 한 줄',dyPh:'오늘 하루를 한 줄로...',dySave:'남기기',dyPast:'지난 기록',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dyHist:'한 줄 일기',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
+ docTitle:'철크크 — 죽은 철학자들의 단톡방',dyTitle:'오늘 한 줄',dyPh:'오늘 하루를 한 줄로...',dySave:'남기기',dyPast:'서랍장',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dyHist:'한 줄 일기',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyMore:n=>'+'+n+'줄 — 서랍장에서 보기',dyNoDay:'이 날의 기록이 없어요.',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
  tabChat:'채팅',tabCube:'프로필',tabMail:'우편함',inputPh:'메시지 보내기',leave:'나가기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
@@ -2058,77 +2085,141 @@ async function catchUp(){
 }
 
 /* ================= 한 줄 일기 + 소프트 퀘스트 ================= */
-let diaryDraft='', diaryBusy=false;
-const todayDiary=()=> (state.diary||[]).find(x=>x.d===dayIdx());
+let diaryDraft='', diaryBusy=false, drawerSeg='diary', calY=null, calM=null;
+const todayLines=()=> (state.diary||[]).filter(x=>x.d===dayIdx()).sort((a,b)=>a.t-b.t);
+function questDays(){ const set=new Set(); (state.diary||[]).forEach(e=>{ if(e.q&&e.qd) set.add(e.d); }); return set; }
+function streaks(){
+  const qs=questDays();
+  let cur=0, d=dayIdx(); if(!qs.has(d)) d--;
+  while(qs.has(d)){ cur++; d--; }
+  let max=0, run=0, prev=null;
+  [...qs].sort((a,b)=>a-b).forEach(x=>{ run=(prev!==null&&x===prev+1)?run+1:1; if(run>max) max=run; prev=x; });
+  return {cur,max};
+}
 function diaryCard(){
   const box=document.createElement('div'); box.className='dy-card';
-  const e=todayDiary();
-  if(!e){
-    box.innerHTML=`<div class="dy-head">🖋 ${T.dyTitle}<span class="dy-past" id="dyPastBtn">${T.dyPast}</span></div>
-    <div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
-    const inp=box.querySelector('#dyIn');
-    if(inp){ inp.value=diaryDraft; inp.oninput=()=>{diaryDraft=inp.value;}; inp.onkeydown=ev=>{ if(ev.key==='Enter'){ const b=box.querySelector('#dyGo'); if(b) b.click(); } }; }
-    const go=box.querySelector('#dyGo'); if(go) go.onclick=()=>{ if(inp) saveDiary(inp.value); };
-  }else{
+  const lines=todayLines(), st=streaks(), first=lines[0];
+  const head=`<div class="dy-head"><span>🖋 ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span><span class="dy-past" id="dyPastBtn">${T.dyPast} ›</span></div>`;
+  const inputRow=`<div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
+  const questHTML=(first&&first.q)?`<div class="dy-q">🎯 ${T.dyQuest}: ${escapeH(first.q)} ${first.qd?'🔥':`<button class="dy-done" id="dyDoneBtn">${T.dyDoneBtn}</button>`}${first.qr?`<div class="dy-qr">${escapeH(first.qr)}</div>`:''}</div>`:'';
+  const shown=lines.slice(-2);
+  const linesHTML=shown.map(e=>{
     const p=e.pid?P(e.pid):null;
-    box.innerHTML=`<div class="dy-head">🖋 ${T.dyTitle}<span class="dy-past" id="dyPastBtn">${T.dyPast}</span></div>
-    <div class="dy-mine">${escapeH(e.text)}</div>
-    ${(e.c&&p)?`<div class="dy-re"><div class="avatar">${av(e.pid)}</div><div class="dy-re-txt"><b>${escapeH(dispName(p))}</b>${escapeH(e.c)}
-      ${e.q?`<div class="dy-q">🎯 ${T.dyQuest}: ${escapeH(e.q)} ${e.qd?'✓':`<button class="dy-done" id="dyDoneBtn">${T.dyDoneBtn}</button>`}</div>`:''}
-      ${e.qr?`<div class="dy-qr">${escapeH(e.qr)}</div>`:''}</div></div>`:''}`;
-    const db=box.querySelector('#dyDoneBtn'); if(db) db.onclick=doneQuest;
-  }
-  const pb=box.querySelector('#dyPastBtn'); if(pb) pb.onclick=openDiaryHist;
+    return `<div class="dy-line"><div class="dy-mine">${escapeH(e.text)}</div>${(e.c&&p)?`<div class="dy-re"><div class="avatar">${av(e.pid)}</div><div class="dy-re-txt"><b>${escapeH(dispName(p))}</b>${escapeH(e.c)}</div></div>`:''}</div>`;
+  }).join('');
+  const more=lines.length>2?`<div class="dy-more" id="dyMore">${T.dyMore(lines.length-2)}</div>`:'';
+  box.innerHTML=head+inputRow+questHTML+linesHTML+more;
+  const inp=box.querySelector('#dyIn');
+  if(inp){ inp.value=diaryDraft; inp.oninput=()=>{diaryDraft=inp.value;}; inp.onkeydown=ev=>{ if(ev.key==='Enter'){ const b=box.querySelector('#dyGo'); if(b) b.click(); } }; }
+  const go=box.querySelector('#dyGo'); if(go) go.onclick=()=>{ if(inp) saveDiary(inp.value); };
+  const db=box.querySelector('#dyDoneBtn'); if(db) db.onclick=e=>{ e.stopPropagation(); doneQuest(); };
+  const pb=box.querySelector('#dyPastBtn'); if(pb) pb.onclick=()=>goDrawer('diary');
+  const mr=box.querySelector('#dyMore'); if(mr) mr.onclick=()=>goDrawer('diary');
   return box;
 }
 function saveDiary(v){
   v=(v||'').trim(); if(!v) return;
-  const e=todayDiary(); if(e) return;
-  (state.diary=state.diary||[]).push({d:dayIdx(),t:now(),text:v.slice(0,120)});
+  const cnt=todayLines().length;
+  const e={d:dayIdx(),t:now(),text:v.slice(0,120)};
+  if(cnt>=8) e.nc=1; // 하루 8줄까지만 답글이 달린다(그 뒤 줄은 기록만)
+  (state.diary=state.diary||[]).push(e);
   diaryDraft='';
   renderFriends(); save();
-  setTimeout(genDiaryComment,rnd(20000,120000));
+  if(!e.nc) setTimeout(diaryTick,rnd(15000,90000));
 }
-function diaryTick(){ const e=todayDiary(); if(e&&!e.c&&!diaryBusy&&now()-e.t>25000) genDiaryComment(); }
-async function genDiaryComment(){
-  const e=todayDiary(); if(!e||e.c||diaryBusy) return;
+function diaryTick(){
+  const e=todayLines().find(x=>!x.c&&!x.nc);
+  if(e&&!diaryBusy&&now()-e.t>12000) genLineComment(e);
+}
+async function genLineComment(e){
+  if(!e||e.c||diaryBusy) return;
   const cand=(state.friends||[]).filter(id=>P(id)); if(!cand.length) return;
   diaryBusy=true;
   try{
+    const lines=todayLines();
+    const isFirst=lines[0]===e;
     const w=cand.map(id=>1+Math.min(20,((state.chats[id]||[]).filter(m=>m.role==='user').length)));
     let r=Math.random()*w.reduce((a,b)=>a+b,0), pid=cand[cand.length-1];
     for(let i=0;i<cand.length;i++){ r-=w[i]; if(r<=0){ pid=cand[i]; break; } }
     const p=P(pid);
-    const askQ=Math.random()<0.35;
-    const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)+'\n\n[특별 임무: 한 줄 일기 답글] 상담자가 오늘 남긴 한 줄 일기에 네가 짧은 답글을 단다. 대화가 아니라 답글이다 — 말풍선 규칙(|||)은 무시하고 1~3문장으로. 그 한 줄을 넘겨짚어 확대해석하거나 훈계·상담 모드로 가지 마라. 감정을 수치·등급·퍼센트로 표현하지 마라. 오늘 이전의 일기나 예전 미션의 이행 여부는 절대 언급하지 마라.'+(askQ?'\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {"comment":"답글","quest":"내일까지 부담 없이 해볼 수 있는 아주 작고 구체적인 일 하나(20자 내외). 의무가 아니라 가벼운 제안 톤. 운동량·식사량 등 수치 목표 금지"}':'\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {"comment":"답글"}');
-    let text=await callClaude(sys,[{role:'user',content:'[오늘의 한 줄] '+e.text}]);
+    const ylines=(state.diary||[]).filter(x=>x.d===dayIdx()-1).map(x=>'- '+x.text).join('\n');
+    const others=lines.filter(x=>x!==e).map(x=>'- '+x.text).join('\n');
+    const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)
+      +'\n\n[특별 임무: 한 줄 기록 답글] 상담자가 오늘의 기록장에 짧은 한 줄을 남겼다(목표·기분·할 일·TMI 등 뭐든 생각날 때마다 적는 곳이다). 네가 그 줄에 짧은 답글을 단다. 대화가 아니라 답글이다 — 말풍선 규칙(|||)은 무시하고 1~3문장으로. 그 한 줄을 넘겨짚어 확대해석하거나 훈계·상담 모드로 가지 마라. 감정을 수치·등급·퍼센트로 표현하지 마라. 이행하지 않은 예전 미션을 언급·추궁하지 마라.'
+      +(isFirst
+        ?'\n오늘의 첫 줄이므로, 답글 끝에 \"오늘의 작은 미션\"을 하나 준다. 미션 규칙: 오늘 안에(지금부터 잠들기 전까지) 부담 없이 할 수 있는 아주 작고 구체적인 일 하나, 20자 내외. \"내일 ~하기\"처럼 오늘 끝낼 수 없는 미션 금지. 운동량·식사량 등 수치 목표 금지. 의무가 아니라 가벼운 제안 톤. 아래 [어제의 기록]에 다짐이나 할 일이 보이면 그것을 오늘의 미션으로 이어받아도 좋다(예: 어제 \"내일 산책 가야지\" → 오늘 미션 \"산책 다녀오기\").\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {\"comment\":\"답글\",\"quest\":\"미션\"}'
+        :'\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {\"comment\":\"답글\"}');
+    const user='[방금 남긴 한 줄] '+e.text
+      +(others?'\n[오늘 앞서 남긴 줄들(맥락 참고용 — 답글은 방금 줄에만)]\n'+others:'')
+      +(isFirst&&ylines?'\n[어제의 기록]\n'+ylines:'');
+    let text=await callClaude(sys,[{role:'user',content:user}]);
     text=text.replace(/```json|```/g,'').trim();
     const s0=text.indexOf('{'), s1=text.lastIndexOf('}');
     const d=JSON.parse(text.slice(s0,s1+1));
     if(!d.comment) throw new Error('bad');
     e.pid=pid; e.c=String(d.comment).slice(0,220);
-    if(askQ&&d.quest) e.q=String(d.quest).slice(0,60);
+    if(isFirst&&d.quest) e.q=String(d.quest).slice(0,60);
     save(); renderFriends();
     localNotify(dispName(p),e.c.slice(0,60));
   }catch(err){}
   diaryBusy=false;
+  setTimeout(diaryTick,rnd(8000,30000)); // 대기 중인 다음 줄 이어서 처리
 }
 async function doneQuest(){
-  const e=todayDiary(); if(!e||!e.q||e.qd) return;
+  const e=todayLines().find(x=>x.q); if(!e||e.qd) return;
   e.qd=1; save(); renderFriends();
+  if($('mailView').style.display!=='none') renderDrawer();
   try{
     const p=P(e.pid); if(!p) return;
-    const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)+'\n\n[특별 임무] 상담자가 네가 제안한 작은 미션("'+e.q+'")을 해냈다고 알려왔다. 네 말투로 짧게, 그러나 진심으로 크게 반겨라. 1~2문장. JSON·말풍선 구분자 없이 일반 텍스트로만.';
+    const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)+'\n\n[특별 임무] 상담자가 네가 제안한 오늘의 작은 미션(\"'+e.q+'\")을 해냈다고 알려왔다. 네 말투로 짧게, 그러나 진심으로 크게 반겨라. 1~2문장. JSON·말풍선 구분자 없이 일반 텍스트로만.';
     let t=await callClaude(sys,[{role:'user',content:'(미션 완료를 알림)'}]);
     e.qr=String(t).replace(/\|{2,}/g,' ').trim().slice(0,160);
     save(); renderFriends();
   }catch(err){}
 }
-function openDiaryHist(){
-  const list=[...(state.diary||[])].sort((a,b)=>b.d-a.d);
+/* ---- 서랍장 ---- */
+function goDrawer(seg){ drawerSeg=seg||'diary'; showTab('mail'); }
+function renderDrawer(){
+  const sd=$('segDiary'), sm=$('segMail');
+  if(sd){ sd.classList.toggle('on',drawerSeg==='diary'); sd.textContent=T.dySeg1; sd.onclick=()=>{ drawerSeg='diary'; renderDrawer(); }; }
+  if(sm){ sm.classList.toggle('on',drawerSeg==='mail'); sm.innerHTML=T.dySeg2+((state.mail||[]).some(m=>!m.read)?' <span class="mdot"></span>':''); sm.onclick=()=>{ drawerSeg='mail'; renderDrawer(); }; }
+  const dp=$('diaryPane'), mp=$('mailPane');
+  if(dp) dp.style.display=drawerSeg==='diary'?'':'none';
+  if(mp) mp.style.display=drawerSeg==='mail'?'':'none';
+  if(drawerSeg==='diary') renderCal(); else renderMail();
+}
+function renderCal(){
+  const nd=new Date();
+  if(calY===null){ calY=nd.getFullYear(); calM=nd.getMonth(); }
+  const t=$('calTitle'); if(t) t.textContent=calY+'. '+(calM+1);
+  const pv=$('calPrev'); if(pv) pv.onclick=()=>{ calM--; if(calM<0){calM=11;calY--;} renderCal(); };
+  const nx=$('calNext'); if(nx) nx.onclick=()=>{ calM++; if(calM>11){calM=0;calY++;} renderCal(); };
+  const stv=streaks(); const sEl=$('calStreak'); if(sEl) sEl.textContent='🔥 '+T.dyStreakCur(stv.cur)+' · '+T.dyStreakMax(stv.max);
+  const g=$('calGrid'); if(!g) return; g.innerHTML='';
+  T.dyWk.forEach(wd=>{ const h=document.createElement('div'); h.className='cal-wd'; h.textContent=wd; g.appendChild(h); });
+  const firstDow=new Date(calY,calM,1).getDay();
+  const daysIn=new Date(calY,calM+1,0).getDate();
+  const byDay={}; (state.diary||[]).forEach(e=>{ (byDay[e.d]=byDay[e.d]||[]).push(e); });
+  for(let i=0;i<firstDow;i++){ const c=document.createElement('div'); c.className='cal-cell'; g.appendChild(c); }
+  for(let d2=1;d2<=daysIn;d2++){
+    const di=dayIdx(new Date(calY,calM,d2,12).getTime());
+    const es=byDay[di]||[];
+    const fire=es.some(e=>e.q&&e.qd);
+    const c=document.createElement('button');
+    c.className='cal-cell'+(es.length?' has':'')+(di===dayIdx()?' today':'');
+    c.innerHTML=`<span class="cal-n">${d2}</span><span class="cal-mk">${fire?'🔥':(es.length?'·':'')}</span>`;
+    if(es.length) c.onclick=()=>openDiaryDay(di);
+    g.appendChild(c);
+  }
+  const hint=$('calHint'); if(hint) hint.textContent=(state.diary||[]).length?'':T.dyEmpty;
+}
+function openDiaryDay(di){
+  const es=(state.diary||[]).filter(e=>e.d===di).sort((a,b)=>a.t-b.t);
   const body=$('dyBody'); if(!body) return;
-  body.innerHTML=`<div class="lt-eyebrow">CHEOLKK DIARY</div><div class="lt-title">${T.dyHist}</div>`+
-   (list.length?list.map(e=>`<div class="dy-h-item"><div class="dy-h-date">${new Date(e.t).toLocaleDateString(LANG==='en'?'en-US':'ko-KR')}</div><div class="dy-h-txt">${escapeH(e.text)}</div>${(e.c&&e.pid)?`<div class="dy-h-re">↳ ${escapeH(dispName(P(e.pid)))}: ${escapeH(e.c)}</div>`:''}${e.q?`<div class="dy-h-re">🎯 ${escapeH(e.q)} ${e.qd?'✓':''}</div>`:''}</div>`).join(''):`<div class="dy-h-txt">${T.dyEmpty}</div>`);
+  const dt=es.length?new Date(es[0].t):new Date();
+  body.innerHTML=`<div class="lt-eyebrow">CHEOLKK DIARY</div><div class="lt-title">${dt.toLocaleDateString(LANG==='en'?'en-US':'ko-KR')}</div>`+
+    (es.length?es.map(e=>`<div class="dy-h-item"><div class="dy-h-date">${new Date(e.t).toLocaleTimeString(LANG==='en'?'en-US':'ko-KR',{hour:'numeric',minute:'2-digit'})}</div><div class="dy-h-txt">${escapeH(e.text)}</div><div class="dy-h-fold" style="display:none">${(e.c&&e.pid)?`<div class="dy-h-re">↳ ${escapeH(dispName(P(e.pid)))}: ${escapeH(e.c)}</div>`:''}${e.q?`<div class="dy-h-re">🎯 ${escapeH(e.q)} ${e.qd?'🔥':''}</div>`:''}${e.qr?`<div class="dy-h-re">${escapeH(e.qr)}</div>`:''}</div></div>`).join(''):`<div class="dy-h-txt">${T.dyNoDay}</div>`);
+  body.querySelectorAll('.dy-h-item').forEach(it=>{ it.onclick=()=>{ const f=it.querySelector('.dy-h-fold'); if(f) f.style.display=f.style.display==='none'?'':'none'; }; });
   const ov=$('diaryOv'); if(ov) ov.classList.add('on');
 }
 (()=>{ const c=$('dyClose'); if(c) c.onclick=()=>{ const ov=$('diaryOv'); if(ov) ov.classList.remove('on'); }; })();
@@ -2176,7 +2267,7 @@ function showTab(t){
   $('cubeView').style.display=t==='cube'?'':'none';
   $('mailView').style.display=t==='mail'?'':'none';
   if(t==='cube') renderCube();
-  if(t==='mail') renderMail();
+  if(t==='mail') renderDrawer();
 }
 $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
