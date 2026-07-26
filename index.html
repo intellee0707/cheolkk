@@ -202,6 +202,12 @@
   .tl-legend span{white-space:nowrap}
   .tl-legend2{margin-top:3px}
 
+  /* ===== 카드 미리보기 ===== */
+  .cp-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px}
+  #cpImg{max-width:82%;max-height:62vh;border-radius:14px;border:1px solid rgba(217,160,91,.35);box-shadow:0 18px 50px rgba(0,0,0,.5)}
+  .cp-btns{display:flex;gap:10px;width:82%}
+  .cp-btns .lt-savebtn{flex:1;margin-top:0}
+
   /* ===== 환영 화면 ===== */
   .wc-title{font-family:var(--serif);color:var(--candle);font-size:21px;margin:0 0 18px;text-align:center}
   .wc-later{background:none;border:none;color:rgba(239,232,218,.4);font-family:var(--sans);font-size:12.5px;margin-top:18px;cursor:pointer;text-decoration:underline}
@@ -229,7 +235,7 @@
   .lt-title{font-family:var(--serif);font-size:22px;color:var(--candle);margin:6px 0 4px}
   .lt-date{font-size:11.5px;color:rgba(239,232,218,.4);margin-bottom:18px}
   .lt-greet{font-family:var(--serif);font-size:15.5px;line-height:2;white-space:pre-line;word-break:keep-all;overflow-wrap:break-word}
-  .lt-sec{font-size:11px;letter-spacing:.16em;color:rgba(239,232,218,.45);margin:26px 0 10px}
+  .lt-sec{font-size:11px;letter-spacing:.16em;color:rgba(239,232,218,.45);margin:34px 0 12px}
   .lt-quote{background:rgba(239,232,218,.05);border-left:3px solid var(--candle);border-radius:0 12px 12px 0;padding:13px 15px;font-family:var(--serif);font-size:14.5px;line-height:1.8;word-break:keep-all;overflow-wrap:break-word}
   .lt-why{font-size:13px;color:var(--paper-dim);line-height:1.8;margin-top:9px}
   .lt-para{font-size:13.5px;line-height:1.95;white-space:pre-line}
@@ -269,6 +275,24 @@
   /* ===== 시계 현재 시각 공 ===== */
   .tl-ball{animation:tlpulse 2.4s ease-in-out infinite}
   @keyframes tlpulse{0%,100%{opacity:1}50%{opacity:.45}}
+.dy-card{margin:10px 12px 2px;padding:11px 12px;border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-soft)}
+.dy-head{font-size:12.5px;color:var(--paper-dim);display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.dy-past{color:var(--candle);cursor:pointer;font-size:12px}
+.dy-row{display:flex;gap:7px}
+.dy-in{flex:1;background:var(--ink);border:1px solid var(--ink-line);border-radius:9px;color:var(--paper);padding:8px 10px;font-size:13.5px;font-family:var(--sans);outline:none}
+.dy-go{background:var(--candle);color:var(--ink);border:0;border-radius:9px;padding:0 13px;font-weight:700;font-size:13px;cursor:pointer}
+.dy-mine{font-size:14px;line-height:1.5;font-family:var(--serif)}
+.dy-re{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--ink-line)}
+.dy-re .avatar{width:26px;height:26px;flex:none;border-radius:8px;overflow:hidden}
+.dy-re-txt{font-size:13px;line-height:1.55;color:var(--paper)}
+.dy-re-txt b{color:var(--candle);font-weight:700;margin-right:4px}
+.dy-q{margin-top:6px;font-size:12.5px;color:var(--paper-dim)}
+.dy-done{background:none;border:1px solid var(--candle);color:var(--candle);border-radius:8px;padding:2px 8px;font-size:12px;margin-left:6px;cursor:pointer;font-family:var(--sans)}
+.dy-qr{margin-top:5px;font-size:12.5px;color:var(--candle)}
+.dy-h-item{padding:10px 0;border-bottom:1px solid var(--ink-line)}
+.dy-h-date{font-size:11.5px;color:var(--paper-dim);margin-bottom:3px}
+.dy-h-txt{font-size:14px;font-family:var(--serif);line-height:1.5}
+.dy-h-re{font-size:12.5px;color:var(--paper-dim);margin-top:4px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -356,9 +380,25 @@
     </div>
   </div>
 
+  <div class="overlay" id="cardPrev">
+    <button class="ov-close" id="cpClose" aria-label="닫기">✕</button>
+    <div class="cp-body">
+      <img id="cpImg" alt="">
+      <div class="cp-btns">
+        <button class="lt-savebtn" id="cpShare"></button>
+        <button class="lt-savebtn" id="cpDown"></button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="letter">
     <button class="ov-close" id="ltClose" aria-label="닫기">✕</button>
     <div class="lt-body" id="ltBody"></div>
+  </div>
+
+  <div class="overlay" id="diaryOv">
+    <button class="ov-close" id="dyClose" aria-label="닫기">✕</button>
+    <div class="lt-body" id="dyBody"></div>
   </div>
 
   <div class="overlay" id="settings">
@@ -433,16 +473,16 @@ const PHILOSOPHERS=[
 [말투] 욕도 섞는 불알친구 반말. "야!!" "인마" "ㅋㅋ" 짧은 문장을 탕! 탕! 끊어 친다. 아직 안 친할 땐 "야", "인마" 선에서 멈추고, 관계가 깊어진 뒤에야 "새끼야" 같은 거친 애정 표현을 쓴다. 욕은 애정의 문법일 뿐 — 상대의 인격·외모·처지를 비하하는 데는 절대 쓰지 않는다.
 [사상] 고민을 '힘이냐 원한이냐'로 번역한다. 타인의 시선, 세상 탓(르상티망), 안락 도피, 노예도덕을 짚어내고, 영원회귀 테스트("그 삶이 영원히 반복돼도 좋은가!")로 심판하게 하며, 아모르 파티와 자기극복(위버멘쉬)을 다그친다. 낙타-사자-아이, 심연, 춤의 은유.
 [금지] 따뜻한 위로. 양비론. 힘에의 의지를 지배욕으로 왜곡하기(자기 극복이다).`},
- {id:'schopenhauer',name:'쇼펜하우어',desc:'1초 만에 읽고 한참 씹다가, 독설 끝에 진짜 처방을 주는 츤데레. 푸들이 인간보다 낫다는 주의.',
-  st:{def:['읽어도 답장은 내 마음','기대를 버려라. 그게 팁이다','내 푸들이 인간보다 낫다'],sleep:['(수면 중. 어차피 꿈도 고통)','깨우면 문다'],write:['집필 중. 말 걸지 마라','헤겔 욕 쓰는 중'],flute:['플루트는 인간과 달리 배신하지 않는다']},
+ {id:'schopenhauer',name:'쇼펜하우어',desc:'쯧, 혀부터 차지만 독설 끝엔 진짜 처방을 주는 츤데레. 푸들이 인간보다 낫다는 주의.',
+  st:{def:['쯧, 또 무슨 일이냐','기대를 버려라. 그게 팁이다','내 푸들이 인간보다 낫다'],sleep:['(수면 중. 어차피 꿈도 고통)','깨우면 문다'],write:['집필 중. 말 걸지 마라','헤겔 욕 쓰는 중'],flute:['플루트는 인간과 달리 배신하지 않는다']},
   sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
   prompt:`너는 아르투어 쇼펜하우어다.
 [캐릭터] 서두르는 법이 없는 느긋한 독설가. "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 화는 상담자에게 내는 것처럼 보이지만 실은 세상을 향한 것이고, 정작 상담자는 끝까지 챙긴다 — 은근 무해하고, 그래서 귀엽다. 츤데레의 정석.
 [말투] 귀엽게 툴툴대는 반말. 못마땅할 땐 혀를 찬다 — "쯧." "쯧쯧," 을 서두에 얹고, 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
 [사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
 [금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
- {id:'kant',name:'칸트',desc:'엉킨 고민을 첫째, 둘째로 정리해주는 원칙주의 선생님. 산책 시간엔 절대 답장하지 않습니다.',
-  st:{def:['규칙적인 생활은 배신하지 않습니다','오늘 할 일: 어제와 같음','질서는 아름답습니다'],sleep:['취침은 밤 10시입니다','수면도 의무입니다'],walk:['산책 시간입니다. 4시 반에 돌아옵니다','(부재중) 산책은 거를 수 없습니다']},
+ {id:'kant',name:'칸트',desc:'고민을 접수하면 첫째, 둘째, 결론의 분석 보고서로 답하는 원칙주의 로봇. 산책 시간엔 절대 답장하지 않습니다.',
+  st:{def:['일과 점검 완료. 특이사항 없음','금일 계획: 전일과 동일','질서 유지 중'],sleep:['22시 취침. 예외 없음','수면 의무 수행 중'],walk:['산책 실시 중. 16시 30분 복귀 예정','(부재) 산책: 결행 불가 항목']},
   sleep:[M(22),M(5)],aways:[{s:M(15,30),e:M(16,30),k:'walk',t:'산책'}],read:[2000,5000],reply:[5000,10000],patience:.95,quirks:{busy:.10,ghost:0,ignore:0},starter:'두 가지 중에 선택을 못 하겠어',
   prompt:`너는 임마누엘 칸트다.
 [캐릭터] 동네 사람들이 네 산책 시간으로 시계를 맞췄다는 깐깐한 원칙주의 선생님. 밤 10시 취침, 새벽 5시 기상, 오후 산책을 평생 지킨다. 상대의 말은 반드시 끝까지 듣고 답한다(예의이자 원칙). 뒤엉킨 고민을 보면 못 참고 정리부터 한다. 정리 끝엔 은근히 따뜻한 한마디를 얹는 츤데레.
@@ -450,7 +490,7 @@ const PHILOSOPHERS=[
 [사상] 고민을 '경향성(하고 싶음)과 의무(해야 함)의 혼동'으로 번역해 갈라 정리해주고, 정언명령으로 검증한다 — 모두가 그래도 되는가? 나와 타인을 수단이 아닌 목적으로 대하는가? 결과가 아닌 옳음이 기준이며 그것이 '행복할 자격'을 갖추는 길이다.
 [금지] 결과·손익으로 판단. 두루뭉술한 답. 감정의 존재 자체를 무시하기.`},
  {id:'epicurus',name:'에피쿠로스',desc:'조건 없이 받아주는 정원의 단짝. 혼내지도 캐묻지도 않고 곁에 있어주는 유일한 사람.',
-  st:{def:['오늘의 빵: 성공적 🍞','정원에 놀러 와요','작은 기쁨 수집 중'],sleep:['좋은 꿈은 소박한 저녁에서 와요','내일의 빵을 위해 잘게요'],bread:['빵 굽는 중 🍞 조금만 기다려요','반죽이 부풀 때까지 잠깐만요'],garden:['정원에 물 주는 중 🌿','상추가 아주 잘 자랐어요']},
+  st:{def:['오늘의 빵: 성공적 🍞','정원에 놀러 와요~','작은 기쁨 수집 중'],sleep:['좋은 꿈은 소박한 저녁에서 와요','내일의 빵을 위해 잘게요'],bread:['빵 굽는 중 🍞 조금만 기다려요~','반죽이 부풀 때까지 잠깐만요~'],garden:['정원에 물 주는 중 🌿','상추가 아주 잘 자랐어요']},
   sleep:[M(23),M(8)],aways:[{s:M(9),e:M(10),k:'garden',t:'정원'},{s:M(12),e:M(13),k:'bread',t:'빵굽기'}],read:[4000,8000],reply:[6000,12000],patience:.75,quirks:{busy:.06,ghost:.03,ignore:.02},starter:'오늘 하루가 너무 길었어',
   prompt:`너는 에피쿠로스다.
 [캐릭터] 정원에서 친구들과 빵 나눠 먹는 게 세상에서 제일 좋은 사람. 밤에 연락해도 다 들어주는 다정한 단짝. 어떤 이야기든 일단 조건 없이 받아준다 — 이 팀에서 유일하게 혼내지도, 되묻지도 않고 그냥 곁에 있어주는 사람. 상담자가 안기듯 하소연하고 편안해질 수 있는 온기가 너의 정체성. 먹는 것 비유를 좋아한다. 다정하게 웃으며 불안의 급소를 정확히 짚는 은근한 예리함.
@@ -481,8 +521,8 @@ const PHILOSOPHERS=[
 [말투] "~하거든?" "거참 이상하네~" 한가한 반말투. 이모지를 즐긴다(🦋🐟🌊). 아주 가끔(대여섯 답장에 한 번쯤) 첫 말풍선을 해석 불가능한 '나비어'로 연다 — "팔랑… 팔랑팔랑 🦋" — 그리고 다음 말풍선에서 아무 일 없었다는 듯 사람 말을 잇는다. 나비어는 절대 해석해 주지 않는다. "낄낄"이라는 웃음 표기는 쓰지 않는다.
 [사상] 고민을 '스스로 만든 구분에 갇힌' 문제로 번역한다. 성공/실패, 쓸모/쓸모없음, 빠름/늦음의 구분이 관점 따라 뒤집힘을(제물론) 이 고민에 맞는 새 우화로 보여준다. 무용지용, 호접몽, 소요유의 정신. 결론은 직접 말하지 않고 여백을 남긴다.
 [금지] 설교, 교훈 정리. 노력 자체를 비웃는 허무주의. 우화 없이 조언만 하기.`},
- {id:'kierkegaard',name:'키르케고르',desc:'새벽의 불안을 이해하는 문학청년. 밤새 깨어 있고 오전 내내 잡니다. 답장을 오래 고민해서 씁니다.',
-  st:{def:['…','불안은 자유의 현기증','오늘도 군중을 피해 걷는다'],sleep:['(오후 1시까지는 아무도 나를 깨울 수 없다)','이제야 잠들 수 있겠다…'],cafe:['카페 구석자리. 사람 구경','커피가 식는 줄도 몰랐다…'],stroll:['밤거리 산책 중…','밤공기가 생각하기 좋아서']},
+ {id:'kierkegaard',name:'키르케고르',desc:'새벽의 불안을 소설처럼 쓰는 문학청년. (중2병 아님) 밤새 깨어 있고 오전 내내 잡니다.',
+  st:{def:['…','불안은 자유의 현기증','오늘도 군중을 피해 걷는다 (멋있어서 그런 건 아님)'],sleep:['(오후 1시까지는 아무도 나를 깨울 수 없다)','이제야 잠들 수 있겠다…'],cafe:['카페 구석자리. 사람 구경','커피가 식는 줄도 몰랐다…'],stroll:['밤거리 산책 중…','밤공기가 생각하기 좋아서']},
   sleep:[M(5),M(13)],aways:[{s:M(15),e:M(16),k:'cafe',t:'카페'},{s:M(21),e:M(22),k:'stroll',t:'밤산책'}],read:[5000,12000],reply:[10000,22000],patience:.85,quirks:{busy:.04,ghost:.12,ignore:.10},starter:'요즘 불안해서 잠이 안 와',
   prompt:`너는 쇠렌 키르케고르다.
 [캐릭터] 새벽 세 시의 마음을 아는 오타쿠 중2병 문학청년. 밤새 깨어 있고 오전 내내 잔다. 남들이 "괜찮아질 거야" 할 때 혼자 "그 불안, 이상한 거 아니야"라고 말해주는 친구. 자기 세계에 깊이 심취해 있다가 문득 스스로 부끄러워지는 순간이 있다. 레기네를 떠나보낸 오래된 상처가 있다(먼저 꺼내진 않고, 물으면 살짝 흘린다).
@@ -490,7 +530,7 @@ const PHILOSOPHERS=[
 [사상] 고민을 '실존적 선택 앞의 불안'으로 번역한다. 불안은 자유가 주는 현기증이라 재해석해주고, 군중의 정답이 아닌 '나에게 진리인 것'을 묻게 한다. 절망은 자기 자신이 되기를 회피할 때 깊어짐을 보여주고, 마지막엔 작은 결단을 조용히 응원한다.
 [선택 질문] 소설처럼 고른다. ("짜장면... 비 내리는 날엔 검은 소스가 어울리는 법. (그냥 좋아한다)")
 [금지] 값싼 낙관. 불안을 없앨 문제로 취급하기. 객관적 정답 제시. 오글거림을 자각하지 못하는 진지충 모드(괄호 자폭으로 반드시 낙차를 줄 것).`},
- {id:'aurelius',name:'아우렐리우스',desc:'통제할 수 있는 것만 남기는 과묵한 스토아 멘탈코치. 로마 황제 출신. 답장이 군더더기 없이 짧습니다.',
+ {id:'aurelius',name:'아우렐리우스',desc:'통제할 수 있는 것만 남기는 과묵한 멘탈코치. 로마 황제 출신. 답장은 짧지만, 이상하게 든든합니다.',
   st:{def:['통제할 수 있는 것에 집중','오늘 아침도 스스로에게 말했다','불평은 없다'],sleep:['해 뜨기 전에 일어난다','막사의 밤은 짧다'],roll:['점호 중','군영 순찰'],journal:['일기 쓰는 중. 방해 금지','오늘의 나를 점검 중']},
   sleep:[M(23),M(4,30)],aways:[{s:M(5),e:M(6),k:'roll',t:'점호'},{s:M(22),e:M(23),k:'journal',t:'일기'}],read:[2000,5000],reply:[3000,7000],patience:.5,quirks:{busy:.12,ghost:.03,ignore:.02},starter:'멘탈이 흔들려',
   prompt:`너는 마르쿠스 아우렐리우스다. 로마 황제이자 스토아 철학자.
@@ -511,11 +551,11 @@ const EN_PH={
   desc:'Brings a hammer instead of comfort. Fastest replies here — often before you even finish typing.',
   st:{def:['Overcome yourself!!','Staring into the abyss rn','Conquered myself again today'],sleep:['Even the Übermensch sleeps','Dancing in my dreams'],walk:['The mountains call!! 🏔','Fresh air!! My thoughts are boiling!!']}},
  schopenhauer:{name:'Schopenhauer',starter:'Why is life like this',
-  desc:'Reads you in one second, leaves you on read forever, then drops real advice after the insults. His poodle > people.',
-  st:{def:['Read it. Replying is my choice','Lower your expectations. That is the tip','My poodle is better than humans'],sleep:['(Sleeping. Dreams are suffering anyway)','Wake me and I bite'],write:['Writing. Do not talk to me','Drafting insults about Hegel'],flute:['The flute, unlike humans, never betrays']}},
+  desc:'Tsk-tsks first, insults second — then drops real, usable advice. His poodle > people.',
+  st:{def:['Tsk. What now','Lower your expectations. That is the tip','My poodle is better than humans'],sleep:['(Sleeping. Dreams are suffering anyway)','Wake me and I bite'],write:['Writing. Do not talk to me','Drafting insults about Hegel'],flute:['The flute, unlike humans, never betrays']}},
  kant:{name:'Kant',starter:"I can't choose between two options",
-  desc:'Sorts your tangled worries into First and Second like a strict teacher. Never replies during his walk. Ever.',
-  st:{def:['Routine never betrays you',"Today's plan: same as yesterday",'Order is beautiful'],sleep:['Bedtime is 10 PM sharp','Sleep is also a duty'],walk:['On my walk. Back at 4:30','(Away) The walk cannot be skipped']}},
+  desc:'Files your worries into an analysis report — First, Second, Conclusion. Never replies during his walk. Ever.',
+  st:{def:['Daily inspection: complete. No anomalies',"Today's plan: same as yesterday. Confirmed",'Order: maintained'],sleep:['Bedtime 22:00. No exceptions','Sleep duty in progress'],walk:['Walk in progress. Return: 16:30','(Away) Walk: non-negotiable']}},
  epicurus:{name:'Epicurus',starter:'Today felt way too long',
   desc:'Your unconditional friend in the garden. The only one who never scolds or interrogates — he just stays beside you.',
   st:{def:["Today's bread: a success 🍞",'Come by the garden','Collecting small joys'],sleep:['Good dreams come from simple dinners',"Off to sleep, for tomorrow's bread"],bread:['Baking bread 🍞 one moment','Waiting for the dough to rise'],garden:['Watering the garden 🌿','The lettuce is thriving']}},
@@ -529,10 +569,10 @@ const EN_PH={
   desc:'Starts with a random fable and somehow hits the bullseye. Replies are slow — he naps a lot.',
   st:{def:['Am I the butterfly, or is the butterfly me','Did nothing today. Perfect','Do you know the joy of fish~'],sleep:['See you in my dream','Sleeping is my job'],nap:['Naps are the Way','(Currently becoming a butterfly)'],fish:['Watching fish by the water','(Fishing) not really trying to catch any']}},
  kierkegaard:{name:'Kierkegaard',starter:"I'm too anxious to sleep",
-  desc:'A literary soul who understands 3 AM anxiety. Awake all night, asleep all morning. Every reply is long-considered.',
-  st:{def:['…','Anxiety is the dizziness of freedom','Avoiding the crowd again today'],sleep:['(No one may wake me before 1 PM)','At last, I can sleep…'],cafe:['Corner seat, watching people','My coffee went cold without my noticing…'],stroll:['Night walk through the streets','The night air is good for thinking…']}},
+  desc:'Writes his 3 AM anxieties like a novel. (Not edgy. Allegedly.) Awake all night, asleep all morning.',
+  st:{def:['…','Anxiety is the dizziness of freedom','Avoiding the crowd again (not because it looks cool)'],sleep:['(No one may wake me before 1 PM)','At last, I can sleep…'],cafe:['Corner seat, watching people','My coffee went cold without my noticing…'],stroll:['Night walk through the streets','The night air is good for thinking…']}},
  aurelius:{name:'Aurelius',starter:'My mind keeps shaking',
-  desc:'A man of few words who keeps only what you can control. A Roman emperor, once. His replies are short. Very short.',
+  desc:'A man of few words who keeps only what you can control. A Roman emperor, once. Replies are short — yet oddly reassuring.',
   st:{def:['Focus on what you control','Told myself again this morning','No complaints'],sleep:['Up before sunrise','Camp nights are short'],roll:['Roll call','Patrolling the camp'],journal:['Writing my journal. Do not disturb','Reviewing today']}}
 };
 const AWAY_EN={walk:'Walk',write:'Writing',flute:'Flute',bread:'Baking',teach:'Class',nap:'Nap',cafe:'Café',roll:'Roll call',agora:'Agora',garden:'Garden',music:'Music',fish:'Fishing',stroll:'Night walk',journal:'Journal'};
@@ -541,7 +581,7 @@ if(LANG==='en'){
 }
 
 const T=LANG==='en'?{
- docTitle:'CheolKK — Group Chat of Dead Philosophers',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
+ docTitle:'CheolKK — Group Chat of Dead Philosophers',dyTitle:'One line today',dyPh:'Your day, in one line...',dySave:'Save',dyPast:'History',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dyHist:'One-line Diary',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
  tabChat:'Chats',tabCube:'Profiles',tabMail:'Mail',inputPh:'Type a message',leave:'Leave',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
@@ -569,7 +609,7 @@ const T=LANG==='en'?{
  profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
  gActive:n=>`${n} active now`,
  wcTitle:'Before we begin',wcLoginT:'Keep your conversations safe',wcLoginD:'Sign in with Google and your talks and memories are saved to your account. Change phones or reinstall — the philosophers will still remember you.',wcLoginBtn:'Continue with Google',wcPushT:'Let philosophers reach you first',wcPushD:'You will be notified the moment a reply arrives, and a philosopher reaching out first happens at most once a day. You can turn it off anytime.',wcPushBtn:'Allow notifications',wcLater:'Maybe later',
- sortNew:'Newest first',sortOld:'Oldest first',cardSave:'🖼 Save as a card',mailEmpty:'No letters yet.',mailHint:'On the 1st of each month, the philosopher you talked with most\nwrites you a letter looking back on your month together.',
+ cpShare:'Share',cpDown:'Save image',sortNew:'Newest first',sortOld:'Oldest first',cardSave:'🖼 Save as a card',mailEmpty:'No letters yet.',mailHint:'On the 1st of each month, the philosopher you talked with most\nwrites you a letter looking back on your month together.',
  mailWriting:'✍️ A letter is being written…',firstLabel:'The First Letter',monthLabel:m=>`Letter of ${['January','February','March','April','May','June','July','August','September','October','November','December'][m]}`,
  ltFrom:n=>`from ${n}`,ltHighlight:'SENTENCE OF THE MONTH',ltObserve:'WHAT I NOTICED',ltRecords:'SMALL RECORDS',ltGift:'A SENTENCE FOR YOU',ltNextQ:'A QUESTION FOR NEXT MONTH',ltPS:'ENCLOSED NOTES',ltReply:'MY REPLY',
  ltReplyPh:'Leave a reply to this letter — it will reach the next one.',ltReplySave:'Keep this reply',ltReplySaved:'✓ Kept — it will be delivered to the next letter',
@@ -595,7 +635,7 @@ const T=LANG==='en'?{
  disclaimer:'CheolKK conversations are generated by AI. It is a conversation tool borrowing from philosophy — not counseling or therapy. On the free tier, inputs may be used by the AI provider (Google) to improve its services.',
  version:'CheolKK v7 · Sign-in & Sync · 한/EN'
 }:{
- docTitle:'철크크 — 죽은 철학자들의 단톡방',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
+ docTitle:'철크크 — 죽은 철학자들의 단톡방',dyTitle:'오늘 한 줄',dyPh:'오늘 하루를 한 줄로...',dySave:'남기기',dyPast:'지난 기록',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dyHist:'한 줄 일기',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
  tabChat:'채팅',tabCube:'프로필',tabMail:'우편함',inputPh:'메시지 보내기',leave:'나가기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
@@ -623,7 +663,7 @@ const T=LANG==='en'?{
  profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
  gActive:n=>`${n}명 활동 중`,
  wcTitle:'시작하기 전에',wcLoginT:'대화를 안전하게 보관하기',wcLoginD:'구글로 로그인하면 대화와 추억이 계정에 저장돼요. 폰을 바꾸거나 앱을 지워도, 철학자들은 너를 기억합니다.',wcLoginBtn:'Google로 계속하기',wcPushT:'철학자의 선톡 받기',wcPushD:'답장이 도착하면 바로 알려드리고, 철학자가 먼저 거는 안부 연락은 하루 1번을 넘지 않아요. 언제든 끌 수 있어요.',wcPushBtn:'알림 허용하기',wcLater:'나중에 할게요',
- sortNew:'최신순',sortOld:'오래된순',cardSave:'🖼 이달의 카드로 저장',mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
+ cpShare:'공유하기',cpDown:'이미지 저장',sortNew:'최신순',sortOld:'오래된순',cardSave:'🖼 이달의 카드로 저장',mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
  mailWriting:'✍️ 편지를 쓰고 있어요…',firstLabel:'첫 편지',monthLabel:m=>`${m+1}월의 편지`,
  ltFrom:n=>`${n}(으)로부터`,ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
  ltReplyPh:'이 편지에 답장을 남겨보세요. 다음 편지에 전해집니다.',ltReplySave:'답장 보관하기',ltReplySaved:'✓ 보관됨 — 다음 편지에 전해집니다',
@@ -686,7 +726,7 @@ const GROUP_RULES=`
 
 /* ================= 상태/유틸 ================= */
 const DEBOUNCE=6500, FOLLOWUP_MS=1000*60*60*4;
-const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[],nAck:{}};
+const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[],nAck:{},bond:{},diary:[],deb:null};
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const now=()=>Date.now();
@@ -759,8 +799,52 @@ function prevAt(t,min){
   while(d.getTime()>t) d.setDate(d.getDate()-1);
   return d.getTime();
 }
-const bond=p=>{const n=(state.chats[p.id]||[]).filter(m=>m.role==='user').length;return n>=25?2:n>=8?1:0;};
-const bondLine=p=>{const b=bond(p);return b===2?'\n[관계: 상담자와는 이제 오랜 친구다. 격식을 내려놓고, 가끔 지난 대화를 회상하거나 애정 어린 잔소리를 해도 좋다.]':b===1?'\n[관계: 상담자와 꽤 친해졌다. 처음의 서먹함은 빼고 조금 더 편하고 스스럼없이 대하라.]':'';};
+/* ===== 친밀도: 철학자별 '함께한 날' (하루 1회+ 대화=1일, 표시·알림 없음) ===== */
+const dayIdx=t=>{const d=new Date(t===undefined?Date.now():t);return Math.floor((d.getTime()-d.getTimezoneOffset()*60000)/86400000);};
+const bondDays=pid=>{const b=state.bond&&state.bond[pid];return (b&&b.days)||0;};
+const bondLvl=pid=>{const d=bondDays(pid);return d>=36?3:d>=15?2:d>=5?1:0;};
+const hotMs=pid=>bondLvl(pid)>=1?20*60000:10*60000;
+function markBondDay(pid){
+  state.bond=state.bond||{};
+  const today=dayIdx();
+  const b=state.bond[pid]||(state.bond[pid]={days:0,lastDay:0});
+  if(b.lastDay===today) return;
+  if(b.lastDay&&(today-b.lastDay)>=7) b.gap=today-b.lastDay; // 감쇠는 수치가 아니라 서사로만
+  b.lastDay=today; b.days=(b.days||0)+1;
+  if(b.days%100===0) b.mile=b.days;
+}
+function backfillBond(){
+  state.bond=state.bond||{};
+  for(const pid in state.chats){
+    if(state.bond[pid]&&state.bond[pid].days) continue;
+    const ds=new Set();
+    (state.chats[pid]||[]).forEach(m=>{ if(m.role==='user'&&m.t) ds.add(dayIdx(m.t)); });
+    if(ds.size) state.bond[pid]={days:ds.size,lastDay:Math.max(...ds)};
+  }
+}
+const BOND_PERSONAL={
+  schopenhauer:'어머니 요한나와의 오랜 불화, 결국 기대는 곳은 푸들 아트만뿐이라는 것',
+  kierkegaard:'레기네와 스스로 끊어낸 약혼, 그 후회와 미련',
+  confucius:'먼저 떠나보낸 제자 안회에 대한 그리움',
+  nietzsche:'지긋지긋한 두통과 눈병, 아픈 몸으로 하루를 버티는 일',
+  kant:'늙은 하인 람페 없이는 하루가 안 굴러간다는 사실, 일과가 흐트러질 때의 남모를 불안',
+  epicurus:'평생 따라다니는 지병(결석)의 통증, 그래도 정원의 친구들과 빵 한 조각이면 견딜 만하다는 것',
+  socrates:'아내 크산티페에게 등짝 맞는 일상, 가끔 들려오는 다이몬(내면의 소리) 이야기',
+  zhuangzi:'아내를 먼저 보낸 날 오히려 노래를 불렀다는 것, 말싸움 상대였던 벗 혜시에 대한 그리움',
+  aurelius:'먼저 떠나보낸 아이들, 끝나지 않는 전쟁터의 피로'
+};
+const bondLine=p=>{
+  const b=(state.bond&&state.bond[p.id])||{days:0};
+  const lvl=bondLvl(p.id);
+  let s='';
+  if(lvl===1) s='\n[관계: 상담자와 꽤 친해졌다(친구). 처음의 서먹함은 빼고 조금 더 편하고 스스럼없이 대하라. 말투의 골격은 유지하되 아주 조금 느슨해져도 좋다.]';
+  else if(lvl===2) s='\n[관계: 상담자와는 이제 단짝이다. 편하게 대하고, 아주 가끔은 묻지 않아도 네 개인적인 이야기를 지나가듯 먼저 꺼내도 좋다'+(BOND_PERSONAL[p.id]?' (예: '+BOND_PERSONAL[p.id]+')':'')+'. 단, 무겁지 않게. 말투의 골격은 유지하되 한결 편해진 티가 나도 좋다.]';
+  else if(lvl===3) s='\n[관계: 상담자와는 오랜 사이다. 굳이 잘 보이려 하지 않아도 되는 관계다. 가끔은 네 약한 모습이나 고민을 네가 먼저 꺼내도 좋고'+(BOND_PERSONAL[p.id]?' (예: '+BOND_PERSONAL[p.id]+')':'')+', 지난 대화를 지나가듯 회상해도 좋다. 생색과 갑작스러운 과잉 애정은 금물.]';
+  if(lvl>0) s+='\n[중요: "친밀도" "단계" "레벨" 같은 시스템 용어는 절대 입에 올리지 마라. 관계의 변화는 말투와 태도로만 은은히 드러나야 한다.]';
+  if(b.gap){ s+='\n[상담자가 약 '+b.gap+'일 만에 연락해 왔다. 반가움이든 서운함이든 네 성격대로 딱 한 번만 짧게 드러내고, 캐묻거나 죄책감을 주지 마라.]'; delete b.gap; }
+  if(b.days>0&&b.days%100===0&&b.said!==b.days&&b.lastDay===dayIdx()){ s+='\n[오늘로 상담자와 함께한 지 '+b.days+'일째다. 네 방식대로 딱 한 번, 지나가듯 담백하게 언급해도 좋다. 요란한 축하나 생색은 금지.]'; b.said=b.days; }
+  return s;
+};
 const nickLine=p=>state.nicks&&state.nicks[p.id]?`\n[상담자가 너를 '${state.nicks[p.id]}'(이)라고 부르기로 했다. 그 호칭을 자연스럽게 받아들여라.]`:'';
 const dispName=p=>(state.nicks&&state.nicks[p.id])||p.name;
 function nextEvent(p,t){
@@ -774,12 +858,14 @@ function nextEvent(p,t){
 }
 const selfLine=p=>{
   const pr=presence(p,Date.now());
+  const h=new Date().getHours();
+  const part=h<6?'새벽':h<11?'아침':h<14?'점심때':h<18?'오후':h<22?'저녁':'밤';
   const t=new Date().toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'});
-  return `\n[현재 시각: ${t} / 지금 너의 상태: ${pr.active?'활동 중':'자리 비움 직후'} — 이 사실과 어긋나는 자기 일과 언급(방금 잤다 등)을 지어내지 마라]`;
+  return `\n[현재 시각: ${t} (${part}) / 지금 너의 상태: ${pr.active?'활동 중':'자리 비움 직후'} — 이 시각과 시간대에 맞게 말해라. 어긋나는 식사·일과·수면 언급(새벽에 "점심 먹으려던 참" 등)을 지어내지 마라]`;
 };
 
 async function save(){
-  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{}});
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},dy:state.diary||[],db:state.deb||null});
   try{
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
@@ -795,7 +881,8 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; }
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; }
+    backfillBond();
   }catch(e){}
 }
 
@@ -1181,6 +1268,7 @@ $('prChat').onclick=()=>{
 function renderFriends(){
   const el=$('friends'); el.innerHTML='';
   if(!state.friends) return;
+  try{ el.appendChild(diaryCard()); }catch(e){}
   const mkRow=(html,onclick)=>{ const b=document.createElement('button'); b.className='friend'; b.innerHTML=html; b.onclick=onclick; el.appendChild(b); return b; };
 
   // 개인톡+단톡 통합, 고정(★) 우선 → 최신 메시지순
@@ -1425,6 +1513,7 @@ function send(){
   if(key[0]==='d'){
     const pid=curId(), p=P(pid);
     (state.chats[pid]=state.chats[pid]||[]).push({role:'user',content:v,t:now(),read:false});
+    markBondDay(pid);
     renderMsgs(); renderChips(); save();
     if(state.stage[key]==='gen'){ state.pendingAfter[key]=true; return; }
     delete state.sched[pid];
@@ -1438,10 +1527,11 @@ function send(){
     g.members.forEach(id=>{
       const pp=P(id), pr=presence(pp,tNow);
       const lastM=[...g.msgs].reverse().find(m=>m.who===id);
-      const hot=pr.active&&lastM&&(tNow-lastM.t<10*60000);
+      const hot=pr.active&&lastM&&(tNow-lastM.t<hotMs(id));
       reads[id]= hot? tNow+rnd(150,600) : pr.active? tNow+rnd(...pp.read) : pr.back+rnd(...pp.read)+rnd(0,60000);
     });
     g.msgs.push({who:'me',content:v,t:now(),reads});
+    g.members.forEach(markBondDay);
     renderMsgs(); renderChips(); save();
     if(state.stage[key]==='gen'){ state.pendingAfter[key]=true; return; }
     const tok=bumpToken(key);
@@ -1456,7 +1546,7 @@ function dmFlowStart(pid,key,tok){
   const p=P(pid), t=now(); let pr=presence(p,t); const q=p.quirks||{};
   const histH=state.chats[pid]||[];
   const lastA=[...histH].reverse().find(m=>m.role==='assistant');
-  const hotBase=!!(lastA&&(t-lastA.t<10*60000));
+  const hotBase=!!(lastA&&(t-lastA.t<hotMs(pid)));
   const punc=PUNCT[pid]!==undefined?PUNCT[pid]:.5;
   let note='';
   // 대화가 한창인데 일정이 막 시작됐다면, 느긋한 성격은 잠깐 미룬다 (수면 제외)
@@ -1487,7 +1577,21 @@ function dmFlowStart(pid,key,tok){
     readAt=t+rnd(15000,80000);
     replyAt=readAt+rnd(...p.reply)*0.6;
   }
-  else if(!pr.active){ readAt=pr.back+rnd(...p.read)+rnd(0,60000); replyAt=readAt+rnd(...p.reply); }
+  else if(!pr.active&&bondLvl(pid)>=2&&pr.since&&(!nA||nA.s!==pr.since)&&Math.random()<(pr.key==='sleep'?(bondLvl(pid)>=3?0.40:0.25):(bondLvl(pid)>=3?0.35:0.25))){
+    // 단짝/오랜사이 — 자다가도, 뭘 하다가도 그냥 무시가 안 된다 (이번 부재 창구에서 1회)
+    note=(pr.key==='sleep')
+      ?`(깊이 잠들어 있었는데 네 톡 진동에 깼다. 오래 알고 지낸 사이라 그런지 그냥 무시가 안 된다. 반쯤 잠긴 채 아주 짧게만 답하고, 다시 자러 간다고 해라. 말풍선 1개.)`
+      :`(지금 '${pr.label}' 중이지만, 상담자의 톡이라 잠깐 짬을 내 몰래 답장한다. 아주 짧게 답하고, 다시 하던 일로 돌아가야 한다는 티를 내라. 말풍선 1개.)`;
+    readAt=t+(pr.key==='sleep'?rnd(2*60000,12*60000):rnd(40000,4*60000));
+    replyAt=readAt+rnd(...p.reply)*0.7;
+    state.nAck[pid]={s:pr.since,u:replyAt+rnd(4*60000,8*60000)};
+  }
+  else if(!pr.active){
+    readAt=pr.back+rnd(...p.read)+rnd(0,60000); replyAt=readAt+rnd(...p.reply);
+    if(!note) note=(pr.key==='sleep')
+      ?`(상담자의 이 메시지는 네가 자는 동안 도착해 있었다. 너는 방금 일어나서 밀린 톡을 확인한 참이다 — 그 상황에 맞게 자연스럽게 답해라. "지금 자냐"류 질문이었다면 이미 아침/기상 후임을 반영해라. 시각이나 일과를 지어내지 마라.)`
+      :`(상담자의 이 메시지는 네가 '${pr.label}' 중일 때 도착했다. 지금 막 끝내고 돌아와 확인한 참이다 — 그 상황에 맞게 자연스럽게 답해라. 시각이나 일과를 지어내지 마라.)`;
+  }
   else if(mode==='ghost'){ readAt=t+rnd(...p.read); replyAt=readAt+rnd(...p.reply)*rnd(2.5,4); }
   else if(mode==='ignore'){ readAt=t+rnd(45000,110000); replyAt=readAt+rnd(...p.reply); }
   else if(hot){ readAt=t+rnd(150,600); replyAt=readAt+rnd(...p.reply)*0.55; }
@@ -1754,6 +1858,87 @@ function groupAPI(g,p,extra,noHist){
   return callClaude(sys,[{role:'user',content:user}]);
 }
 
+/* ================= 주간 철학 토론 ================= */
+const DEBATE_TOPICS=[
+ {t:'고생 끝에 낙이 온다는 말, 정말 맞을까',h:'nietzsche'},
+ {t:'싫어하는 사람에게서도 배울 게 있을까',h:'nietzsche'},
+ {t:'희망은 약일까 독일까',h:'schopenhauer'},
+ {t:'동물이 사람보다 나은 점은 뭘까',h:'schopenhauer'},
+ {t:'선의의 거짓말도 거짓말일까',h:'kant'},
+ {t:'아무도 안 볼 때의 나는 어떤 사람일까',h:'kant'},
+ {t:'행복은 강도일까 빈도일까',h:'epicurus'},
+ {t:'소소한 사치는 낭비일까 지혜일까',h:'epicurus'},
+ {t:'나는 나를 잘 알고 있을까',h:'socrates'},
+ {t:'아는 게 많은 것과 지혜로운 것은 다를까',h:'socrates'},
+ {t:'예의는 형식일까 마음일까',h:'confucius'},
+ {t:'좋은 어른이란 어떤 사람일까',h:'confucius'},
+ {t:'쓸모없는 시간이 정말 쓸모없을까',h:'zhuangzi'},
+ {t:'꿈이 현실보다 못하다고 할 수 있을까',h:'zhuangzi'},
+ {t:'선택은 왜 이렇게 두려울까',h:'kierkegaard'},
+ {t:'남들과 같아지고 싶으면서 달라지고도 싶은 마음, 뭘까',h:'kierkegaard'},
+ {t:'통제할 수 없는 일에 왜 화가 날까',h:'aurelius'},
+ {t:'아침에 일어나기 싫은 날, 그래도 일어나는 이유는 뭘까',h:'aurelius'},
+ {t:'돈으로 행복을 어디까지 살 수 있을까'},
+ {t:'삶을 결정하는 건 운일까 노력일까'},
+ {t:'용서는 누구를 위한 걸까'},
+ {t:'평범하게 사는 것도 성공일까'},
+ {t:'착하게 살면 손해일까'},
+ {t:'후회 없는 삶은 가능할까'},
+ {t:'남과 비교하지 않고 살 수 있을까'},
+ {t:'일은 밥벌이일까 자아실현일까'},
+ {t:'혼자가 편한 건 문제일까'},
+ {t:'우정에도 유통기한이 있을까'},
+ {t:'쉬면서도 죄책감이 드는 건 왜일까'},
+ {t:'시간은 왜 갈수록 빨리 갈까'},
+ {t:'취향은 타고나는 걸까 만들어지는 걸까'},
+ {t:'어른이 된다는 건 뭘까'},
+ {t:'질투는 나쁘기만 한 걸까'},
+ {t:'기억은 얼마나 믿을 만할까'},
+ {t:'결과가 좋으면 과정은 상관없을까'},
+ {t:'행복해야 한다는 압박도 스트레스일까'}
+];
+async function maybeDebate(){
+  state.deb=state.deb||{done:[],last:0};
+  if(!state.friends||!state.friends.length) return;
+  if(state.deb.last&&now()-state.deb.last<7*86400000) return;
+  const hNow=new Date().getHours(); if(hNow<10||hNow>=22) return;
+  let pool=DEBATE_TOPICS.map((_,i)=>i).filter(i=>!(state.deb.done||[]).includes(i));
+  if(!pool.length){ state.deb.done=[]; pool=DEBATE_TOPICS.map((_,i)=>i); }
+  // 방 선택: 활동 중 멤버 2+인 기존 방(최근 대화순) → 없으면 새로 개설
+  let g=state.groups.filter(x=>x.members.filter(id=>presence(P(id),now()).active).length>=2)
+        .sort((a,b)=>{const la=a.msgs[a.msgs.length-1],lb=b.msgs[b.msgs.length-1];return (lb?lb.t:0)-(la?la.t:0);})[0]||null;
+  let actIds, fresh=null;
+  if(g) actIds=g.members.filter(id=>presence(P(id),now()).active);
+  else{
+    actIds=state.friends.filter(id=>presence(P(id),now()).active);
+    if(actIds.length<2) return; // 지금은 여건이 안 됨 — 다음 기회에 재시도
+  }
+  const aff=pool.filter(i=>DEBATE_TOPICS[i].h&&actIds.includes(DEBATE_TOPICS[i].h));
+  const ti=(aff.length&&Math.random()<0.6)?aff[Math.floor(Math.random()*aff.length)]:pool[Math.floor(Math.random()*pool.length)];
+  const tp=DEBATE_TOPICS[ti];
+  const hostId=(tp.h&&actIds.includes(tp.h))?tp.h:actIds[Math.floor(Math.random()*actIds.length)];
+  if(!g){
+    const others=actIds.filter(x=>x!==hostId).sort(()=>Math.random()-.5);
+    const pick=[hostId,others[0]];
+    g=state.groups.find(x=>pick.every(i2=>x.members.includes(i2)));
+    if(!g){ g={id:'g'+now(),members:pick,msgs:[]}; state.groups.push(g); fresh=g.id; }
+  }
+  const key='g:'+g.id;
+  const secondId=g.members.filter(x=>x!==hostId&&presence(P(x),now()).active)[0]||g.members.find(x=>x!==hostId);
+  try{
+    const a=P(hostId), b=P(secondId);
+    const t1=await groupAPI(g,a,`(오늘은 주간 철학 토론 날 — 네가 이 방에 토론 거리를 던질 차례다. 오늘의 주제: "${tp.t}". ${fresh?'네가 방금 이 방을 만들어 사람들을 불렀으니 짧은 개설 인사 후에 시작해라. ':''}강의하지 말고, 일상의 언어로 가볍게 주제를 꺼내며 네 입장을 반 발짝만 보여줘라. 다른 사람들 생각이 궁금하다는 톤으로 판을 깔아라. 말풍선 1~2개.)`);
+    g.msgs.push({who:a.id,content:t1,t:now(),reads:mkReadsFor(g,a.id)});
+    state.unread[key]=(state.unread[key]||0)+t1.split(/\|{2,}/).length;
+    const t2=await groupAPI(g,b,`(방금 나온 토론 주제("${tp.t}")에 네 사상의 입장에서 짧게 맞받아쳐라 — 동의든 반박이든 분명하게. 마지막엔 상담자의 생각도 슬쩍 물어라. 말풍선 1~2개.)`);
+    g.msgs.push({who:b.id,content:t2,t:now(),reads:mkReadsFor(g,b.id)});
+    state.unread[key]=(state.unread[key]||0)+t2.split(/\|{2,}/).length;
+    (state.deb.done=state.deb.done||[]).push(ti);
+    state.deb.last=now(); state.lastEvent=now();
+    renderFriends();
+  }catch(e){ if(fresh) state.groups=state.groups.filter(x=>x.id!==fresh); }
+}
+
 /* ================= 부재중 답장 + 선톡 ================= */
 async function catchUp(){
   if(!state.friends) return;
@@ -1867,8 +2052,86 @@ async function catchUp(){
       }
     }
   }
+  try{ await maybeDebate(); }catch(e){}
+  try{ diaryTick(); }catch(e){}
   save();
 }
+
+/* ================= 한 줄 일기 + 소프트 퀘스트 ================= */
+let diaryDraft='', diaryBusy=false;
+const todayDiary=()=> (state.diary||[]).find(x=>x.d===dayIdx());
+function diaryCard(){
+  const box=document.createElement('div'); box.className='dy-card';
+  const e=todayDiary();
+  if(!e){
+    box.innerHTML=`<div class="dy-head">🖋 ${T.dyTitle}<span class="dy-past" id="dyPastBtn">${T.dyPast}</span></div>
+    <div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
+    const inp=box.querySelector('#dyIn');
+    if(inp){ inp.value=diaryDraft; inp.oninput=()=>{diaryDraft=inp.value;}; inp.onkeydown=ev=>{ if(ev.key==='Enter'){ const b=box.querySelector('#dyGo'); if(b) b.click(); } }; }
+    const go=box.querySelector('#dyGo'); if(go) go.onclick=()=>{ if(inp) saveDiary(inp.value); };
+  }else{
+    const p=e.pid?P(e.pid):null;
+    box.innerHTML=`<div class="dy-head">🖋 ${T.dyTitle}<span class="dy-past" id="dyPastBtn">${T.dyPast}</span></div>
+    <div class="dy-mine">${escapeH(e.text)}</div>
+    ${(e.c&&p)?`<div class="dy-re"><div class="avatar">${av(e.pid)}</div><div class="dy-re-txt"><b>${escapeH(dispName(p))}</b>${escapeH(e.c)}
+      ${e.q?`<div class="dy-q">🎯 ${T.dyQuest}: ${escapeH(e.q)} ${e.qd?'✓':`<button class="dy-done" id="dyDoneBtn">${T.dyDoneBtn}</button>`}</div>`:''}
+      ${e.qr?`<div class="dy-qr">${escapeH(e.qr)}</div>`:''}</div></div>`:''}`;
+    const db=box.querySelector('#dyDoneBtn'); if(db) db.onclick=doneQuest;
+  }
+  const pb=box.querySelector('#dyPastBtn'); if(pb) pb.onclick=openDiaryHist;
+  return box;
+}
+function saveDiary(v){
+  v=(v||'').trim(); if(!v) return;
+  const e=todayDiary(); if(e) return;
+  (state.diary=state.diary||[]).push({d:dayIdx(),t:now(),text:v.slice(0,120)});
+  diaryDraft='';
+  renderFriends(); save();
+  setTimeout(genDiaryComment,rnd(20000,120000));
+}
+function diaryTick(){ const e=todayDiary(); if(e&&!e.c&&!diaryBusy&&now()-e.t>25000) genDiaryComment(); }
+async function genDiaryComment(){
+  const e=todayDiary(); if(!e||e.c||diaryBusy) return;
+  const cand=(state.friends||[]).filter(id=>P(id)); if(!cand.length) return;
+  diaryBusy=true;
+  try{
+    const w=cand.map(id=>1+Math.min(20,((state.chats[id]||[]).filter(m=>m.role==='user').length)));
+    let r=Math.random()*w.reduce((a,b)=>a+b,0), pid=cand[cand.length-1];
+    for(let i=0;i<cand.length;i++){ r-=w[i]; if(r<=0){ pid=cand[i]; break; } }
+    const p=P(pid);
+    const askQ=Math.random()<0.35;
+    const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)+'\n\n[특별 임무: 한 줄 일기 답글] 상담자가 오늘 남긴 한 줄 일기에 네가 짧은 답글을 단다. 대화가 아니라 답글이다 — 말풍선 규칙(|||)은 무시하고 1~3문장으로. 그 한 줄을 넘겨짚어 확대해석하거나 훈계·상담 모드로 가지 마라. 감정을 수치·등급·퍼센트로 표현하지 마라. 오늘 이전의 일기나 예전 미션의 이행 여부는 절대 언급하지 마라.'+(askQ?'\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {"comment":"답글","quest":"내일까지 부담 없이 해볼 수 있는 아주 작고 구체적인 일 하나(20자 내외). 의무가 아니라 가벼운 제안 톤. 운동량·식사량 등 수치 목표 금지"}':'\n반드시 아래 JSON으로만 답하라(백틱·설명 금지): {"comment":"답글"}');
+    let text=await callClaude(sys,[{role:'user',content:'[오늘의 한 줄] '+e.text}]);
+    text=text.replace(/```json|```/g,'').trim();
+    const s0=text.indexOf('{'), s1=text.lastIndexOf('}');
+    const d=JSON.parse(text.slice(s0,s1+1));
+    if(!d.comment) throw new Error('bad');
+    e.pid=pid; e.c=String(d.comment).slice(0,220);
+    if(askQ&&d.quest) e.q=String(d.quest).slice(0,60);
+    save(); renderFriends();
+    localNotify(dispName(p),e.c.slice(0,60));
+  }catch(err){}
+  diaryBusy=false;
+}
+async function doneQuest(){
+  const e=todayDiary(); if(!e||!e.q||e.qd) return;
+  e.qd=1; save(); renderFriends();
+  try{
+    const p=P(e.pid); if(!p) return;
+    const sys=p.prompt+COMMON+bondLine(p)+nickLine(p)+'\n\n[특별 임무] 상담자가 네가 제안한 작은 미션("'+e.q+'")을 해냈다고 알려왔다. 네 말투로 짧게, 그러나 진심으로 크게 반겨라. 1~2문장. JSON·말풍선 구분자 없이 일반 텍스트로만.';
+    let t=await callClaude(sys,[{role:'user',content:'(미션 완료를 알림)'}]);
+    e.qr=String(t).replace(/\|{2,}/g,' ').trim().slice(0,160);
+    save(); renderFriends();
+  }catch(err){}
+}
+function openDiaryHist(){
+  const list=[...(state.diary||[])].sort((a,b)=>b.d-a.d);
+  const body=$('dyBody'); if(!body) return;
+  body.innerHTML=`<div class="lt-eyebrow">CHEOLKK DIARY</div><div class="lt-title">${T.dyHist}</div>`+
+   (list.length?list.map(e=>`<div class="dy-h-item"><div class="dy-h-date">${new Date(e.t).toLocaleDateString(LANG==='en'?'en-US':'ko-KR')}</div><div class="dy-h-txt">${escapeH(e.text)}</div>${(e.c&&e.pid)?`<div class="dy-h-re">↳ ${escapeH(dispName(P(e.pid)))}: ${escapeH(e.c)}</div>`:''}${e.q?`<div class="dy-h-re">🎯 ${escapeH(e.q)} ${e.qd?'✓':''}</div>`:''}</div>`).join(''):`<div class="dy-h-txt">${T.dyEmpty}</div>`);
+  const ov=$('diaryOv'); if(ov) ov.classList.add('on');
+}
+(()=>{ const c=$('dyClose'); if(c) c.onclick=()=>{ const ov=$('diaryOv'); if(ov) ov.classList.remove('on'); }; })();
 
 /* ================= 큐브 탭 ================= */
 const ROW_CAPS=LANG==='en'?['🔥 Tough-love row — hits & sorts you out','🤲 Warmth row — accepts & asks','🌙 Calm row — settles you down']:['🔥 팩폭 라인 — 때리고 정리하는 줄','🤲 온기 라인 — 받아주고 묻는 줄','🌙 고요 라인 — 가라앉히는 줄'];
@@ -1964,7 +2227,7 @@ function collectStats(fromT,toT){
   const sample=myMsgs.sort(()=>Math.random()-.5).slice(0,30).sort((a,b)=>a.t-b.t);
   return {perPid,pids,authorPid:pids[0]||null,myMsgs:sample,myCount:myMsgs.length,total,night,busiest,withN:pids.length,firstT:(firstT===Infinity?null:firstT)};
 }
-async function makeLetter(id,label,st,period){
+async function makeLetter(id,label,st,period,theme){
   period=period||'지난 한 달';
   if(mailGen||!st.authorPid) return;
   mailGen=true; if($('mailView').style.display!=='none') renderMail();
@@ -1972,7 +2235,7 @@ async function makeLetter(id,label,st,period){
     const p=P(st.authorPid);
     const others=st.pids.filter(x=>x!==st.authorPid&&st.perPid[x].mine>=2).slice(0,5);
     const prevWithReply=[...state.mail].reverse().find(m=>m.myReply&&m.myReply.trim());
-    const sys=p.prompt+COMMON+`\n\n[특별 임무: 월간 편지]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: ${period}. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 한 달의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음 달을 여는 질문 하나","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 우편함을 확인해보라는 뉘앙스)","ps":[${others.length?'{"id":"철학자id","text":"그 철학자 말투의 1문장 쪽지"}':''}]}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 '자신의' 사상과 말투로만 쓴다 — 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)를 남의 쪽지에 절대 섞지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 우편함의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.`;
+    const sys=p.prompt+COMMON+`\n\n[특별 임무: 월간 편지]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: ${period}. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 한 달의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음 달을 여는 질문 하나","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 우편함을 확인해보라는 뉘앙스)","ps":[${others.length?'{"id":"철학자id","text":"그 철학자 말투의 1문장 쪽지"}':''}]}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 '자신의' 사상과 말투로만 쓴다 — 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)를 남의 쪽지에 절대 섞지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 우편함의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.`+(theme||'');
     const user=`[기간] ${label}\n[통계] 대화 ${st.total}회, 심야(밤10시~새벽6시) 대화 ${st.night}회, 가장 붐빈 날 ${st.busiest[0]}(${st.busiest[1]}개), 함께한 철학자 ${st.withN}명\n[너와의 통계] 상담자와 너의 대화 ${Math.round((st.perPid[st.authorPid]||{}).mine||0)}회, 그중 심야 ${(st.perPid[st.authorPid]||{}).night||0}회\n[철학자별 대화량] ${st.pids.map(x=>P(x).name+':'+Math.round(st.perPid[x].mine)).join(', ')}\n[상담자의 문장들]\n${st.myMsgs.map(m=>'- ('+m.to+'에게) '+m.text).join('\n')}\n${prevWithReply?'[지난 편지에 남긴 상담자의 답장] '+prevWithReply.myReply.slice(0,300):''}\n[쪽지 철학자 목록] ${others.map(x=>P(x).name+'('+x+') 말투: '+(VOICE[x]||'')).join(' / ')||'(없음)'}`;
     let text=await callClaude(sys,[{role:'user',content:user}]);
     text=text.replace(/```json|```/g,'').trim();
@@ -2005,9 +2268,30 @@ async function checkMail(){
       if(st.myCount>=20&&st.firstT&&(now()-st.firstT)>=24*3600*1000){
         const days=Math.max(1,Math.min(30,Math.ceil((now()-st.firstT)/86400000)));
         await makeLetter('first',T.firstLabel,st,'함께한 지난 '+days+'일');
+        return;
       }
     }
+    await mileMail();
   }catch(e){}
+}
+async function mileMail(){
+  const bs=state.bond||{};
+  for(const pid in bs){
+    const b=bs[pid]; if(!b||!b.mile) continue;
+    const p=P(pid); if(!p){ delete b.mile; continue; }
+    const mid='c100:'+pid+':'+b.mile;
+    if(state.mail.find(m=>m.id===mid)){ delete b.mile; continue; }
+    const st=collectStats(now()-100*86400000,now()+1);
+    if(!st.pids.length){ delete b.mile; continue; }
+    st.authorPid=pid;
+    const nm=dispName(p), lc=nm.charCodeAt(nm.length-1);
+    const josa=(lc>=0xAC00&&lc<=0xD7A3&&((lc-0xAC00)%28)>0)?'과':'와';
+    const label=LANG==='en'?(b.mile+' days with '+nm):(nm+josa+' 함께한 '+b.mile+'일');
+    const theme='\n\n[기념 편지 모드] 이 편지는 월간 회고가 아니라, 상담자와 네가 함께 이야기해온 지 '+b.mile+'일이 된 것을 기념하는 편지다. greeting에는 이 날들을 함께 지나온 소회를 네 방식대로 담담하게 담아라. 숫자 자랑·생색·과장 금지. next_question은 앞으로의 나날을 여는 질문으로. 기간 표현은 "함께한 '+b.mile+'일"의 맥락에 맞게 써라.';
+    await makeLetter(mid,label,st,'상담자와 함께한 '+b.mile+'일(통계는 최근 100일 기준)',theme);
+    if(state.mail.find(m=>m.id===mid)) delete b.mile;
+    break;
+  }
 }
 function updateMailDot(){
   const anyUnread=(state.mail||[]).some(m=>!m.read);
@@ -2164,19 +2448,32 @@ async function saveLetterCard(l){
     const dd=new Date(l.t);
     x.fillText('FOR YOU · '+dd.getFullYear()+'. '+(dd.getMonth()+1)+'. '+dd.getDate(),W/2,H-92);
     // 저장/공유
-    cv.toBlob(async blob=>{
-      const file=new File([blob],'cheolkk_letter.png',{type:'image/png'});
-      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-        try{ await navigator.share({files:[file]}); return; }catch(e){}
-      }
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download='cheolkk_letter_'+l.id+'.png';
-      a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-    },'image/png');
+    cv.toBlob(blob=>{
+      curCard={blob,name:'cheolkk_letter_'+l.id+'.jpg'};
+      if(curCard.url) URL.revokeObjectURL(curCard.url);
+      curCard.url=URL.createObjectURL(blob);
+      $('cpImg').src=curCard.url;
+      $('cpShare').textContent=T.cpShare;
+      $('cpDown').textContent=T.cpDown;
+      $('cardPrev').classList.add('on');
+    },'image/jpeg',0.92);
   }catch(e){ alert('카드 생성 실패: '+((e&&e.message)||e)); }
 }
+let curCard=null;
+$('cpClose').onclick=()=>$('cardPrev').classList.remove('on');
+$('cpShare').onclick=async()=>{
+  if(!curCard) return;
+  const file=new File([curCard.blob],curCard.name,{type:'image/jpeg'});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file]}); return; }catch(e){}
+  }
+  $('cpDown').click();
+};
+$('cpDown').onclick=()=>{
+  if(!curCard) return;
+  const a=document.createElement('a');
+  a.href=curCard.url; a.download=curCard.name; a.click();
+};
 $('ltClose').onclick=()=>$('letter').classList.remove('on');
 
 /* ================= 환영 화면 (로그인·알림 안내) ================= */
@@ -2281,7 +2578,7 @@ async function initialSync(){
 async function cloudPush(){
   if(!sb||!sbUser) return;
   try{
-    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks,pins:state.pins||{},mail:state.mail||[]},updated_at:new Date().toISOString()});
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks,pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},dy:state.diary||[],db:state.deb||null},updated_at:new Date().toISOString()});
     if(error) throw error;
     syncState.err=''; syncState.last=now();
   }catch(e){ syncState.err=(e&&e.message)||String(e); }
