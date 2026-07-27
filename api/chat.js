@@ -1,14 +1,19 @@
-// 철크크 — Gemini API 중계 함수 (진단 v2)
+// 철크크 — Gemini API 중계 함수 (진단 v2 + 모델 라우팅 v1)
 // 브라우저로 /api/chat 을 열면(GET) 설정 상태와 구글 연결 테스트 결과를 보여줍니다.
-// 환경변수: GEMINI_API_KEY (필수), GEMINI_MODEL (선택, 기본 gemini-3.1-flash-lite)
+// 환경변수: GEMINI_API_KEY (필수)
+//           GEMINI_MODEL (선택, 기본 gemini-3.1-flash-lite — 깊은 대화용)
+//           GEMINI_MODEL_LITE (선택, 기본 gemini-2.5-flash-lite — 짧은 리액션용)
+// 라우팅: 클라이언트가 body.tier==='lite'를 보내면 라이트 모델 사용(허용 목록 방식 — 임의 모델명은 받지 않음)
 export default async function handler(req, res) {
   const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const modelLite = process.env.GEMINI_MODEL_LITE || 'gemini-2.5-flash-lite';
   const key = process.env.GEMINI_API_KEY || '';
   /* ---------- 진단 모드 ---------- */
   if (req.method === 'GET') {
     const info = {
       진단: '철크크 API 상태 점검',
       모델: model,
+      라이트_모델: modelLite,
       키_존재: !!key,
       키_미리보기: key ? key.slice(0, 4) + '...(' + key.length + '자)' : '(없음)'
     };
@@ -48,36 +53,39 @@ export default async function handler(req, res) {
   /* ---------- 실제 대화 중계 ---------- */
   if (req.method !== 'POST') { res.status(405).json({ error: 'method' }); return; }
   try {
-    const { system, messages } = req.body || {};
+    const { system, messages, tier } = req.body || {};
     if (!key) { console.error('[chat] no_key'); res.status(500).json({ error: 'no_key' }); return; }
+    // 허용 목록 라우팅: 'lite'일 때만 라이트 모델, 그 외 전부 기본 모델
+    const useModel = tier === 'lite' ? modelLite : model;
+    const maxTok = tier === 'lite' ? 400 : 1000;
     const contents = (messages || []).slice(-30).map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: String(m.content || '') }]
     }));
     if (!contents.length) contents.push({ role: 'user', parts: [{ text: '(대화 시작)' }] });
     const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${useModel}:generateContent?key=${key}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: String(system || '') }] },
           contents,
-          generationConfig: { maxOutputTokens: 1000, temperature: 1.0 }
+          generationConfig: { maxOutputTokens: maxTok, temperature: 1.0 }
         })
       }
     );
     const data = await r.json();
     if (!r.ok) {
       const msg = data.error && data.error.message;
-      console.error('[chat] upstream', r.status, msg);
+      console.error('[chat] upstream', r.status, useModel, msg);
       res.status(502).json({ error: 'upstream', detail: msg });
       return;
     }
     const cand = (data.candidates || [])[0];
     const text = cand && cand.content && cand.content.parts
       ? cand.content.parts.map(p => p.text || '').join('').trim() : '';
-    if (!text) { console.error('[chat] empty', JSON.stringify(data).slice(0, 300)); res.status(502).json({ error: 'empty' }); return; }
+    if (!text) { console.error('[chat] empty', useModel, JSON.stringify(data).slice(0, 300)); res.status(502).json({ error: 'empty' }); return; }
     res.status(200).json({ text });
   } catch (e) {
     console.error('[chat] crash', e);
