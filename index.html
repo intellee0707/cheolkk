@@ -352,15 +352,15 @@
 .ad-note{margin-top:14px;font-size:11.5px;color:var(--paper-dim)}
 #cardPrev{z-index:30} /* 편지(z:20) 위에 카드 미리보기가 뜨도록 */
 .sub-hook{margin:10px 0 16px;padding:12px 14px;border-left:2px solid var(--candle);background:var(--ink);border-radius:0 10px 10px 0;font-size:13px;line-height:1.65;color:var(--paper);font-family:var(--serif)}
-.f-tags{font-size:10px;color:var(--candle);opacity:.75;margin-left:7px;font-weight:400;letter-spacing:.02em}
-.pr-spec{margin:14px 18px 0;padding:11px 13px;border:1px dashed var(--ink-line);border-radius:12px;text-align:left}
+.f-tags{font-size:12.5px;color:var(--candle);opacity:.95;margin-left:8px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.pr-spec{margin:16px 18px 0;padding:11px 13px;border:1px dashed var(--ink-line);border-radius:12px;text-align:left}
 .pr-spec-t{font-size:11px;color:var(--candle);font-weight:700;letter-spacing:.06em;margin-bottom:6px}
 .pr-spec-d{font-size:12.5px;color:var(--paper);line-height:1.6}
 .pr-spec-tags{margin-top:7px;font-size:11px;color:var(--paper-dim)}
 body{word-break:keep-all;overflow-wrap:break-word}
 .f-spec{font-size:11px;color:var(--candle);opacity:.8;letter-spacing:.02em;margin-top:1px}
 .gtag{font-size:9.5px;color:var(--candle);opacity:.8;margin-top:2px}
-.cube-spec{display:block;margin-top:6px;font-size:12px;color:var(--paper);line-height:1.55}
+.cube-spec{display:block;margin-top:16px;font-size:12px;color:var(--paper);line-height:1.55}
 .me-card{margin:10px 14px 4px;padding:12px 14px;border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-soft);display:flex;align-items:center;gap:11px;cursor:pointer;width:calc(100% - 28px);text-align:left;color:var(--paper);font-family:var(--sans)}
 .me-emoji{font-size:26px}
 .me-name{font-size:14.5px;font-weight:700}
@@ -451,9 +451,9 @@ select.me-in{appearance:auto}
       <button class="nick-btn" id="prNick">✏️ 별명 짓기</button>
       <div class="pr-status" id="prStatus"></div>
       <div class="pr-desc" id="prDesc"></div>
-      <div class="pr-spec" id="prSpec"></div>
       <div class="tl" id="prTimeline"></div>
       <div class="pr-sched" id="prSched"></div>
+      <div class="pr-spec" id="prSpec"></div>
     </div>
     <div class="pr-foot"><button class="ov-go" id="prChat">채팅하기</button></div>
   </div>
@@ -1408,8 +1408,7 @@ function renderFriends(){
     if(it.kind==='d'){
       const id=it.id, p=P(id), last=it.last, pr=presence(p,now()), key=it.key;
       rowEl=mkRow(`<div class="avwrap"><div class="avatar">${av(id)}</div><span class="dot${pr.active?'':' off'}"></span></div>
-      <div class="f-mid"><div class="f-name">${dispName(p)}</div>
-        <div class="f-spec">${specTags(id)}</div>
+      <div class="f-mid"><div class="f-name">${dispName(p)}<span class="f-tags">${specTags(id)}</span></div>
         ${last?`<div class="f-preview">${escapeH((splitBubbles(last.content).pop()||'').slice(0,34))}</div>`:''}</div>
       <div class="f-right">${last?`<div class="f-time">${fmtT(last.t)}</div>`:''}
         ${state.unread[key]?`<div class="badge">${state.unread[key]}</div>`:''}</div>${pinHTML(key)}`,
