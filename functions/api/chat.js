@@ -1,82 +1,95 @@
-// 철크크 API 중계 v2 (자가진단 포함)
-// GitHub의 functions/api/chat.js 내용을 이걸로 전체 교체하세요.
-// 브라우저에서 /api/chat?test=1 을 열면 상태를 알려줍니다.
+// 철크크 — Gemini API 중계 (Cloudflare Pages Functions, 진단 v2 + 모델 라우팅 v1)
+// 브라우저로 /api/chat?test=1 을 열면 설정 상태와 구글 연결 테스트 결과를 보여줍니다.
+// 환경변수: GEMINI_API_KEY (필수)
+//           GEMINI_MODEL (선택, 기본 gemini-3.1-flash-lite — 깊은 대화용)
+//           GEMINI_MODEL_LITE (선택, 기본 gemini-2.5-flash-lite — 짧은 리액션용)
+// 라우팅: 클라이언트가 body.tier==='lite'를 보내면 라이트 모델 사용(허용 목록 방식 — 임의 모델명은 받지 않음)
+const J = (obj, status = 200) =>
+  new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
-export async function onRequestGet(context) {
-  const key = (context.env.GEMINI_API_KEY || '').trim();
-  const model = context.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
-  const info = {
-    ok: true,
-    functionAlive: true,
-    keySet: !!key,
-    keyLength: key ? key.length : 0,
-    keyPrefix: key ? key.slice(0, 5) : '',
-    model
-  };
-
-  const url = new URL(context.request.url);
-  if (url.searchParams.get('test') === '1' && key) {
-    try {
-      const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: '안녕이라고 한 단어로만 답해' }] }] })
-        }
-      );
-      info.geminiStatus = r.status;
-      const t = await r.text();
-      info.geminiSays = t.slice(0, 300);
-    } catch (e) {
-      info.geminiError = String((e && e.message) || e);
+async function callGemini(env, model, body) {
+  return fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
+      body: JSON.stringify(body)
     }
-  }
-  return json(info);
+  );
 }
 
-export async function onRequestPost(context) {
-  try {
-    const { system, messages } = await context.request.json();
-    const key = (context.env.GEMINI_API_KEY || '').trim();
-    const model = context.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
-    if (!key) return json({ error: 'GEMINI_API_KEY missing' }, 500);
+export async function onRequest(context) {
+  const { request, env } = context;
+  const model = env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const modelLite = env.GEMINI_MODEL_LITE || 'gemini-2.5-flash-lite';
+  const key = env.GEMINI_API_KEY || '';
 
-    const contents = (messages || []).map(m => ({
+  /* ---------- 진단 모드 (GET 또는 ?test=1) ---------- */
+  if (request.method === 'GET') {
+    const info = {
+      진단: '철크크 API 상태 점검 (Cloudflare)',
+      모델: model,
+      라이트_모델: modelLite,
+      키_존재: !!key,
+      키_미리보기: key ? key.slice(0, 4) + '...(' + key.length + '자)' : '(없음)'
+    };
+    if (!key) {
+      info.결론 = '이 프로젝트에 GEMINI_API_KEY 환경변수가 없습니다.';
+      return J(info);
+    }
+    try {
+      const r = await callGemini(env, model, {
+        contents: [{ role: 'user', parts: [{ text: '테스트입니다. 한 단어로만 답하세요.' }] }],
+        generationConfig: { maxOutputTokens: 30 }
+      });
+      const d = await r.json();
+      if (r.ok) {
+        info.구글_연결 = '성공 ✅';
+        info.테스트_응답 = (((d.candidates || [])[0] || {}).content?.parts || []).map(p => p.text).join('').trim();
+        info.결론 = '모든 설정이 정상입니다.';
+      } else {
+        info.구글_연결 = '실패 (' + r.status + ')';
+        info.구글_에러_원문 = d.error ? (d.error.status + ': ' + d.error.message) : JSON.stringify(d);
+        info.결론 = '구글이 요청을 거절했습니다. 위의 구글_에러_원문을 확인하세요.';
+      }
+    } catch (e) {
+      info.구글_연결 = '네트워크 오류';
+      info.구글_에러_원문 = String((e && e.message) || e);
+    }
+    return J(info);
+  }
+
+  /* ---------- 실제 대화 중계 ---------- */
+  if (request.method !== 'POST') return J({ error: 'method' }, 405);
+  try {
+    const { system, messages, tier } = await request.json().catch(() => ({}));
+    if (!key) { console.error('[chat] no_key'); return J({ error: 'no_key' }, 500); }
+    // 허용 목록 라우팅: 'lite'일 때만 라이트 모델, 그 외 전부 기본 모델
+    const useModel = tier === 'lite' ? modelLite : model;
+    const maxTok = tier === 'lite' ? 400 : 1000;
+    const contents = (messages || []).slice(-30).map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: String(m.content || '') }]
     }));
-
-    const body = {
-      contents,
+    if (!contents.length) contents.push({ role: 'user', parts: [{ text: '(대화 시작)' }] });
+    const r = await callGemini(env, useModel, {
       systemInstruction: { parts: [{ text: String(system || '') }] },
-      generationConfig: { temperature: 0.9, maxOutputTokens: 1000 }
-    };
-
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) }
-    );
-
-    if (!r.ok) {
-      const t = await r.text();
-      return json({ error: 'gemini ' + r.status, detail: t.slice(0, 300) }, 502);
-    }
-
+      contents,
+      generationConfig: { maxOutputTokens: maxTok, temperature: 1.0 }
+    });
     const data = await r.json();
-    const text = ((((data.candidates || [])[0] || {}).content || {}).parts || [])
-      .map(p => p.text || '').join('');
-
-    if (!text) return json({ error: 'empty', detail: JSON.stringify(data).slice(0, 300) }, 502);
-    return json({ text });
+    if (!r.ok) {
+      const msg = data.error && data.error.message;
+      console.error('[chat] upstream', r.status, useModel, msg);
+      return J({ error: 'upstream', detail: msg }, 502);
+    }
+    const cand = (data.candidates || [])[0];
+    const text = cand && cand.content && cand.content.parts
+      ? cand.content.parts.map(p => p.text || '').join('').trim() : '';
+    if (!text) { console.error('[chat] empty', useModel, JSON.stringify(data).slice(0, 300)); return J({ error: 'empty' }, 502); }
+    return J({ text });
   } catch (e) {
-    return json({ error: String((e && e.message) || e) }, 500);
+    console.error('[chat] crash', e);
+    return J({ error: String((e && e.message) || e) }, 500);
   }
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj, null, 2), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
-  });
 }
