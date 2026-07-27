@@ -389,6 +389,8 @@ select.me-in{appearance:auto}
 .ci-spec{margin-top:6px;font-size:12.5px;color:var(--paper);line-height:1.65}
 .ci-traits{margin-top:11px}
 .cube-cap:empty{display:none}
+.wc-note{margin-top:9px;font-size:11.5px;color:var(--candle);line-height:1.6;text-align:center;opacity:.9}
+.wc-warn{margin-top:12px;font-size:11px;color:var(--paper-dim);line-height:1.7;text-align:center;padding:0 6px}
 </style>
 </head>
 <body>
@@ -476,6 +478,7 @@ select.me-in{appearance:auto}
         <div class="st-acc-line" id="wcLoginT"></div>
         <div class="st-acc-sub" id="wcLoginD"></div>
         <button class="ov-go" id="wcLoginBtn"></button>
+        <div class="wc-note" id="wcTrialNote"></div>
       </div>
       <div class="st-card" id="wcPushCard">
         <div class="st-acc-line" id="wcPushT"></div>
@@ -483,6 +486,7 @@ select.me-in{appearance:auto}
         <button class="ov-go" id="wcPushBtn"></button>
       </div>
       <button class="wc-later" id="wcLater"></button>
+      <div class="wc-warn" id="wcGuestWarn"></div>
     </div>
   </div>
 
@@ -693,7 +697,7 @@ if(LANG==='en'){
 
 const T=LANG==='en'?{
  docTitle:'CheolKK — Group Chat of Dead Philosophers',dyTitle:'One line today',dyPh:'Anything, one line at a time...',dySave:'Save',dyPast:'Drawer',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dyHist:'One-line Diary',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyMore:n=>'+'+n+' more — see the drawer',dyNoDay:'Nothing on this day.',dyCap:'Thoughts, feelings, goals, resolutions — one line each, and the philosophers reply',dyToggle:n=>'Show today ('+n+')',dyFold:'Fold',brand:'CheolKK',eyebrow:'GROUP CHAT OF DEAD PHILOSOPHERS',
- tabChat:'Chats',trialBadge:n=>'🔓 Free trial: '+n+' days left — everything is unlocked',freeBadge:l=>'💬 '+l+' bubbles left this week · tap for more',paidLow:l=>'💬 '+l+' bubbles left this month',limitT:'Out of bubbles this week',limitTP:'Out of bubbles this month',limitDP:'You made the most of this month.\nTop up 100 for 990 won, or a fresh 1,000 arrives on the 1st.',topupBtn:'⚡ Top up 100 bubbles · ₩990',topupNote:'Topped-up bubbles never expire — they roll over.',specT:'When to knock',cubeCap:'Rows are temperature, columns are method. Tap to compare.',meTitle:'My Profile',meBasic:'Basics',meMake:'Create my profile',meNameL:'Name',meNamePh:'What philosophers call you',meGenderL:'Gender',meG0:'Prefer not to say',meG1:'Female',meG2:'Male',meBirthL:'Birthday',meSave:'Save',meSaved:'Saved ✓',meCardQa:(a,u,t)=>'100 Questions of Me — '+a+' answered · '+u+'/'+t+' open',qaTitle:'100 Questions of Me',qaSub:'Each completed quest opens one more question. No rush — this is time spent getting to know yourself.',qaLocked:'🔒 Complete a quest to open',qaAnsPh:'My answer...',subHook:'☕ One coffee covers a whole month — about 163 won a day.\nNine people who crossed 2,500 years are waiting for you, every day.',limitD:'The philosophers are catching their breath.\nA fresh 50 bubbles arrive Monday morning.',adBtn:(a,mx)=>'📺 Watch an ad for +10 ('+a+'/'+mx+')',adMax:'No more ads today. See you tomorrow!',adWatch:'Watching ad...',subH1:'☕ CheolKK Plus',subCta:'Start subscribing',whyDrawer:'Subscribe to open the drawer.',whyAdd:'Subscribe to meet the remaining philosophers.',whyTrial:'When the free trial ends, some features lock. Subscribe to keep going together.',whyLimit:'If waiting until tomorrow feels too long.',planM1:'₩4,900/mo',planM2:'~163 won/day · billed monthly',planY1:'₩39,000/yr',planY2:'~107 won/day · 34% off',subNote:'Unlocks all nine philosophers, every letter, the drawer, and 1,000 bubbles every month.\n(A 500/day cap applies to prevent abuse.)\nYour first letter and your first three friends are always free.',drawerLockT:'The drawer is still locked',drawerLockD1:'Your daily lines and flames pile up here, day by day.\nSubscribe to open the drawer anytime.',drawerLockD2:'Letters the philosophers wrote with you in mind gather here.\nSubscribe to open them all, even the ones waiting.',firstFreeBtn:'The first letter is a gift — read it now',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',leave:'Leave',
+ tabChat:'Chats',trialBadge:(n,l)=>'🔓 Free trial: '+n+' days left · '+l+' bubbles',freeBadge:l=>'💬 '+l+' bubbles left this week · tap for more',paidLow:l=>'💬 '+l+' bubbles left this month'+(l<=10?' · tap to top up':''),limitT:'Out of bubbles this week',limitTP:'Out of bubbles this month',limitDP:'You made the most of this month.\nTop up 100 for 990 won, or a fresh 1,000 arrives on the 1st.',topupBtn:'⚡ Top up 100 bubbles · ₩990',topupNote:'Topped-up bubbles never expire — they roll over.',specT:'When to knock',cubeCap:'Rows are temperature, columns are method. Tap to compare.',meTitle:'My Profile',meBasic:'Basics',meMake:'Create my profile',meNameL:'Name',meNamePh:'What philosophers call you',meGenderL:'Gender',meG0:'Prefer not to say',meG1:'Female',meG2:'Male',meBirthL:'Birthday',meSave:'Save',meSaved:'Saved ✓',meCardQa:(a,u,t)=>'100 Questions of Me — '+a+' answered · '+u+'/'+t+' open',qaTitle:'100 Questions of Me',qaSub:'Each completed quest opens one more question. No rush — this is time spent getting to know yourself.',qaLocked:'🔒 Complete a quest to open',qaAnsPh:'My answer...',subHook:'☕ One coffee covers a whole month — about 130 won a day.\nNine people who crossed 2,500 years are waiting for you, every day.',limitD:'The philosophers are catching their breath.\nA fresh 50 bubbles arrive Monday morning.',adBtn:(a,mx)=>'📺 Watch an ad for +10 ('+a+'/'+mx+')',adMax:'No more ads today. See you tomorrow!',adWatch:'Watching ad...',subH1:'☕ CheolKK Plus',subCta:'Start subscribing',trialStart:'🎁 Try 7 days free first',paySoon:'Payments are almost ready. Hang tight!',payNeedLogin:'Please sign in with Google before paying.',payFail:'We could not complete the payment. Please try again.',payCancel:'Payment cancelled.',payDone:'Your subscription is active. All nine philosophers, letters, and the drawer are open.',topupDone:'100 bubbles added.',topupOrder:'CheolKK 100 bubbles',trialStarted:'Your 7-day free trial has started. All nine philosophers, letters, and the drawer are open.',trialOffer:l=>'🎁 Start your 7-day free trial · '+l+' bubbles',whyDrawer:'Subscribe to open the drawer.',whyAdd:'Subscribe to meet the remaining philosophers.',whyTrial:'When the free trial ends, some features lock. Subscribe to keep going together.',whyLimit:'If waiting until tomorrow feels too long.',planM1:'₩3,900/mo',planM2:'~130 won/day · billed monthly',planY1:'₩32,900/yr',planY2:'~90 won/day · 30% off',subNote:'Unlocks all nine philosophers, every letter, the drawer, and 1,000 bubbles every month — over 200 chats a week.\nTop up 100 more for 990 won; topped-up bubbles roll over to next month.\nFree users still get the first letter and 50 bubbles a week with their first three friends.\n(A 500/day cap applies to prevent abuse.)\nYour first letter and your first three friends are always free.',drawerLockT:'The drawer is still locked',drawerLockD1:'Your daily lines and flames pile up here, day by day.\nSubscribe to open the drawer anytime.',drawerLockD2:'Letters the philosophers wrote with you in mind gather here.\nSubscribe to open them all, even the ones waiting.',firstFreeBtn:'The first letter is a gift — read it now',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',leave:'Leave',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature (hit → accept → settle). Columns are method (way of living · inner reflection · duty & order). And in the very center lives the question.',
  cubeDefault:'Tap philosophers to compare them.',
@@ -719,7 +723,7 @@ const T=LANG==='en'?{
  trFast:'⚡ Instant replies',trMid:'💬 Normal pace',trSlow:'🐢 Slow & easy',trGhost:'👀 Leaves you on read',trVanish:'🫥 Sometimes vanishes',trBusy:'📅 Schedule first',trCut:'✂️ Interrupts you',trListen:'🙇 Hears you out',
  profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
  gActive:n=>`${n} active now`,
- wcTitle:'Before we begin',wcLoginT:'Keep your conversations safe',wcLoginD:'Sign in with Google and your talks and memories are saved to your account. Change phones or reinstall — the philosophers will still remember you.',wcLoginBtn:'Continue with Google',wcPushT:'Let philosophers reach you first',wcPushD:'You will be notified the moment a reply arrives, and a philosopher reaching out first happens at most once a day. You can turn it off anytime.',wcPushBtn:'Allow notifications',wcLater:'Maybe later',
+ wcTitle:'Before we begin',wcLoginT:'Keep your conversations safe',wcLoginD:'Sign in with Google and your talks and memories are saved to your account. Change phones or reinstall — the philosophers will still remember you.',wcLoginBtn:'Continue with Google',wcTrialNote:'Your records are saved to your account. Start the 7-day free trial whenever you like.',wcGuestWarn:'You can use it without signing in, but your records vanish if you switch devices or delete the app. Signing in later carries everything over.',wcPushT:'Let philosophers reach you first',wcPushD:'You will be notified the moment a reply arrives, and a philosopher reaching out first happens at most once a day. You can turn it off anytime.',wcPushBtn:'Allow notifications',wcLater:'Maybe later',
  cpShare:'Share',cpDown:'Save image',sortNew:'Newest first',sortOld:'Oldest first',cardSave:'🖼 Save as a card',mailEmpty:'No letters yet.',mailHint:'On the 1st of each month, the philosopher you talked with most\nwrites you a letter looking back on your month together.',
  mailWriting:'✍️ A letter is being written…',firstLabel:'The First Letter',monthLabel:m=>`Letter of ${['January','February','March','April','May','June','July','August','September','October','November','December'][m]}`,
  ltFrom:n=>`from ${n}`,ltHighlight:'SENTENCE OF THE MONTH',ltObserve:'WHAT I NOTICED',ltRecords:'SMALL RECORDS',ltGift:'A SENTENCE FOR YOU',ltNextQ:'A QUESTION FOR NEXT MONTH',ltHl1:'OUR FIRST SENTENCE',ltRec1:'THE STORY SO FAR',ltNq1:'A QUESTION FOR WHAT COMES NEXT',ltHlC:n=>'SENTENCE OF '+n+' DAYS',ltRecC:n=>n+' DAYS ON RECORD',ltNqC:'A QUESTION FOR THE NEXT 100 DAYS',ltPS:'ENCLOSED NOTES',ltReply:'MY REPLY',
@@ -747,7 +751,7 @@ const T=LANG==='en'?{
  version:'CheolKK v7 · Sign-in & Sync · 한/EN'
 }:{
  docTitle:'철크크 — 죽은 철학자들의 단톡방',dyTitle:'오늘 한 줄',dyPh:'뭐든 생각날 때 한 줄씩...',dySave:'남기기',dyPast:'서랍장',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dyHist:'한 줄 일기',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyMore:n=>'+'+n+'줄 — 서랍장에서 보기',dyNoDay:'이 날의 기록이 없어요.',dyCap:'오늘 든 생각·감정·일기·목표·다짐 — 뭐든 한 줄씩 적으면 철학자들이 답글을 달아요',dyToggle:n=>'오늘 '+n+'줄 보기',dyFold:'접기',brand:'철크크',eyebrow:'죽은 철학자들의 단톡방',
- tabChat:'채팅',trialBadge:n=>'🔓 무료 체험 '+n+'일 남음 — 모든 기능이 열려 있어요',freeBadge:l=>'💬 이번 주 말풍선 '+l+'개 남음 · 눌러서 더 보기',paidLow:l=>'💬 이번 달 말풍선 '+l+'개 남음',limitT:'이번 주 말풍선을 다 썼어요',limitTP:'이번 달 말풍선을 다 썼어요',limitDP:'이번 달을 정말 알차게 보내셨네요.\n990원으로 100개를 더 채우거나, 다음 달 1일에 새로 채워져요.',topupBtn:'⚡ 말풍선 100개 충전 · 990원',topupNote:'충전한 말풍선은 사라지지 않고 이월돼요.',specT:'이럴 때 찾아오세요',cubeCap:'가로줄은 온도, 세로줄은 방법. 눌러서 비교해 보세요.',meTitle:'나의 프로필',meBasic:'기본 정보',meMake:'내 프로필 만들기',meNameL:'이름·별명',meNamePh:'철학자들이 부를 이름',meGenderL:'성별',meG0:'밝히지 않음',meG1:'여성',meG2:'남성',meBirthL:'생일',meSave:'저장하기',meSaved:'저장됐어요 ✓',meCardQa:(a,u,t)=>'나를 만드는 백문백답 — '+a+'답 · '+u+'/'+t+' 열림',qaTitle:'나를 만드는 백문백답',qaSub:'퀘스트를 하나 완료할 때마다 질문이 하나씩 열려요. 서두르지 않아도 괜찮아요 — 천천히, 나를 알아가는 시간이에요.',qaLocked:'🔒 퀘스트를 완료하면 열려요',qaAnsPh:'나의 답...',subHook:'☕ 커피 한 잔 값으로 한 달 — 하루 163원이에요.\n2,500년을 건너온 아홉 사람이, 매일 당신을 기다립니다.',limitD:'철학자들도 잠시 숨을 고르는 중이에요.\n월요일 아침이면 새 말풍선 50개가 채워져요.',adBtn:(a,mx)=>'📺 광고 보고 +10회 ('+a+'/'+mx+')',adMax:'오늘 볼 수 있는 광고를 다 봤어요. 내일 다시 이어가요!',adWatch:'광고 시청 중...',subH1:'☕ 철크크 구독',subCta:'구독 시작하기',whyDrawer:'서랍장을 열려면 구독이 필요해요.',whyAdd:'남은 철학자들은 구독하면 만나볼 수 있어요.',whyTrial:'무료 체험이 끝나면 일부 기능이 잠겨요. 이어서 함께하려면 구독해 주세요.',whyLimit:'내일까지 기다리지 않고 지금 이어가고 싶다면.',planM1:'월 4,900원',planM2:'하루 163원 · 매월 자동결제',planY1:'연 39,000원',planY2:'하루 107원 · 34% 할인',subNote:'아홉 철학자 전원, 모든 편지와 서랍장이 열리고\n매달 말풍선 1,000개가 채워져요 — 하루 서른 번 넘게 이야기해도 넉넉해요.\n다 쓰면 990원으로 100개를 더 채울 수 있어요.\n첫 편지와 처음 만난 세 친구와의 대화는 언제나 무료예요.\n언제든 해지할 수 있고, 남긴 기록은 그대로 남아요.',drawerLockT:'서랍장이 아직 잠겨 있어요',drawerLockD1:'당신이 하루하루 남긴 기록과 불꽃이 여기 차곡차곡 쌓여요.\n구독하면 언제든 서랍을 열어 꺼내볼 수 있어요.',drawerLockD2:'철학자들이 당신을 생각하며 쓴 편지가 여기 모여요.\n구독하면 밀린 편지까지 전부 개봉할 수 있어요.',firstFreeBtn:'첫 편지는 선물이에요 — 지금 읽어보기',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',leave:'나가기',
+ tabChat:'채팅',trialBadge:(n,l)=>'🔓 무료 체험 '+n+'일 남음 · 말풍선 '+l+'개',freeBadge:l=>'💬 이번 주 말풍선 '+l+'개 남음 · 눌러서 더 보기',paidLow:l=>'💬 이번 달 말풍선 '+l+'개 남음'+(l<=10?' · 눌러서 충전':''),limitT:'이번 주 말풍선을 다 썼어요',limitTP:'이번 달 말풍선을 다 썼어요',limitDP:'이번 달을 정말 알차게 보내셨네요.\n990원으로 100개를 더 채우거나, 다음 달 1일에 새로 채워져요.',topupBtn:'⚡ 말풍선 100개 충전 · 990원',topupNote:'충전한 말풍선은 사라지지 않고 다음 달로 이월돼요.',specT:'이럴 때 찾아오세요',cubeCap:'가로줄은 온도, 세로줄은 방법. 눌러서 비교해 보세요.',meTitle:'나의 프로필',meBasic:'기본 정보',meMake:'내 프로필 만들기',meNameL:'이름·별명',meNamePh:'철학자들이 부를 이름',meGenderL:'성별',meG0:'밝히지 않음',meG1:'여성',meG2:'남성',meBirthL:'생일',meSave:'저장하기',meSaved:'저장됐어요 ✓',meCardQa:(a,u,t)=>'나를 만드는 백문백답 — '+a+'답 · '+u+'/'+t+' 열림',qaTitle:'나를 만드는 백문백답',qaSub:'퀘스트를 하나 완료할 때마다 질문이 하나씩 열려요. 서두르지 않아도 괜찮아요 — 천천히, 나를 알아가는 시간이에요.',qaLocked:'🔒 퀘스트를 완료하면 열려요',qaAnsPh:'나의 답...',subHook:'☕ 커피 한 잔 값으로 한 달 — 하루 130원이에요.\n2,500년을 건너온 아홉 사람이, 매일 당신을 기다립니다.',limitD:'철학자들도 잠시 숨을 고르는 중이에요.\n월요일 아침이면 새 말풍선 50개가 채워져요.',adBtn:(a,mx)=>'📺 광고 보고 +10회 ('+a+'/'+mx+')',adMax:'오늘 볼 수 있는 광고를 다 봤어요. 내일 다시 이어가요!',adWatch:'광고 시청 중...',subH1:'☕ 철크크 구독',subCta:'구독 시작하기',trialStart:'🎁 7일 무료 체험 먼저 해보기',paySoon:'결제 준비를 마무리하는 중이에요. 조금만 기다려 주세요!',payNeedLogin:'결제하려면 먼저 Google로 로그인해 주세요.',payFail:'결제를 완료하지 못했어요. 잠시 후 다시 시도해 주세요.',payCancel:'결제를 취소했어요.',payDone:'구독이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',topupDone:'말풍선 100개가 충전됐어요.',topupOrder:'철크크 말풍선 100개',trialStarted:'7일 무료 체험이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',trialOffer:l=>'🎁 7일 무료 체험 시작하기 · 말풍선 '+l+'개',whyDrawer:'서랍장을 열려면 구독이 필요해요.',whyAdd:'남은 철학자들은 구독하면 만나볼 수 있어요.',whyTrial:'무료 체험이 끝나면 일부 기능이 잠겨요. 이어서 함께하려면 구독해 주세요.',whyLimit:'내일까지 기다리지 않고 지금 이어가고 싶다면.',planM1:'월 3,900원',planM2:'하루 130원 · 매월 자동결제',planY1:'연 32,900원',planY2:'하루 90원 · 30% 할인',subNote:'아홉 철학자 전원, 모든 편지와 서랍장이 열리고\n매달 말풍선 1,000개가 채워져요 — 일주일에 200번 넘게 이야기해도 넉넉해요.\n다 쓰면 990원으로 100개를 더 채울 수 있고, 충전한 말풍선은 다음 달로 이월돼요.\n무료로도 첫 편지를 읽고, 처음 만난 세 친구와 매주 말풍선 50개를 나눌 수 있어요.\n언제든 해지할 수 있고, 남긴 기록은 그대로 남아요.',drawerLockT:'서랍장이 아직 잠겨 있어요',drawerLockD1:'당신이 하루하루 남긴 기록과 불꽃이 여기 차곡차곡 쌓여요.\n구독하면 언제든 서랍을 열어 꺼내볼 수 있어요.',drawerLockD2:'철학자들이 당신을 생각하며 쓴 편지가 여기 모여요.\n구독하면 밀린 편지까지 전부 개봉할 수 있어요.',firstFreeBtn:'첫 편지는 선물이에요 — 지금 읽어보기',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',leave:'나가기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도(때리기→받아주기→가라앉히기), 세로줄은 방법(삶의 태도·내면 성찰·규율과 도리). 그리고 정중앙엔 질문이 삽니다.',
  cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
@@ -773,7 +777,7 @@ const T=LANG==='en'?{
  trFast:'⚡ 즉답형',trMid:'💬 답장 보통',trSlow:'🐢 느긋한 답장',trGhost:'👀 읽씹 장인',trVanish:'🫥 가끔 잠수',trBusy:'📅 일과 우선',trCut:'✂️ 말 끊고 들어옴',trListen:'🙇 끝까지 듣는 편',
  profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
  gActive:n=>`${n}명 활동 중`,
- wcTitle:'시작하기 전에',wcLoginT:'대화를 안전하게 보관하기',wcLoginD:'구글로 로그인하면 대화와 추억이 계정에 저장돼요. 폰을 바꾸거나 앱을 지워도, 철학자들은 너를 기억합니다.',wcLoginBtn:'Google로 계속하기',wcPushT:'철학자의 선톡 받기',wcPushD:'답장이 도착하면 바로 알려드리고, 철학자가 먼저 거는 안부 연락은 하루 1번을 넘지 않아요. 언제든 끌 수 있어요.',wcPushBtn:'알림 허용하기',wcLater:'나중에 할게요',
+ wcTitle:'시작하기 전에',wcLoginT:'대화를 안전하게 보관하기',wcLoginD:'구글로 로그인하면 대화와 추억이 계정에 저장돼요. 폰을 바꾸거나 앱을 지워도, 철학자들은 너를 기억합니다.',wcLoginBtn:'Google로 계속하기',wcTrialNote:'기록이 계정에 저장돼요. 7일 무료 체험은 원할 때 직접 시작할 수 있어요.',wcGuestWarn:'로그인 없이도 쓸 수 있지만, 기기를 바꾸거나 앱을 지우면 기록이 사라져요. 나중에 로그인하면 지금까지 쌓인 기록도 그대로 옮겨집니다.',wcPushT:'철학자의 선톡 받기',wcPushD:'답장이 도착하면 바로 알려드리고, 철학자가 먼저 거는 안부 연락은 하루 1번을 넘지 않아요. 언제든 끌 수 있어요.',wcPushBtn:'알림 허용하기',wcLater:'나중에 할게요',
  cpShare:'공유하기',cpDown:'이미지 저장',sortNew:'최신순',sortOld:'오래된순',cardSave:'🖼 카드로 저장',mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
  mailWriting:'✍️ 편지를 쓰고 있어요…',firstLabel:'첫 편지',monthLabel:m=>`${m+1}월의 편지`,
  ltFrom:n=>`${n}(으)로부터`,ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltHl1:'우리의 첫 문장',ltRec1:'지금까지의 기록',ltNq1:'다음 이야기의 화두',ltHlC:n=>n+'일의 문장',ltRecC:n=>'함께한 '+n+'일의 기록',ltNqC:'다음 100일의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
@@ -837,7 +841,7 @@ const GROUP_RULES=`
 
 /* ================= 상태/유틸 ================= */
 const DEBOUNCE=6500, FOLLOWUP_MS=1000*60*60*4;
-const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[],nAck:{},bond:{},diary:[],deb:null,sub:{start:0,paidUntil:0},use:{d:0,n:0,ad:0},memo:{},gmemo:{},me:{n:'',g:'',b:'',qa:{}}};
+const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[],nAck:{},bond:{},diary:[],deb:null,sub:{since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},use:{d:0,n:0,ad:0},memo:{},gmemo:{},me:{n:'',g:'',b:'',qa:{}}};
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const now=()=>Date.now();
@@ -993,9 +997,10 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({start:0,paidUntil:0},d.su); if(d.us) state.use=d.us; state.memo=d.mm||{}; state.gmemo=d.gm||{}; if(d.me) state.me=Object.assign({n:'',g:'',b:'',qa:{}},d.me); }
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
+      if(state.sub&&!state.sub.since) state.sub.since=state.sub.start||now(); /* 기존 유저 이관 */ if(d.us) state.use=d.us; state.memo=d.mm||{}; state.gmemo=d.gm||{}; if(d.me) state.me=Object.assign({n:'',g:'',b:'',qa:{}},d.me); }
     backfillBond();
-    if(state.friends) initSub(); // 기존 유저도 이 시점부터 7일 체험 시작
+    if(state.friends) initSub(); /* 주간 리셋 기준일(since) 확보 — 체험은 자동 시작하지 않음 */
   }catch(e){}
 }
 
@@ -1388,9 +1393,10 @@ function renderFriends(){
   // 개인톡+단톡 통합, 고정(★) 우선 → 최신 메시지순
   {
     let bhtml=null, bwhy=null;
-    if(isTrial()){ bhtml=T.trialBadge(trialRemain()); bwhy='trial'; }
+    if(isTrial()){ bhtml=T.trialBadge(trialRemain(),chatLeft()); bwhy='trial'; }
+    else if(canTrial()){ bhtml=T.trialOffer(chatLeft()); bwhy='trial'; }
     else if(!isPremium()){ bhtml=T.freeBadge(chatLeft()); bwhy='limit'; }
-    else if(isPaid()&&chatLeft()<=100){ bhtml=T.paidLow(chatLeft()); bwhy='limit'; }
+    else { bhtml=T.paidLow(chatLeft()); bwhy='limit'; }
     if(bhtml){
       const bn=document.createElement('div'); bn.className='trial-banner';
       bn.innerHTML=bhtml;
@@ -2050,20 +2056,122 @@ function buildDM(pid,extra){
   if(!out.length||out[out.length-1].role!=='user') out.push({role:'user',content:'(상대는 아직 아무 말이 없다)'});
   return out;
 }
+/* ================= 결제 (토스페이먼츠) ================= */
+// 클라이언트 키는 공개용이라 코드에 있어도 안전하다. 시크릿 키는 절대 여기 두지 말 것.
+const TOSS_CLIENT_KEY='test_ck_REPLACE_ME';   // ← 토스페이먼츠 발급 후 교체
+const PAY_ON=()=>TOSS_CLIENT_KEY.indexOf('REPLACE')<0 && !!sbUser;
+let tossSdk=null;
+async function loadToss(){
+  if(tossSdk) return tossSdk;
+  if(!window.TossPayments){
+    await new Promise((res,rej)=>{
+      const sc=document.createElement('script');
+      sc.src='https://js.tosspayments.com/v1/payment';
+      sc.onload=res; sc.onerror=()=>rej(new Error('sdk'));
+      document.head.appendChild(sc);
+    });
+  }
+  tossSdk=window.TossPayments(TOSS_CLIENT_KEY);
+  return tossSdk;
+}
+const custKey=()=>'ck_'+((sbUser&&sbUser.id)||'guest').replace(/-/g,'').slice(0,20);
+// 구독 시작 — 카드 등록(빌링키) 창을 띄운다. 성공하면 authKey를 들고 돌아온다.
+async function payStartSub(plan){
+  if(!sbUser){ alert(T.payNeedLogin); return; }
+  if(!PAY_ON()){ alert(T.paySoon); return; }
+  try{
+    const tp=await loadToss();
+    const back=location.origin+location.pathname;
+    await tp.requestBillingAuth('카드',{
+      customerKey:custKey(),
+      successUrl:back+'?pay=sub&plan='+plan,
+      failUrl:back+'?pay=fail'
+    });
+  }catch(e){ alert(T.payFail); }
+}
+// 말풍선 100개 단건 결제
+async function payTopup(){
+  if(!sbUser){ alert(T.payNeedLogin); return; }
+  if(!PAY_ON()){ alert(T.paySoon); return; }
+  try{
+    const tp=await loadToss();
+    const back=location.origin+location.pathname;
+    await tp.requestPayment('카드',{
+      amount:SUB.TOPUPWON,
+      orderId:'ck_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+      orderName:T.topupOrder,
+      successUrl:back+'?pay=topup',
+      failUrl:back+'?pay=fail'
+    });
+  }catch(e){ alert(T.payFail); }
+}
+// 결제창에서 돌아왔을 때 처리
+async function handlePayReturn(){
+  const q=new URLSearchParams(location.search);
+  const mode=q.get('pay'); if(!mode) return;
+  const clean=()=>{ try{ history.replaceState({},'',location.pathname); }catch(e){} };
+  if(mode==='fail'){ clean(); alert(T.payCancel); return; }
+  try{
+    if(mode==='sub'){
+      const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'issue',authKey:q.get('authKey'),customerKey:q.get('customerKey')||custKey(),
+          plan:q.get('plan')||'m',userId:sbUser&&sbUser.id})});
+      const d=await r.json();
+      if(d&&d.ok){
+        state.sub.paidUntil=d.paidUntil; state.sub.paidSince=d.paidSince; state.sub.plan=d.plan; state.sub.autoRenew=1;
+        save(); renderFriends(); clean(); alert(T.payDone);
+      }else{ clean(); alert(T.payFail+(d&&d.detail?'\n'+d.detail:'')); }
+    }else if(mode==='topup'){
+      const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'topup',paymentKey:q.get('paymentKey'),orderId:q.get('orderId'),
+          amount:Number(q.get('amount')||SUB.TOPUPWON),userId:sbUser&&sbUser.id})});
+      const d=await r.json();
+      if(d&&d.ok){
+        state.sub.extra=d.extra; save(); renderFriends(); clean(); alert(T.topupDone);
+      }else{ clean(); alert(T.payFail+(d&&d.detail?'\n'+d.detail:'')); }
+    }
+  }catch(e){ clean(); alert(T.payFail); }
+}
+
 /* ================= 구독·사용량 게이트 ================= */
 const SUB={TRIAL:7,FREEW:50,PAIDM:1000,TOPUP:100,TOPUPWON:990,AD:5,ADMAX:0}; // 무료 주50·유료 월1000 말풍선, ADMAX>0이면 광고 부활
-function initSub(){ if(!state.sub) state.sub={start:0,paidUntil:0}; if(!state.sub.start) state.sub.start=now(); }
+function initSub(){
+  if(!state.sub) state.sub={since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0};
+  if(!state.sub.since) state.sub.since=now();          // 앱을 처음 시작한 시각 = 주간 리셋 기준
+}
 const isPaid=()=>!!(state.sub&&state.sub.paidUntil>now());
 const isTrial=()=>!isPaid()&&!!(state.sub&&state.sub.start)&&(now()-state.sub.start<SUB.TRIAL*86400000);
 const isPremium=()=>isPaid()||isTrial();
+const canTrial=()=>!isPaid()&&!(state.sub&&(state.sub.trialUsed||state.sub.start));  // 아직 체험을 안 써봤다
 const trialRemain=()=>Math.max(0,Math.ceil(((state.sub&&state.sub.start||0)+SUB.TRIAL*86400000-now())/86400000));
-const weekIdx=()=>Math.floor((dayIdx()-4)/7);          // 월요일 시작
-const monthIdx=()=>{const d=new Date();return d.getFullYear()*12+d.getMonth();};
+function startTrial(){
+  if(!canTrial()) return false;
+  state.sub.start=now(); state.sub.trialUsed=1; save(); renderFriends();
+  return true;
+}
+// 주간: 앱 시작 요일 기준 7일 주기 / 월간: 결제일(없으면 체험 시작일) 기준 월 주기
+const weekIdx=()=>{
+  const base=(state.sub&&state.sub.since)?dayIdx(state.sub.since):dayIdx();
+  return Math.floor((dayIdx()-base)/7);
+};
+const monthIdx=()=>{
+  const base=(state.sub&&(state.sub.paidSince||state.sub.start))||0;
+  if(!base) return 0;
+  const d=new Date(), b=new Date(base);
+  let n=(d.getFullYear()-b.getFullYear())*12+(d.getMonth()-b.getMonth());
+  if(d.getDate()<b.getDate()) n--;                      // 결제일 전이면 아직 지난 주기
+  return n;
+};
 function useQuota(){
   const w=weekIdx(), m=monthIdx();
   if(!state.use||state.use.w===undefined) state.use={w,wn:0,m,mn:0,ad:0};
   if(state.use.w!==w){ state.use.w=w; state.use.wn=0; state.use.ad=0; }
-  if(state.use.m!==m){ state.use.m=m; state.use.mn=0; }
+  if(state.use.m!==m){
+    // 이번 달에 기본 제공량을 넘겨 쓴 만큼만 충전분에서 차감 → 남은 충전분은 다음 달로 이월
+    const over=Math.max(0,(state.use.mn||0)-SUB.PAIDM);
+    if(state.sub) state.sub.extra=Math.max(0,((state.sub.extra)||0)-over);
+    state.use.m=m; state.use.mn=0;
+  }
   return state.use;
 }
 const useToday=useQuota; // 구코드 호환
@@ -2097,10 +2205,14 @@ function showSubSheet(why){
   const b=sheetBase(`<div class="sub-h1">${T.subH1}</div><div class="sub-why">${whyT}</div>
     <div class="sub-hook" style="white-space:pre-line">${T.subHook}</div>
     <div class="sub-plans"><button class="sub-plan on" data-p="m">${T.planM1}<span>${T.planM2}</span></button><button class="sub-plan" data-p="y">${T.planY1}<span>${T.planY2}</span></button></div>
+    ${canTrial()?`<button class="sub-cta ghost" id="subTrial">${T.trialStart}</button>`:''}
     <button class="sub-cta" id="subPay">${T.subCta}</button>
     <div class="sub-note">${T.subNote.replace(/\n/g,'<br>')}</div>`);
   b.querySelectorAll('.sub-plan').forEach(pl=>pl.onclick=()=>{ b.querySelectorAll('.sub-plan').forEach(x=>x.classList.remove('on')); pl.classList.add('on'); });
-  const pay=b.querySelector('#subPay'); if(pay) pay.onclick=()=>{ alert('결제 연동을 준비하고 있어요. 곧 만나요! (토스페이먼츠 연결 예정)'); };
+  const tb=b.querySelector('#subTrial');
+  if(tb) tb.onclick=()=>{ if(startTrial()){ b.remove(); alert(T.trialStarted); } };
+  const pay=b.querySelector('#subPay');
+  if(pay) pay.onclick=()=>{ const sel=b.querySelector('.sub-plan.on'); payStartSub((sel&&sel.dataset.p)||'m'); };
 }
 function showLimitSheet(){
   const u=useQuota();
@@ -2110,7 +2222,7 @@ function showLimitSheet(){
       <button class="sub-cta" id="tpGo">${T.topupBtn}</button>
       <div class="sub-note">${T.topupNote}</div>`);
     const tg=b.querySelector('#tpGo');
-    if(tg) tg.onclick=()=>{ alert('충전 결제를 준비하고 있어요. 곧 만나요! (토스페이먼츠 연결 예정)'); };
+    if(tg) tg.onclick=()=>{ payTopup(); };
     return;
   }
   const b=sheetBase(`<div class="sub-h1">${T.limitT}</div><div class="sub-why" style="white-space:pre-line">${T.limitD}</div>
@@ -2577,11 +2689,11 @@ const specTags=pid=>{const sp=SPECS[pid];return sp?(LANG==='en'?sp.te:sp.tk).joi
 const specDesc=pid=>{const sp=SPECS[pid];return sp?(LANG==='en'?sp.se:sp.sk):'';};
 /* ===== 내 프로필 + 백문백답 ===== */
 const QNA=LANG==='en'?[
- 'What makes you laugh the most these days?','What would your childhood self say about who you are now?','What does rest mean to you?','What upset you recently, and why do you think it did?','What are you quietly proud of?','One habit you want to drop?','What makes you lose track of time?','What matters most to you in a person?','Introduce yourself in one sentence.','Your biggest worry these days?','If that worry vanished, what would you do first?','What makes a day a good day for you?','When do you feel lonely?','A recent moment you felt grateful to someone?','Your favorite time of the day?','Something you regret but learned from?','What is your fear really about?','What do you hope for yourself five years from now?','A quirky taste or routine only you have?','A phrase that has stayed with you lately?','What is money to you?','What is work to you?','What do you find hardest to forgive?','Given one perfectly free day, what would you do?','A turning point in your life?','The one thing you need most right now?','A side of you people rarely see?','One principle you want to keep?','Something you must try someday?','What would you like to say to yourself today?'
+ 'What makes you laugh most these days?','What moment stayed with you today?','What worries you most right now?','If that worry vanished, what would you do first?','Introduce yourself in one sentence.','What thought keeps returning lately?','When did you last feel relief?','What drains you these days?','Your favorite time of day?','What makes a day a good day for you?','What angered you recently, and why?','When do you feel lonely?','When did you last cry?','What is your fear really about?','Who do you envy, and what does that reveal?','How do you handle anxiety?','How do you show joy?','What have you been holding back from saying?','What kind of praise moves you?','Do you hide feelings or show them?','What matters most to you in a person?','When were you last grateful to someone?','Who do you reach out to first?','Who knows you best?','What mistake do you repeat in relationships?','What is hardest for you to forgive?','What do you do when someone disappoints you?','What kind of friend are you?','What have you left unsaid to family?','What does time alone give you?','What is work to you?','What is money to you?','What made you proudest at work?','When did you want to quit, and why did you stay?','With enough money, what would you do?','What are you good at?','What can you endure longer than others?','What does success look like to you?','Do you feel guilty resting?','Imagine a day after retirement.','One principle you want to keep?','What can you never compromise on?','A belief you changed your mind about?','What is freedom to you?','What is responsibility to you?','Is living kindly the same as living well?','When honesty and kindness collide, what do you choose?','Who do you admire, and why?','One thing you wish would disappear from the world?','What kind of adult do you want to be?','What would your childhood self say about you now?','Something you regret but learned from?','A turning point in your life?','A day you would return to?','Your clearest childhood memory?','A sentence that shaped you?','What will not leave you, though you wish it would?','What do you know now that you did not then?','One line for someone who hurt you?','What are you thankful to your past self for?','What do you hope for yourself in five years?','Something you must try someday?','What must you face eventually, though it scares you?','Where will you be this time next year?','What do you want to leave behind?','What would you ask your future self?','What have you not given up on?','What feels too late to start?','Your next goal?','How do you want to be remembered?','One habit you want to drop?','What signals is your body sending lately?','Your last thought before sleep?','First feeling when you wake?','How do you recover?','What makes you lose track of time?','What are you putting off, and why?','How much of the day is yours alone?','What are you doing for your body lately?','What does rest mean to you?','A quirky taste or routine only you have?','Something you return to again and again?','A place you love, and why?','A line or scene that stayed with you?','Which season resembles you?','Something you do alone and never mention?','A smell or sound you love?','A food that comforts you?','Something you want but hold off buying?','One object that represents you?','Do you know yourself well?','Given one perfectly free day, what would you do?','A side of you people rarely see?','What are you living for?','Do you think life is fair?','Does suffering carry meaning?','What in you never changes?','Rate yourself today, and why?','What does being yourself look like?','What would you say to yourself today?'
 ]:[
- '요즘 나를 가장 많이 웃게 하는 건?','어릴 적 내가 지금의 나를 보면 뭐라고 할까?','나에게 휴식이란?','최근 나를 화나게 한 일, 왜 화가 났을까?','내가 은근히 자부심을 느끼는 것은?','버리고 싶은 습관 하나는?','시간 가는 줄 모르고 하게 되는 것은?','사람에게서 가장 중요하게 보는 것은?','나를 한 문장으로 소개한다면?','요즘 나의 가장 큰 걱정은?','그 걱정이 사라진다면 제일 먼저 뭘 할까?','내가 생각하는 좋은 하루의 조건은?','나는 언제 외로움을 느낄까?','최근 누군가에게 고마웠던 순간은?','하루 중 가장 좋아하는 시간대는?','후회하지만 배운 것이 있는 일은?','내가 두려워하는 것의 정체는 뭘까?','5년 뒤 나에게 바라는 모습은?','나만 아는 이상한 취향이나 루틴은?','요즘 마음에 남아 있는 말 한마디는?','나에게 돈이란?','나에게 일이란?','내가 용서하기 어려운 것은?','완벽히 자유로운 하루가 주어진다면?','내 인생의 전환점이 된 순간은?','요즘의 나에게 가장 필요한 한 가지는?','남들은 모르는 나의 모습은?','내가 지키고 싶은 원칙 하나는?','언젠가 꼭 해보고 싶은 것은?','오늘의 나에게 해주고 싶은 말은?'
+ '요즘 나를 가장 많이 웃게 하는 건?','오늘 하루 중 가장 마음에 남은 순간은?','요즘 나의 가장 큰 걱정은?','그 걱정이 사라진다면 제일 먼저 뭘 할까?','나를 한 문장으로 소개한다면?','요즘 가장 자주 하는 생각은?','최근에 마음이 놓였던 순간은?','요즘 나를 지치게 하는 것은?','하루 중 가장 좋아하는 시간대는?','내가 생각하는 좋은 하루의 조건은?','최근 나를 화나게 한 일, 왜 화가 났을까?','나는 언제 외로움을 느낄까?','눈물이 났던 가장 최근의 순간은?','내가 두려워하는 것의 정체는 뭘까?','부러움을 느낄 때 나는 어떤 사람이 되는가?','불안할 때 나만의 대처법은?','기쁨을 표현하는 나만의 방식은?','참았던 말이 있다면 무엇인가?','나는 어떤 칭찬에 약한가?','감정을 숨기는 편인가, 드러내는 편인가?','사람에게서 가장 중요하게 보는 것은?','최근 누군가에게 고마웠던 순간은?','내가 먼저 연락하는 사람은 누구인가?','나를 가장 잘 아는 사람은 누구일까?','관계에서 내가 반복하는 실수가 있다면?','내가 용서하기 어려운 것은?','누군가에게 실망했을 때 나는 어떻게 하는가?','나는 어떤 친구인가?','가족에게 하지 못한 말이 있다면?','혼자 있는 시간이 나에게 주는 것은?','나에게 일이란?','나에게 돈이란?','일하면서 가장 뿌듯했던 순간은?','그만두고 싶었던 순간과 버틴 이유는?','돈이 충분하다면 무엇을 하고 싶은가?','내가 잘한다고 생각하는 것은?','남들보다 오래 견딜 수 있는 일은?','성공이란 나에게 어떤 모습인가?','쉬는 것에 죄책감을 느끼는가?','은퇴 후의 하루를 상상한다면?','내가 지키고 싶은 원칙 하나는?','절대 타협할 수 없는 것은?','옳다고 믿었다가 바뀐 생각이 있다면?','나에게 자유란?','나에게 책임이란?','착하게 사는 것과 잘 사는 것은 같은가?','정직과 배려가 부딪힐 때 나는?','내가 존경하는 사람과 그 이유는?','세상에서 사라졌으면 하는 것 하나는?','나는 어떤 어른이 되고 싶은가?','어릴 적 내가 지금의 나를 보면 뭐라고 할까?','후회하지만 배운 것이 있는 일은?','내 인생의 전환점이 된 순간은?','다시 돌아가고 싶은 하루가 있다면?','어린 시절 가장 선명한 기억은?','나를 만든 말 한마디가 있다면?','잊고 싶지만 잊히지 않는 것은?','그때는 몰랐지만 지금은 아는 것은?','나에게 상처를 준 사람에게 지금 한마디 한다면?','과거의 나에게 고마운 점은?','5년 뒤 나에게 바라는 모습은?','언젠가 꼭 해보고 싶은 것은?','두렵지만 언젠가 마주해야 할 일은?','내년 이맘때 나는 어디에 있을까?','죽기 전에 꼭 남기고 싶은 것은?','미래의 나에게 지금 부탁하고 싶은 것은?','포기하지 않고 있는 것은 무엇인가?','지금 시작하기에 늦었다고 생각하는 일은?','나의 다음 목표는?','어떤 사람으로 기억되고 싶은가?','버리고 싶은 습관 하나는?','요즘 내 몸이 보내는 신호는?','잠들기 전 마지막으로 하는 생각은?','아침에 눈을 뜨면 가장 먼저 드는 감정은?','나만의 회복 방법은?','시간 가는 줄 모르고 하게 되는 것은?','미루고 있는 일과 그 이유는?','하루 중 나를 위해 쓰는 시간은 얼마인가?','요즘 몸을 위해 하고 있는 것은?','나에게 휴식이란?','나만 아는 이상한 취향이나 루틴은?','반복해서 듣거나 보게 되는 것이 있다면?','좋아하는 장소와 그 이유는?','최근 마음에 남은 문장이나 장면은?','계절 중 나와 가장 닮은 계절은?','혼자 있을 때 하는 일 중 남에게 말 안 한 것은?','내가 좋아하는 냄새나 소리는?','위로가 되는 음식은?','사고 싶지만 참고 있는 것은?','나를 대표하는 물건 하나는?','나는 나를 잘 알고 있을까?','완벽히 자유로운 하루가 주어진다면?','남들은 모르는 나의 모습은?','나는 무엇을 위해 살고 있는가?','삶이 공평하다고 생각하는가?','고통에는 의미가 있을까?','변하지 않는 나의 중심은 무엇인가?','지금의 나는 몇 점인가, 그 이유는?','나에게 ’나답다’는 건 어떤 모습인가?','오늘의 나에게 해주고 싶은 말은?'
 ];
-const qaUnlocked=()=>Math.min(QNA.length, 3+questDays().size); // 시작 3개 + 퀘스트 1개당 1개
+const qaUnlocked=()=>Math.min(QNA.length, 1+questDays().size); // 시작 1개 + 퀘스트 1개당 1개
 const qaAnswered=()=>Object.values((state.me&&state.me.qa)||{}).filter(v=>v&&String(v).trim()).length;
 const myLine=()=>{
   const m=state.me||{}; const parts=[];
@@ -3022,24 +3134,34 @@ $('cpDown').onclick=()=>{
 $('ltClose').onclick=()=>$('letter').classList.remove('on');
 
 /* ================= 환영 화면 (로그인·알림 안내) ================= */
-function maybeWelcome(){
+function afterWelcome(){
+  $('welcome').classList.remove('on');
+  if(!state.friends) onboarding(); // 신규 유저는 이어서 철학자 선택
+}
+function maybeWelcome(pre){
   try{
-    if(!state.friends) return;
+    if(!pre&&!state.friends) return;
     const stage=+(localStorage.getItem('ck-intro')||0);
-    if(stage>=2) return;
+    if(stage>=2&&!pre) return;
     const needLogin=!!sb&&!sbUser&&stage<1;
     const needPush=(typeof Notification!=='undefined')&&Notification.permission==='default';
-    if(!needLogin&&!needPush){ try{localStorage.setItem('ck-intro','2');}catch(e){} return; }
+    if((stage>=2&&pre)||(!needLogin&&!needPush)){
+      try{localStorage.setItem('ck-intro','2');}catch(e){}
+      if(pre) onboarding();
+      return;
+    }
     $('wcTitle').textContent=T.wcTitle;
     $('wcLoginT').textContent=T.wcLoginT; $('wcLoginD').textContent=T.wcLoginD; $('wcLoginBtn').textContent=T.wcLoginBtn;
     $('wcPushT').textContent=T.wcPushT; $('wcPushD').textContent=T.wcPushD; $('wcPushBtn').textContent=T.wcPushBtn;
     $('wcLater').textContent=T.wcLater;
+    { const a=$('wcTrialNote'); if(a) a.textContent=T.wcTrialNote;
+      const b=$('wcGuestWarn'); if(b){ b.textContent=T.wcGuestWarn; b.style.display=needLogin?'':'none'; } }
     $('wcLoginCard').style.display=needLogin?'':'none';
     $('wcPushCard').style.display=needPush?'':'none';
     $('welcome').classList.add('on');
-  }catch(e){}
+  }catch(e){ if(pre) onboarding(); }
 }
-$('wcLater').onclick=()=>{ try{localStorage.setItem('ck-intro','2');}catch(e){} $('welcome').classList.remove('on'); };
+$('wcLater').onclick=()=>{ try{localStorage.setItem('ck-intro','2');}catch(e){} afterWelcome(); };
 $('wcLoginBtn').onclick=async()=>{
   try{localStorage.setItem('ck-intro','1');}catch(e){}
   if(!sb){ alert(T.noSb); return; }
@@ -3048,6 +3170,7 @@ $('wcLoginBtn').onclick=async()=>{
 };
 $('wcPushBtn').onclick=async()=>{
   try{localStorage.setItem('ck-intro','2');}catch(e){}
+  const __pre=!state.friends;
   try{
     const perm=await Notification.requestPermission();
     if(perm==='granted'&&sb&&sbUser){
@@ -3067,7 +3190,7 @@ $('wcPushBtn').onclick=async()=>{
     }
   }catch(e){}
   $('welcome').classList.remove('on');
-  maybeWelcome();
+  if(__pre) afterWelcome(); else maybeWelcome();
 };
 
 /* ================= 대화 백업/복원 ================= */
@@ -3273,7 +3396,8 @@ $('stReset').onclick=async()=>{
   const t0=now();
   await initAuth();
   await load();
-  if(!state.friends){ onboarding(); }
+  try{ await handlePayReturn(); }catch(e){}
+  if(!state.friends){ maybeWelcome(true); }
   else{ renderFriends(); catchUp(); setTimeout(()=>checkMail(),4000); setTimeout(()=>maybeWelcome(),1200); }
   const wait=Math.max(0,1100-(now()-t0));
   setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
