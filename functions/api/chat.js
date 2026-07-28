@@ -1,8 +1,10 @@
-// 철크크 — Gemini API 중계 (Cloudflare Pages Functions, 진단 v2 + 모델 라우팅 v1)
-// 브라우저로 /api/chat?test=1 을 열면 설정 상태와 구글 연결 테스트 결과를 보여줍니다.
+// Deep End — Gemini API 중계 (Cloudflare Pages Functions, 진단 v3 + 모델 라우팅 v1)
+// 진단: /api/chat?test=<DIAG_TOKEN> 으로 접속하면 설정 상태와 구글 연결 테스트 결과를 보여줍니다.
+//       DIAG_TOKEN 환경변수를 설정하지 않으면 진단 기능은 꺼진 상태로 동작합니다.
 // 환경변수: GEMINI_API_KEY (필수)
 //           GEMINI_MODEL (선택, 기본 gemini-3.1-flash-lite — 깊은 대화용)
 //           GEMINI_MODEL_LITE (선택, 기본 gemini-2.5-flash-lite — 짧은 리액션용)
+//           DIAG_TOKEN (선택, 진단 모드 열쇠. 아무 문자열이나 길게)
 // 라우팅: 클라이언트가 body.tier==='lite'를 보내면 라이트 모델 사용(허용 목록 방식 — 임의 모델명은 받지 않음)
 const J = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
@@ -24,10 +26,16 @@ export async function onRequest(context) {
   const modelLite = env.GEMINI_MODEL_LITE || 'gemini-2.5-flash-lite';
   const key = env.GEMINI_API_KEY || '';
 
-  /* ---------- 진단 모드 (GET 또는 ?test=1) ---------- */
+  /* ---------- 진단 모드 (DIAG_TOKEN이 일치할 때만) ----------
+     이 경로는 실제 Gemini 호출을 한 번 발생시키므로 공개해두면
+     아무나 반복 호출해 할당량과 요금을 소모시킬 수 있다. 반드시 잠가둔다. */
   if (request.method === 'GET') {
+    const diag = env.DIAG_TOKEN || '';
+    const given = new URL(request.url).searchParams.get('test') || '';
+    if (!diag || given !== diag) return J({ error: 'method' }, 405);
+
     const info = {
-      진단: '철크크 API 상태 점검 (Cloudflare)',
+      진단: 'Deep End API 상태 점검 (Cloudflare)',
       모델: model,
       라이트_모델: modelLite,
       키_존재: !!key,
