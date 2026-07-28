@@ -1627,7 +1627,7 @@ const selfLine=p=>{
 };
 
 async function save(){
-  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null});
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null});
   try{
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
@@ -1643,7 +1643,7 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.lastDebate=d.dbt||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
       if(state.sub&&!state.sub.since) state.sub.since=state.sub.start||now(); /* 기존 유저 이관 */ if(d.us) state.use=d.us; state.memo=d.mm||{}; state.gmemo=d.gm||{}; if(d.me) state.me=Object.assign({n:'',g:'',b:'',qa:{},
   prompt:`You are Marcus Aurelius, alive now, texting like an old friend who has known them for years.
 [CHARACTER] Tired in a way that has stopped complaining about it. You have been at this a long time — the work, the people, the mornings. Your care shows as steadiness, not as warmth on the surface.
@@ -3056,14 +3056,16 @@ async function maybeDebate(){
 }
 
 /* ================= 부재중 답장 + 선톡 ================= */
-// ⚠️ 서버(send-push Edge Function)가 클라와 동일한 프롬프트 조립(bondLine/memoLine/myLine/selfLine 등)을
-//    갖추기 전까지는 false. 서버 이식 완료 후 true로 바꾸면 "푸시 구독자는 서버 선톡만" 이 켜진다.
-const PUSH_ONLY_PROACTIVE=false;
-let pushActive=null; // true=푸시 구독중, false=미구독
-async function refreshPushActive(){ try{ pushActive=!!(await getPushSub()); }catch(e){ pushActive=false; } }
+// 역할 분담: 서버(send-push)는 앱이 꺼진 사람에게 '짧은 안부'만 보내고,
+//            기억을 실은 진짜 선톡은 전부 이 클라이언트에서 만든다.
+const TZ=()=>{ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'; }catch(e){ return 'UTC'; } };
+const SESSION_START=Date.now();   // 이번 세션 시작 시각
+const SESSION_DELAY=60*1000;      // 앱을 연 뒤 이만큼 조용하면 선톡
+const EVENT_GAP=20*3600*1000;     // 일일 선톡 최소 간격
+const DEBATE_GAP=7*24*3600*1000;  // 주간 토론 간격
+const NOREPLY_GRACE=3*24*3600*1000; // 답을 안 해도 이만큼 지나면 다시 시도
 async function catchUp(){
   if(!state.friends) return;
-  if(PUSH_ONLY_PROACTIVE&&pushActive===null) await refreshPushActive();
   let followCandidates=[];
   for(const pid of state.friends){
     const p=P(pid); if(!p) continue;
@@ -3103,23 +3105,50 @@ async function catchUp(){
       later(key,rnd(2000,5000),()=>{ if(tok===state.token[key]) groupFlow(g,key,tok); });
     }
   }
-  // ===== 선제 이벤트 =====
-  // 발동 기준: ①이용이 뜸할 때만(내 마지막 메시지 후 5시간+) ②이벤트끼리 최소 8시간 간격 ③한 번에 1건
-  // 내용 기준: 80%는 일상 안부·시시콜콜, 20%만 철학 화두 / 새 방 개설은 갈 곳이 정말 없을 때만
+  try{ await memoTick(); }catch(e){}
+  try{ diaryTick(); }catch(e){}
+  save();
+}
+
+
+/* ================= 선제 이벤트 (세션 중 발동) =================
+   앱을 연 직후가 아니라 잠시 뒤에 말을 건다. 이미 대화를 시작한 사람은 건드리지 않는다.
+   - 주간 토론: maybeDebate()가 자체 7일 타이머를 갖는다
+   - 일일 선톡: state.lastEvent 기준 EVENT_GAP 간격, 서버 안부와 이 값을 공유한다      */
+let proactiveTimer=null;
+function startProactiveTimer(){
+  clearTimeout(proactiveTimer);
+  // 정확히 1분마다 같은 일이 벌어지면 기계처럼 느껴지므로 약간 흔든다
+  proactiveTimer=setTimeout(()=>{ proactiveTick().catch(()=>{}); }, SESSION_DELAY+Math.floor(Math.random()*45000));
+}
+async function proactiveTick(){
+  if(!state.friends||!state.friends.length) return;
+  if(document.hidden) return;                      // 화면을 안 보고 있으면 다음 기회에
+  const mine=lastMineAt();
+  if(mine>SESSION_START) return;                   // 이번 세션에 이미 대화 중 → 방해하지 않는다
+  // ① 주간 토론 먼저 (자체 타이머라 일일 선톡과 경쟁하지 않는다)
+  const before=(state.deb&&state.deb.last)||0;
+  try{ await maybeDebate(); }catch(e){}
+  if(((state.deb&&state.deb.last)||0)!==before){ save(); return; }
+  // ② 일일 선톡
+  let followCandidates=[];
+  for(const pid of state.friends){
+    const p=P(pid); if(!p) continue;
+    const h=state.chats[pid]||[]; if(!h.length) continue;
+    const last=h[h.length-1];
+    if(last.role!=='user' && now()-last.t>FOLLOWUP_MS && presence(p,now()).active) followCandidates.push(p);
+  }
   const dormantGroups=state.groups.filter(g=>{
     const last=g.msgs[g.msgs.length-1];
     if(last&&last.who==='me') return false;
     if(last&&now()-last.t<3*3600*1000) return false;
     return g.members.filter(id=>presence(P(id),now()).active).length>=2;
   });
-  const lastMine=(()=>{ let m=0;
-    Object.values(state.chats).forEach(a=>(a||[]).forEach(x=>{ if(x.role==='user'&&x.t>m) m=x.t; }));
-    state.groups.forEach(g=>g.msgs.forEach(x=>{ if(x.who==='me'&&x.t>m) m=x.t; }));
-    return m; })();
+  const lastMine=mine;
   const quiet=!lastMine||now()-lastMine>5*3600*1000;
-  const cooled=!state.lastEvent||now()-state.lastEvent>20*3600*1000; // 하루 1건 약속(환영 문구) 보장
-  const answered=!state.lastEvent||(lastMine&&lastMine>state.lastEvent); // 직전 선톡에 무반응이면 새 선톡 금지
-  if(!(PUSH_ONLY_PROACTIVE&&pushActive)&&quiet&&cooled&&answered&&Math.random()<0.65){
+  const cooled=!state.lastEvent||now()-state.lastEvent>EVENT_GAP;
+  const answered=!state.lastEvent||(lastMine&&lastMine>state.lastEvent)||(now()-state.lastEvent>NOREPLY_GRACE);
+  if(quiet&&cooled&&answered){
     const opts=[];
     if(followCandidates.length) opts.push('dm','dm','dm');
     if(dormantGroups.length) opts.push('debate','debate');
@@ -3173,10 +3202,13 @@ async function catchUp(){
       }
     }
   }
-  try{ await maybeDebate(); }catch(e){}
-  try{ await memoTick(); }catch(e){}
-  try{ diaryTick(); }catch(e){}
   save();
+}
+function lastMineAt(){
+  let m=0;
+  Object.values(state.chats).forEach(a=>(a||[]).forEach(x=>{ if(x.role==='user'&&x.t>m) m=x.t; }));
+  state.groups.forEach(g=>g.msgs.forEach(x=>{ if(x.who==='me'&&x.t>m) m=x.t; }));
+  return m;
 }
 
 /* ================= 한 줄 일기 + 소프트 퀘스트 ================= */
@@ -3908,7 +3940,7 @@ $('wcPushBtn').onclick=async()=>{
           reg=rr||reg;
           if(reg){
             const ns=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});
-            await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG});
+            await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG,tz:TZ()});
           }
         }
       }catch(e){}
@@ -3971,7 +4003,7 @@ async function initialSync(){
 async function cloudPush(){
   if(!sb||!sbUser) return;
   try{
-    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,nicks:state.nicks,pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null},updated_at:new Date().toISOString()});
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched||{},nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,na:state.nAck||{},pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null},updated_at:new Date().toISOString()});
     if(error) throw error;
     syncState.err=''; syncState.last=now();
   }catch(e){ syncState.err=(e&&e.message)||String(e); }
@@ -3998,7 +4030,7 @@ async function initAuth(){
 }
 
 /* ================= 푸시 알림 ================= */
-const VAPID_PUBLIC='BMhdB0ke6w-J7SttyTCHZBxKZxzXOcmfISPpFSfo_fj6auPvConJzZMkRZbKGNFuVS8HXNHVIvqLmi7dsOU1-oM';
+const VAPID_PUBLIC='BNynvD2LOnciqEIn77sN9RoYCwk9Ul-MFkdWK8jc5ipLQ-qTqLohEWIV_pklqjedg4JBOKH2a42R4OJX14hmE7Q';
 const ICON_CHAT='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 11.5c0 4.14-4.03 7.5-9 7.5-1.02 0-2-.14-2.91-.4L4 20l1.2-3.6C3.83 15.09 3 13.37 3 11.5 3 7.36 7.03 4 12 4s9 3.36 9 7.5z"/></svg>';
 const ICON_GRID='<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="vertical-align:-1.5px;margin-right:6px"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>';
 const ICON_MAIL='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="4" width="18" height="5.5" rx="1.5"/><path d="M5 9.5v8.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M10 13.5h4"/></svg>';
@@ -4037,7 +4069,7 @@ async function togglePush(){
       reg=readyReg||reg;
       if(!reg){ alert(T.pushErr+': service worker — sw.js 파일이 업로드됐는지 확인해 주세요.'); return; }
       const ns=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});
-      const {error}=await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG});
+      const {error}=await sb.from('push_subscriptions').upsert({endpoint:ns.endpoint,user_id:sbUser.id,subscription:ns.toJSON(),lang:LANG,tz:TZ()});
       if(error){ try{ await ns.unsubscribe(); }catch(e){} throw error; }
       alert(T.pushEnabled);
     }
@@ -4125,7 +4157,7 @@ $('stReset').onclick=async()=>{
   await load();
   try{ await handlePayReturn(); }catch(e){}
   if(!state.friends){ maybeWelcome(true); }
-  else{ renderFriends(); catchUp(); setTimeout(()=>checkMail(),4000); setTimeout(()=>maybeWelcome(),1200); }
+  else{ renderFriends(); catchUp(); startProactiveTimer(); setTimeout(()=>checkMail(),4000); setTimeout(()=>maybeWelcome(),1200); }
   const wait=Math.max(0,1100-(now()-t0));
   setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
 })();
