@@ -1,6 +1,7 @@
 {
-  "name": "철크크 — 죽은 철학자들의 단톡방",
-  "short_name": "철크크",
+  "name": "Deep End — chat with nine dead philosophers",
+  "short_name": "Deep End",
+  "description": "Chat with nine dead philosophers",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#12141d",
