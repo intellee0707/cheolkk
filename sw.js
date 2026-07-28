@@ -1,9 +1,17 @@
-/* 철크크 Service Worker — 푸시 알림 + PWA */
+/* Deep End Service Worker — 푸시 알림 + PWA */
 self.addEventListener('install', e => { self.skipWaiting(); });
-self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+
+/* 캐시 이름을 바꿀 때마다 옛 캐시를 자동으로 지운다 */
+const CACHE = 'deepend-v8';
+self.addEventListener('activate', e => {
+  e.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names.filter(n => n !== CACHE).map(n => caches.delete(n)));
+    await clients.claim();
+  })());
+});
 
 /* PWA 설치 요건용 fetch 핸들러 (네트워크 우선, 오프라인 시 캐시) */
-const CACHE = 'cheolkk-v7';
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
@@ -17,16 +25,18 @@ self.addEventListener('fetch', e => {
   );
 });
 
-/* 푸시 수신 → 알림 표시 */
+/* 푸시 수신 → 알림 표시
+   서버(send-push)가 구독자의 lang에 맞춰 title/body를 보내는 것이 정상 경로다.
+   아래 기본값은 payload가 비었을 때만 쓰이므로, 앱 기본 언어인 영어로 둔다. */
 self.addEventListener('push', e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) {}
-  const title = d.title || '철크크';
+  const title = d.title || 'Deep End';
   e.waitUntil(self.registration.showNotification(title, {
-    body: d.body || '철학자들이 기다리고 있어요',
+    body: d.body || 'The philosophers are waiting.',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    tag: d.tag || 'cheolkk',
+    tag: d.tag || 'deepend',
     data: { url: d.url || '/' }
   }));
 });
