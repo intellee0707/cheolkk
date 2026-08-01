@@ -112,7 +112,10 @@ export async function onRequest(context) {
         if (pid && pid === env.PADDLE_PRICE_TOPUP) topups += (it.quantity || 1);
       }
       if (topups > 0) {
-        await patchSub(env, userId, (su) => ({ extra: (su.extra || 0) + TOPUP_BUBBLES * topups }));
+        await patchSub(env, userId, (su) => ({
+          extra: (su.extra || 0) + TOPUP_BUBBLES * topups,
+          cid: d.customer_id || su.cid || ''   // 구독 관리 포털을 열 때 필요
+        }));
         return J({ ok: true, topup: topups });
       }
       return J({ ok: true, skip: 'not_topup' });
@@ -127,7 +130,9 @@ export async function onRequest(context) {
             ? Date.parse(d.current_billing_period.ends_at) : 0);
       await patchSub(env, userId, (su) => ({
         paidUntil: active && until ? until : (su.paidUntil || 0),
-        paidSince: su.paidSince || Date.parse(d.started_at || '') || Date.now()
+        paidSince: su.paidSince || Date.parse(d.started_at || '') || Date.now(),
+        cid: d.customer_id || su.cid || '',   // 구독 관리 포털을 열 때 필요
+        sid: d.id || su.sid || ''
       }));
       return J({ ok: true, until });
     }
@@ -137,7 +142,11 @@ export async function onRequest(context) {
       const ends = (d.current_billing_period && d.current_billing_period.ends_at)
         ? Date.parse(d.current_billing_period.ends_at)
         : (d.canceled_at ? Date.parse(d.canceled_at) : Date.now());
-      await patchSub(env, userId, () => ({ paidUntil: ends }));
+      await patchSub(env, userId, (su) => ({
+        paidUntil: ends,
+        cid: d.customer_id || su.cid || '',
+        sid: d.id || su.sid || ''
+      }));
       return J({ ok: true, ends });
     }
 
