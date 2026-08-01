@@ -41,15 +41,25 @@ export async function onRequest(context) {
   if (!r.ok) return J({ error: 'read_failed' }, 500);
   const rows = await r.json();
   const su = (rows[0] && rows[0].data && rows[0].data.su) || {};
-  if (!su.cid) return J({ error: 'no_customer' }, 404);   // 아직 결제한 적이 없는 유저
+
+  // 고객번호는 웹훅이 적어두지만, 웹훅이 늦거나 놓쳤을 때를 대비해
+  // 클라이언트가 결제창에서 직접 받은 값도 보조로 받는다.
+  let cid = su.cid || '';
+  if (!cid) {
+    try {
+      const body = await request.json();
+      if (body && typeof body.cid === 'string' && /^ctm_[a-z0-9]+$/i.test(body.cid)) cid = body.cid;
+    } catch (_) {}
+  }
+  if (!cid) return J({ error: 'no_customer' }, 404);   // 아직 결제한 적이 없는 유저
 
   // 3) Paddle에 포털 주소를 요청한다 (한 번 쓰고 마는 임시 주소)
   const host = (env.PADDLE_ENV === 'production') ? 'https://api.paddle.com' : 'https://sandbox-api.paddle.com';
-  const body = su.sid ? JSON.stringify({ subscription_ids: [su.sid] }) : '{}';
-  const p = await fetch(`${host}/customers/${su.cid}/portal-sessions`, {
+  const payload = su.sid ? JSON.stringify({ subscription_ids: [su.sid] }) : '{}';
+  const p = await fetch(`${host}/customers/${cid}/portal-sessions`, {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + env.PADDLE_API_KEY, 'Content-Type': 'application/json' },
-    body
+    body: payload
   });
   const pd = await p.json();
   if (!p.ok) {
