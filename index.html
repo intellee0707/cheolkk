@@ -4186,24 +4186,28 @@ function applyLangUI(){
   $('stImport').textContent=T.importBtn;
   $('stReset').textContent=T.resetBtn;
   $('stPrivacy').textContent=T.privacyLink;
-  // 구독 관리 — 결제 이력이 있는 사람에게만 보인다. Paddle 포털에서 해지·플랜 변경·영수증 확인.
-  (()=>{
-    const b=$('stManage'); if(!b) return;
-    const has=!!(sbUser && state.sub && (state.sub.paidUntil>0 || state.sub.paidSince>0));
-    b.style.display = has ? '' : 'none';
-    b.textContent = T.manageSub;
-    b.onclick = async ()=>{
-      b.disabled=true;
-      try{
-        const {data:{session}} = await sb.auth.getSession();
-        const r = await fetch('/api/portal',{ method:'POST', headers:{ 'Authorization':'Bearer '+session.access_token } });
-        const j = await r.json();
-        if(j && j.url) window.open(j.url,'_blank','noopener');
-        else alert(T.manageErr);
-      }catch(e){ alert(T.manageErr); }
-      b.disabled=false;
-    };
-  })();
+  renderManageRow();
+
+// 구독 관리 — 결제 이력이 있는 사람에게만 보인다. Paddle 포털에서 해지·플랜 변경·영수증 확인.
+// 설정을 열 때마다 다시 판단한다 (로그인·결제는 앱을 켠 뒤에 일어나므로)
+function renderManageRow(){
+  const b=$('stManage'); if(!b) return;
+  const su=state.sub||{};
+  const has=!!(sbUser && (su.paidUntil>0 || su.paidSince>0 || su.cid));
+  b.style.display = has ? '' : 'none';
+  b.textContent = T.manageSub;
+  b.onclick = async ()=>{
+    b.disabled=true;
+    try{
+      const {data:{session}} = await sb.auth.getSession();
+      const r = await fetch('/api/portal',{ method:'POST', headers:{ 'Authorization':'Bearer '+session.access_token } });
+      const j = await r.json();
+      if(j && j.url) window.open(j.url,'_blank','noopener');
+      else alert(T.manageErr);
+    }catch(e){ alert(T.manageErr); }
+    b.disabled=false;
+  };
+}
   $('stPrivacy').href=LANG==='ja'?'/privacy-ja.html':LANG==='en'?'/privacy-en.html':'/privacy.html';
   $('stDisclaimer').innerHTML=T.disclaimer;
   $('stVersion').textContent=T.version;
@@ -4219,7 +4223,7 @@ function renderSettingsAccount(){
   if(syncState.err){ err.style.display=''; err.textContent=T.syncErr+': '+syncState.err; }
   else err.style.display='none';
 }
-$('btnSettings').onclick=()=>{ renderSettingsAccount(); renderPushRow(); $('settings').classList.add('on'); };
+$('btnSettings').onclick=()=>{ renderSettingsAccount(); renderPushRow(); renderManageRow(); $('settings').classList.add('on'); };
 $('stClose').onclick=()=>$('settings').classList.remove('on');
 $('langKo').onclick=()=>setLang('ko');
 $('langEn').onclick=()=>setLang('en');
