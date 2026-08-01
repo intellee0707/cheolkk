@@ -2759,11 +2759,11 @@ function buildDM(pid,extra){
 // 아래 4개만 채우면 결제가 켜진다. 토큰과 Price ID는 공개돼도 안전하다.
 // 실제 지급 여부는 서버(/api/paddle-webhook)가 서명을 검증해 기록하며, 앱은 그 값만 신뢰한다.
 const PADDLE = {
-  token:   'PADDLE-CLIENT-TOKEN',  // Paddle → Developer tools → Authentication → Client-side token
+  token:   'test_17d3c84c884a5ea991b707082ac',  // Paddle → Developer tools → Authentication → Client-side token
   env:     'sandbox',              // 테스트 중에는 'sandbox', 실제 오픈 시 'production'
-  monthly: 'PRICE-MONTHLY',        // 월간 구독 Price ID (pri_...)
-  yearly:  'PRICE-YEARLY',         // 연간 구독 Price ID (pri_...)
-  topup:   'PRICE-TOPUP'           // 말풍선 충전(단건) Price ID (pri_...)
+  monthly: 'pri_01kyyrx5a8w0n6pn8pzzcam42x',   // 월간 구독 Price ID (pri_...)
+  yearly:  'pri_01kyyt3ra15t7vmr041yf4zf5g',   // 연간 구독 Price ID (pri_...)
+  topup:   'pri_01kyytcr8xxsvpw9y7zdqb88fj'    // 말풍선 충전(단건) Price ID (pri_...)
 };
 // Play 스토어 앱(TWA)에서 열렸는지. 스토어 정책상 앱 안에서는 외부 결제를 띄우지 않는다.
 const IS_TWA = (()=>{ try{ return String(document.referrer||'').indexOf('android-app://')===0; }catch(e){ return false; } })();
