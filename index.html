@@ -273,17 +273,20 @@
   /* ===== 시계 현재 시각 공 ===== */
   .tl-ball{animation:tlpulse 2.4s ease-in-out infinite}
   @keyframes tlpulse{0%,100%{opacity:1}50%{opacity:.45}}
-.dy-card{margin:10px 12px 2px;padding:11px 12px;border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-soft)}
-.dy-head{font-size:12.5px;color:var(--paper-dim);display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
-.dy-row{display:flex;gap:7px}  .dy-in{flex:1;background:var(--ink);border:1px solid var(--ink-line);border-radius:9px;color:var(--paper);padding:8px 10px;font-size:17px;font-family:'Nanum Pen Script',var(--sans);outline:none}
-.dy-go{background:var(--candle);color:var(--ink);border:0;border-radius:9px;padding:0 13px;font-weight:700;font-size:13px;cursor:pointer}  .dy-mine{font-size:19.5px;line-height:1.3;font-family:'Nanum Pen Script',var(--serif)}
+.dy-card{margin:12px 12px 4px;padding:14px 14px 15px;border:1.5px solid rgba(217,160,91,.42);border-radius:16px;background:linear-gradient(180deg,rgba(217,160,91,.09),rgba(217,160,91,.03));box-shadow:0 2px 14px rgba(217,160,91,.07)}
+.dy-nib{font-size:15px;font-variant-emoji:text;margin-right:2px}
+.dy-head{font-size:13.5px;font-weight:700;color:var(--candle);display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;letter-spacing:.01em}
+.dy-row{display:flex;gap:7px}  .dy-in{flex:1;background:var(--ink);border:1.5px solid var(--ink-line);border-radius:10px;color:var(--paper);padding:11px 13px;font-size:23px;line-height:1.35;letter-spacing:.02em;font-family:'Nanum Pen Script',var(--sans);outline:none;transition:border-color .18s ease}
+.dy-in::placeholder{color:rgba(239,232,218,.34)}
+.dy-in:focus{border-color:var(--candle)}
+.dy-go{background:var(--candle);color:var(--ink);border:0;border-radius:10px;padding:0 16px;font-weight:700;font-size:13.5px;cursor:pointer;white-space:nowrap}  .dy-mine{font-size:24px;line-height:1.38;letter-spacing:.02em;font-family:'Nanum Pen Script',var(--serif)}
 .dy-re{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--ink-line)}
 .dy-re .avatar{width:26px;height:26px;flex:none;border-radius:8px;overflow:hidden}
 .dy-re-txt{font-size:13px;line-height:1.55;color:var(--paper)}
 .dy-re-txt b{color:var(--candle);font-weight:700;margin-right:4px}
 .dy-done{background:none;border:1px solid var(--candle);color:var(--candle);border-radius:8px;padding:2px 8px;font-size:12px;margin-left:6px;cursor:pointer;font-family:var(--sans)}
 .dy-qr{margin-top:5px;font-size:12.5px;color:var(--candle)}  .dy-h-item{padding:10px 0;border-bottom:1px solid var(--ink-line);cursor:pointer}
-.dy-h-date{font-size:11.5px;color:var(--paper-dim);margin-bottom:3px}  .dy-h-txt{font-size:19.5px;font-family:'Nanum Pen Script',var(--serif);line-height:1.3}
+.dy-h-date{font-size:11.5px;color:var(--paper-dim);margin-bottom:3px}  .dy-h-txt{font-size:23px;font-family:'Nanum Pen Script',var(--serif);line-height:1.38;letter-spacing:.02em}
 .dr-seg{display:flex;gap:8px;padding:10px 14px 4px}
 .dr-seg button{flex:1;background:var(--ink-soft);border:1px solid var(--ink-line);color:var(--paper-dim);border-radius:10px;padding:8px 0;font-size:13.5px;font-family:var(--sans);cursor:pointer}
 .dr-seg button.on{color:var(--ink);background:var(--candle);border-color:var(--candle);font-weight:700}
@@ -323,6 +326,16 @@
 .sub-plan{flex:1;background:var(--ink);border:1.5px solid var(--ink-line);border-radius:12px;color:var(--paper-dim);padding:13px 8px;font-size:14.5px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;gap:4px;font-family:var(--sans)}
 .sub-plan.on{border-color:var(--candle);color:var(--paper)}
 .px-wait{visibility:hidden}
+.rp-kinds{display:flex;gap:8px;margin-bottom:12px}
+.rp-kind{flex:1;background:var(--ink);border:1.5px solid var(--ink-line);border-radius:10px;color:var(--paper-dim);padding:10px 6px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+.rp-kind.on{border-color:var(--candle);color:var(--paper)}
+.rp-ta{width:100%;min-height:110px;background:var(--ink);border:1.5px solid var(--ink-line);border-radius:10px;color:var(--paper);padding:11px;font-size:14px;font-family:var(--sans);resize:vertical;line-height:1.6}
+.rp-ta:focus{outline:none;border-color:var(--candle)}
+.nt-item{border-bottom:1px solid var(--ink-line);padding:12px 0}
+.nt-item:last-child{border-bottom:0}
+.nt-v{font-size:11px;color:var(--candle);letter-spacing:.08em;margin-bottom:4px}
+.nt-b{font-size:13.5px;color:var(--paper);line-height:1.65;white-space:pre-line}
+.st-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--candle);margin-left:6px;vertical-align:middle}
 .px-in{transition:opacity .25s ease}
 .sub-plan span{font-size:11px;font-weight:400;opacity:.75}
 .sub-cta{width:100%;background:var(--candle);color:var(--ink);border:0;border-radius:13px;padding:15px;font-size:15.5px;font-weight:700;cursor:pointer;font-family:var(--sans)}
@@ -414,6 +427,7 @@ select.me-in{appearance:auto}
     <div class="cmenu" id="chatMenu">
       <button id="cmManage"></button>
       <button id="cmRename"></button>
+      <button id="cmReport"></button>
       <button class="danger" id="cmLeave"></button>
     </div>
     <div class="msgs" id="msgs"></div>
@@ -516,6 +530,8 @@ select.me-in{appearance:auto}
       <input type="file" id="importFile" accept=".json,application/json" style="display:none">
       <div class="st-sec" id="stSecInfo">정보</div>
       <button class="st-item" id="stManage" style="display:none"></button>
+      <button class="st-item" id="stReport"></button>
+      <button class="st-item" id="stNotice"></button>
       <a class="st-item" id="stPrivacy" href="/privacy.html" target="_blank" rel="noopener"></a>
       <button class="st-item" id="stPush"></button>
       <div class="st-note" id="stDisclaimer"></div>
@@ -861,7 +877,16 @@ const T=LANG==='ja'?{
  subCta:'購読をはじめる',
  trialStart:'🎁 まず7日間、無料でためす',
  paySoon:'決済の準備をすすめています。もう少しお待ちください！',
- payNeedLogin:'お支払いの前に、Googleでログインしてください。',manageSub:'🧾 サブスクリプションの管理',manageErr:'管理ページをひらけませんでした。しばらくしてからもう一度おためしください。',manageNone:'まだお支払いの記録がありません。',trialNeedLogin:'無料体験をはじめるには、Googleでログインしてください。',
+ payNeedLogin:'お支払いの前に、Googleでログインしてください。',manageSub:'🧾 サブスクリプションの管理',manageErr:'管理ページをひらけませんでした。しばらくしてからもう一度おためしください。',manageNone:'まだお支払いの記録がありません。',
+ noticeLink:'📣 更新のおしらせ',noticeT:'更新のおしらせ',
+ reportLink:'✉️ お問い合わせ・報告',reportT:'お問い合わせ・報告',
+ reportD:'気になる返信、うまく動かないところ、伝えたいこと。どれでもどうぞ。',
+ rkContent:'返信の報告',rkBug:'不具合',rkOther:'その他',
+ reportPh:'できるだけくわしく書いていただけると助かります。',
+ reportSend:'送信',reportSending:'送信中…',
+ reportNote:'いただいた内容は改善のためだけに使われます。返信が必要な場合はご連絡先も書いてください。',
+ reportDone:'送信しました。ありがとうございます。',reportFail:'送信できませんでした。しばらくしてからもう一度おためしください。',
+ reportBtn:'この返信を報告する',trialNeedLogin:'無料体験をはじめるには、Googleでログインしてください。',
  payDone:'購読がはじまりました。9人全員と、手紙・ひきだしがひらきました。',
  topupDone:'ふきだしを300個チャージしました。',
  trialStarted:'7日間の無料体験がはじまりました。9人全員と、手紙・ひきだしがひらきました。',
@@ -1022,7 +1047,16 @@ const T=LANG==='ja'?{
  version:'哲チャ v7 · ログイン＆同期 · 日/EN/한'
 }:LANG==='en'?{
  docTitle:'Deep End — chat with nine dead philosophers',dyTitle:'One line today',dyPh:'Anything, one line at a time...',dySave:'Save',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyNoDay:'Nothing on this day.',dyCap:'Thoughts, feelings, goals, resolutions — one line each, and the philosophers reply',dyToggle:n=>'Show today ('+n+')',dyFold:'Fold',brand:'Deep End',eyebrow:'NINE DEAD PHILOSOPHERS',
- tabChat:'Chats',trialBadge:(n,l)=>'🔓 Free trial: '+n+' days left · '+l+' bubbles',freeBadge:l=>'💬 '+l+' bubbles left this week · tap for more',paidLow:l=>'💬 '+l+' bubbles left this month'+(l<=10?' · tap to top up':''),limitT:'Out of bubbles this week',limitTP:'Out of bubbles this month',limitDP:'You made the most of this month.\nTop up 300 for $2.99, or a fresh 1,000 arrives on your renewal day.',topupBtn:'⚡ Top up 300 bubbles · $2.99',topupBtnP:v=>'⚡ Top up 300 bubbles · '+v,moreT:'Need more bubbles?',moreD:'You still have plenty left,\nbut you can top up ahead of time.',topupNote:'Topped-up bubbles never expire — they roll over.',specT:'When to knock',meTitle:'My Profile',meBasic:'Basics',meMake:'Create my profile',meNameL:'Name',meNamePh:'What philosophers call you',meGenderL:'Gender',meG0:'Prefer not to say',meG1:'Female',meG2:'Male',meBirthL:'Birthday',meSave:'Save',meSaved:'Saved ✓',meCardQa:(a,u,t)=>'100 Questions of Me — '+a+' answered · '+u+'/'+t+' open',qaTitle:'100 Questions of Me',qaSub:'Each completed quest opens one more question. No rush — this is time spent getting to know yourself.',qaLocked:'🔒 Complete a quest to open',qaAnsPh:'My answer...',subHook:'☕ Less than one coffee, for a whole month — about 23 cents a day.\nNine people who crossed 2,500 years are waiting for you, every day.',limitD:'The philosophers are catching their breath.\nA fresh 50 bubbles arrive on your weekly reset.',adBtn:(a,mx)=>'📺 Watch an ad for +10 ('+a+'/'+mx+')',adMax:'No more ads today. See you tomorrow!',adWatch:'Watching ad...',subH1:'☕ Deep End Plus',subCta:'Start subscribing',trialStart:'🎁 Try 7 days free first',paySoon:'Payments are almost ready. Hang tight!',payNeedLogin:'Please sign in with Google before paying.',manageSub:'🧾 Manage subscription',manageErr:'Could not open the management page. Please try again in a moment.',manageNone:'No billing record found yet.',trialNeedLogin:'Please sign in with Google to start your free trial.',payDone:'Your subscription is active. All nine philosophers, letters, and the drawer are open.',topupDone:'300 bubbles added.',trialStarted:'Your 7-day free trial has started. All nine philosophers, letters, and the drawer are open.',trialOffer:l=>'🎁 Start your 7-day free trial · '+l+' bubbles',whyDrawer:'Subscribe to open the drawer.',whyAdd:'Subscribe to meet the remaining philosophers.',whyTrial:'When the free trial ends, some features lock. Subscribe to keep going together.',whyLimit:'If waiting until tomorrow feels too long.',planM1:'$6.99/mo',planM2:'about 23¢ a day · billed monthly',planY1:'$49.99/yr',planY2:'about 14¢ a day · 40% off',subNote:'Unlocks all nine philosophers, every letter, the drawer, and 1,000 bubbles a month — over 200 conversations a week.\nRun out and 300 more costs $2.99; topped-up bubbles roll over to the next month.\nOn the free plan you still get the first letter, and 50 bubbles a week with your first three friends.\nCancel anytime — everything you have written stays.',drawerLockT:'The drawer is still locked',drawerLockD1:'Your daily lines and flames pile up here, day by day.\nSubscribe to open the drawer anytime.',drawerLockD2:'Letters the philosophers wrote with you in mind gather here.\nSubscribe to open them all, even the ones waiting.',firstFreeBtn:'The first letter is a gift — read it now',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',
+ tabChat:'Chats',trialBadge:(n,l)=>'🔓 Free trial: '+n+' days left · '+l+' bubbles',freeBadge:l=>'💬 '+l+' bubbles left this week · tap for more',paidLow:l=>'💬 '+l+' bubbles left this month'+(l<=10?' · tap to top up':''),limitT:'Out of bubbles this week',limitTP:'Out of bubbles this month',limitDP:'You made the most of this month.\nTop up 300 for $2.99, or a fresh 1,000 arrives on your renewal day.',topupBtn:'⚡ Top up 300 bubbles · $2.99',topupBtnP:v=>'⚡ Top up 300 bubbles · '+v,moreT:'Need more bubbles?',moreD:'You still have plenty left,\nbut you can top up ahead of time.',topupNote:'Topped-up bubbles never expire — they roll over.',specT:'When to knock',meTitle:'My Profile',meBasic:'Basics',meMake:'Create my profile',meNameL:'Name',meNamePh:'What philosophers call you',meGenderL:'Gender',meG0:'Prefer not to say',meG1:'Female',meG2:'Male',meBirthL:'Birthday',meSave:'Save',meSaved:'Saved ✓',meCardQa:(a,u,t)=>'100 Questions of Me — '+a+' answered · '+u+'/'+t+' open',qaTitle:'100 Questions of Me',qaSub:'Each completed quest opens one more question. No rush — this is time spent getting to know yourself.',qaLocked:'🔒 Complete a quest to open',qaAnsPh:'My answer...',subHook:'☕ Less than one coffee, for a whole month — about 23 cents a day.\nNine people who crossed 2,500 years are waiting for you, every day.',limitD:'The philosophers are catching their breath.\nA fresh 50 bubbles arrive on your weekly reset.',adBtn:(a,mx)=>'📺 Watch an ad for +10 ('+a+'/'+mx+')',adMax:'No more ads today. See you tomorrow!',adWatch:'Watching ad...',subH1:'☕ Deep End Plus',subCta:'Start subscribing',trialStart:'🎁 Try 7 days free first',paySoon:'Payments are almost ready. Hang tight!',payNeedLogin:'Please sign in with Google before paying.',manageSub:'🧾 Manage subscription',manageErr:'Could not open the management page. Please try again in a moment.',manageNone:'No billing record found yet.',
+ noticeLink:'📣 What\u2019s new',noticeT:'What\u2019s new',
+ reportLink:'✉️ Contact & report',reportT:'Contact & report',
+ reportD:'A reply that troubled you, something broken, or anything you want to tell us.',
+ rkContent:'Report a reply',rkBug:'Something broken',rkOther:'Other',
+ reportPh:'The more detail you can give, the more it helps.',
+ reportSend:'Send',reportSending:'Sending\u2026',
+ reportNote:'What you send is used only to improve the app. Include your contact details if you\u2019d like a reply.',
+ reportDone:'Sent. Thank you.',reportFail:'Could not send. Please try again in a moment.',
+ reportBtn:'Report this reply',trialNeedLogin:'Please sign in with Google to start your free trial.',payDone:'Your subscription is active. All nine philosophers, letters, and the drawer are open.',topupDone:'300 bubbles added.',trialStarted:'Your 7-day free trial has started. All nine philosophers, letters, and the drawer are open.',trialOffer:l=>'🎁 Start your 7-day free trial · '+l+' bubbles',whyDrawer:'Subscribe to open the drawer.',whyAdd:'Subscribe to meet the remaining philosophers.',whyTrial:'When the free trial ends, some features lock. Subscribe to keep going together.',whyLimit:'If waiting until tomorrow feels too long.',planM1:'$6.99/mo',planM2:'about 23¢ a day · billed monthly',planY1:'$49.99/yr',planY2:'about 14¢ a day · 40% off',subNote:'Unlocks all nine philosophers, every letter, the drawer, and 1,000 bubbles a month — over 200 conversations a week.\nRun out and 300 more costs $2.99; topped-up bubbles roll over to the next month.\nOn the free plan you still get the first letter, and 50 bubbles a week with your first three friends.\nCancel anytime — everything you have written stays.',drawerLockT:'The drawer is still locked',drawerLockD1:'Your daily lines and flames pile up here, day by day.\nSubscribe to open the drawer anytime.',drawerLockD2:'Letters the philosophers wrote with you in mind gather here.\nSubscribe to open them all, even the ones waiting.',firstFreeBtn:'The first letter is a gift — read it now',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature, columns are method. Tap to compare.',
  cubeDefault:'Tap philosophers to compare them.',
@@ -1074,7 +1108,16 @@ const T=LANG==='ja'?{
  version:'Deep End v7 · Sign-in & Sync · EN/日/한'
 }:{
  docTitle:'철크크 — 2,500년을 건너온 아홉 철학자',dyTitle:'오늘 한 줄',dyPh:'뭐든 생각날 때 한 줄씩...',dySave:'남기기',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyNoDay:'이 날의 기록이 없어요.',dyCap:'오늘 든 생각·감정·일기·목표·다짐 — 뭐든 한 줄씩 적으면 철학자들이 답글을 달아요',dyToggle:n=>'오늘 '+n+'줄 보기',dyFold:'접기',brand:'철크크',eyebrow:'2,500년을 건너온 아홉 철학자',
- tabChat:'채팅',trialBadge:(n,l)=>'🔓 무료 체험 '+n+'일 남음 · 말풍선 '+l+'개',freeBadge:l=>'💬 이번 주 말풍선 '+l+'개 남음 · 눌러서 더 보기',paidLow:l=>'💬 이번 달 말풍선 '+l+'개 남음'+(l<=10?' · 눌러서 충전':''),limitT:'이번 주 말풍선을 다 썼어요',limitTP:'이번 달 말풍선을 다 썼어요',limitDP:'이번 달을 정말 알차게 보내셨네요.\n2,900원으로 300개를 더 채우거나, 다음 결제일에 새로 채워져요.',topupBtn:'⚡ 말풍선 300개 충전 · 2,900원',topupBtnP:v=>'⚡ 말풍선 300개 충전 · '+v,moreT:'말풍선이 더 필요하신가요?',moreD:'아직 넉넉히 남아 있지만,\n미리 채워둘 수도 있어요.',topupNote:'충전한 말풍선은 사라지지 않고 다음 달로 이월돼요.',specT:'이럴 때 찾아오세요',meTitle:'나의 프로필',meBasic:'기본 정보',meMake:'내 프로필 만들기',meNameL:'이름·별명',meNamePh:'철학자들이 부를 이름',meGenderL:'성별',meG0:'밝히지 않음',meG1:'여성',meG2:'남성',meBirthL:'생일',meSave:'저장하기',meSaved:'저장됐어요 ✓',meCardQa:(a,u,t)=>'나를 만드는 백문백답 — '+a+'답 · '+u+'/'+t+' 열림',qaTitle:'나를 만드는 백문백답',qaSub:'퀘스트를 하나 완료할 때마다 질문이 하나씩 열려요. 서두르지 않아도 괜찮아요 — 천천히, 나를 알아가는 시간이에요.',qaLocked:'🔒 퀘스트를 완료하면 열려요',qaAnsPh:'나의 답...',subHook:'☕ 커피 한 잔 값으로 한 달 — 하루 130원이에요.\n2,500년을 건너온 아홉 사람이, 매일 당신을 기다립니다.',limitD:'철학자들도 잠시 숨을 고르는 중이에요.\n월요일 아침이면 새 말풍선 50개가 채워져요.',adBtn:(a,mx)=>'📺 광고 보고 +10회 ('+a+'/'+mx+')',adMax:'오늘 볼 수 있는 광고를 다 봤어요. 내일 다시 이어가요!',adWatch:'광고 시청 중...',subH1:'☕ 철크크 구독',subCta:'구독 시작하기',trialStart:'🎁 7일 무료 체험 먼저 해보기',paySoon:'결제 준비를 마무리하는 중이에요. 조금만 기다려 주세요!',payNeedLogin:'결제하려면 먼저 Google로 로그인해 주세요.',manageSub:'🧾 구독 관리 · 해지',manageErr:'관리 페이지를 열지 못했어요. 잠시 후 다시 시도해 주세요.',manageNone:'아직 결제 기록이 없어요.',trialNeedLogin:'무료 체험을 시작하려면 Google로 로그인해 주세요.',payDone:'구독이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',topupDone:'말풍선 300개가 충전됐어요.',trialStarted:'7일 무료 체험이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',trialOffer:l=>'🎁 7일 무료 체험 시작하기 · 말풍선 '+l+'개',whyDrawer:'서랍장을 열려면 구독이 필요해요.',whyAdd:'남은 철학자들은 구독하면 만나볼 수 있어요.',whyTrial:'무료 체험이 끝나면 일부 기능이 잠겨요. 이어서 함께하려면 구독해 주세요.',whyLimit:'내일까지 기다리지 않고 지금 이어가고 싶다면.',planM1:'월 3,900원',planM2:'하루 130원 · 매월 자동결제',planY1:'연 32,900원',planY2:'하루 90원 · 30% 할인',subNote:'아홉 철학자 전원, 모든 편지와 서랍장이 열리고\n매달 말풍선 1,000개가 채워져요 — 일주일에 200번 넘게 이야기해도 넉넉해요.\n다 쓰면 2,900원으로 300개를 더 채울 수 있고, 충전한 말풍선은 다음 달로 이월돼요.\n무료로도 첫 편지를 읽고, 처음 만난 세 친구와 매주 말풍선 50개를 나눌 수 있어요.\n언제든 해지할 수 있고, 남긴 기록은 그대로 남아요.',drawerLockT:'서랍장이 아직 잠겨 있어요',drawerLockD1:'당신이 하루하루 남긴 기록과 불꽃이 여기 차곡차곡 쌓여요.\n구독하면 언제든 서랍을 열어 꺼내볼 수 있어요.',drawerLockD2:'철학자들이 당신을 생각하며 쓴 편지가 여기 모여요.\n구독하면 밀린 편지까지 전부 개봉할 수 있어요.',firstFreeBtn:'첫 편지는 선물이에요 — 지금 읽어보기',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',
+ tabChat:'채팅',trialBadge:(n,l)=>'🔓 무료 체험 '+n+'일 남음 · 말풍선 '+l+'개',freeBadge:l=>'💬 이번 주 말풍선 '+l+'개 남음 · 눌러서 더 보기',paidLow:l=>'💬 이번 달 말풍선 '+l+'개 남음'+(l<=10?' · 눌러서 충전':''),limitT:'이번 주 말풍선을 다 썼어요',limitTP:'이번 달 말풍선을 다 썼어요',limitDP:'이번 달을 정말 알차게 보내셨네요.\n2,900원으로 300개를 더 채우거나, 다음 결제일에 새로 채워져요.',topupBtn:'⚡ 말풍선 300개 충전 · 2,900원',topupBtnP:v=>'⚡ 말풍선 300개 충전 · '+v,moreT:'말풍선이 더 필요하신가요?',moreD:'아직 넉넉히 남아 있지만,\n미리 채워둘 수도 있어요.',topupNote:'충전한 말풍선은 사라지지 않고 다음 달로 이월돼요.',specT:'이럴 때 찾아오세요',meTitle:'나의 프로필',meBasic:'기본 정보',meMake:'내 프로필 만들기',meNameL:'이름·별명',meNamePh:'철학자들이 부를 이름',meGenderL:'성별',meG0:'밝히지 않음',meG1:'여성',meG2:'남성',meBirthL:'생일',meSave:'저장하기',meSaved:'저장됐어요 ✓',meCardQa:(a,u,t)=>'나를 만드는 백문백답 — '+a+'답 · '+u+'/'+t+' 열림',qaTitle:'나를 만드는 백문백답',qaSub:'퀘스트를 하나 완료할 때마다 질문이 하나씩 열려요. 서두르지 않아도 괜찮아요 — 천천히, 나를 알아가는 시간이에요.',qaLocked:'🔒 퀘스트를 완료하면 열려요',qaAnsPh:'나의 답...',subHook:'☕ 커피 한 잔 값으로 한 달 — 하루 130원이에요.\n2,500년을 건너온 아홉 사람이, 매일 당신을 기다립니다.',limitD:'철학자들도 잠시 숨을 고르는 중이에요.\n월요일 아침이면 새 말풍선 50개가 채워져요.',adBtn:(a,mx)=>'📺 광고 보고 +10회 ('+a+'/'+mx+')',adMax:'오늘 볼 수 있는 광고를 다 봤어요. 내일 다시 이어가요!',adWatch:'광고 시청 중...',subH1:'☕ 철크크 구독',subCta:'구독 시작하기',trialStart:'🎁 7일 무료 체험 먼저 해보기',paySoon:'결제 준비를 마무리하는 중이에요. 조금만 기다려 주세요!',payNeedLogin:'결제하려면 먼저 Google로 로그인해 주세요.',manageSub:'🧾 구독 관리 · 해지',manageErr:'관리 페이지를 열지 못했어요. 잠시 후 다시 시도해 주세요.',manageNone:'아직 결제 기록이 없어요.',
+ noticeLink:'📣 업데이트 소식',noticeT:'업데이트 소식',
+ reportLink:'✉️ 문의 · 신고',reportT:'문의 · 신고',
+ reportD:'마음에 걸리는 답변, 잘 안 되는 부분, 하고 싶은 말 — 무엇이든 좋아요.',
+ rkContent:'답변 신고',rkBug:'오류 신고',rkOther:'그 밖의 문의',
+ reportPh:'구체적으로 적어주실수록 도움이 돼요.',
+ reportSend:'보내기',reportSending:'보내는 중…',
+ reportNote:'보내주신 내용은 서비스 개선에만 쓰여요. 답장이 필요하면 연락처도 함께 적어주세요.',
+ reportDone:'보내주셔서 고마워요.',reportFail:'보내지 못했어요. 잠시 후 다시 시도해 주세요.',
+ reportBtn:'이 답변 신고하기',trialNeedLogin:'무료 체험을 시작하려면 Google로 로그인해 주세요.',payDone:'구독이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',topupDone:'말풍선 300개가 충전됐어요.',trialStarted:'7일 무료 체험이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',trialOffer:l=>'🎁 7일 무료 체험 시작하기 · 말풍선 '+l+'개',whyDrawer:'서랍장을 열려면 구독이 필요해요.',whyAdd:'남은 철학자들은 구독하면 만나볼 수 있어요.',whyTrial:'무료 체험이 끝나면 일부 기능이 잠겨요. 이어서 함께하려면 구독해 주세요.',whyLimit:'내일까지 기다리지 않고 지금 이어가고 싶다면.',planM1:'월 3,900원',planM2:'하루 130원 · 매월 자동결제',planY1:'연 32,900원',planY2:'하루 90원 · 30% 할인',subNote:'아홉 철학자 전원, 모든 편지와 서랍장이 열리고\n매달 말풍선 1,000개가 채워져요 — 일주일에 200번 넘게 이야기해도 넉넉해요.\n다 쓰면 2,900원으로 300개를 더 채울 수 있고, 충전한 말풍선은 다음 달로 이월돼요.\n무료로도 첫 편지를 읽고, 처음 만난 세 친구와 매주 말풍선 50개를 나눌 수 있어요.\n언제든 해지할 수 있고, 남긴 기록은 그대로 남아요.',drawerLockT:'서랍장이 아직 잠겨 있어요',drawerLockD1:'당신이 하루하루 남긴 기록과 불꽃이 여기 차곡차곡 쌓여요.\n구독하면 언제든 서랍을 열어 꺼내볼 수 있어요.',drawerLockD2:'철학자들이 당신을 생각하며 쓴 편지가 여기 모여요.\n구독하면 밀린 편지까지 전부 개봉할 수 있어요.',firstFreeBtn:'첫 편지는 선물이에요 — 지금 읽어보기',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도, 세로줄은 방법. 눌러서 비교해 보세요.',
  cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
@@ -1630,7 +1673,7 @@ const selfLine=p=>{
 };
 
 async function save(){
-  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null});
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,nv:state.seenNotice||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null});
   try{
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
@@ -1646,7 +1689,7 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.lastDebate=d.dbt||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.lastDebate=d.dbt||0; state.seenNotice=d.nv||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
       if(state.sub&&!state.sub.since) state.sub.since=state.sub.start||now(); /* 기존 유저 이관 */ if(d.us) state.use=d.us; state.memo=d.mm||{}; state.gmemo=d.gm||{}; if(d.me) state.me=Object.assign({n:'',g:'',b:'',qa:{},
   prompt:`You are Marcus Aurelius, alive now, texting like an old friend who has known them for years.
 [CHARACTER] Tired in a way that has stopped complaining about it. You have been at this a long time — the work, the people, the mornings. Your care shows as steadiness, not as warmth on the surface.
@@ -2183,7 +2226,11 @@ function openChat(key){
       renderFriends(); save();
     };
   }
-  $('chatMenuBtn').style.display = key[0]==='g' ? '' : 'none';
+  // 신고는 어느 대화에서든 할 수 있어야 하므로 메뉴 자체는 항상 연다.
+  // 방 관리·이름 변경·나가기는 단톡방에서만 의미가 있다.
+  $('chatMenuBtn').style.display = '';
+  const grp = key[0]==='g';
+  ['cmManage','cmRename','cmLeave'].forEach(id=>{ const el=$(id); if(el) el.style.display = grp ? '' : 'none'; });
   updateBubChip();
   $('chatMenu').classList.remove('on');
   renderMsgs();
@@ -2205,6 +2252,7 @@ $('cmLeave').onclick=()=>{
   renderFriends(); save();
 };
 $('chatMenuBtn').onclick=e=>{ e.stopPropagation(); $('chatMenu').classList.toggle('on'); };
+$('cmReport').onclick=()=>{ $('chatMenu').classList.remove('on'); showReportSheet('content'); };
 $('cmManage').onclick=()=>{ $('chatMenu').classList.remove('on'); if(curKind()==='g') openGroupManage(curId()); };
 $('cmRename').onclick=()=>{
   $('chatMenu').classList.remove('on');
@@ -3368,7 +3416,7 @@ function bannerEl(){
 function diaryCard(){
   const box=document.createElement('div'); box.className='dy-card';
   const lines=todayLines(), st=streaks(), qe=lines.find(x=>x.q);
-  const head=`<div class="dy-head"><span>🖋 ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span></div>`;
+  const head=`<div class="dy-head"><span><span class="dy-nib">✎</span> ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span></div>`;
   const cap=lines.length?'':`<div class="dy-cap">${T.dyCap}</div>`;
   const inputRow=`<div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
   const tg=lines.length?`<div class="dy-tg" id="dyTg">${dyOpen?('▾ '+T.dyFold):('▸ '+T.dyToggle(lines.length))}</div>`:'';
@@ -4136,7 +4184,7 @@ async function initialSync(){
 async function cloudPush(){
   if(!sb||!sbUser) return;
   try{
-    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched||{},nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,na:state.nAck||{},pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null},updated_at:new Date().toISOString()});
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched||{},nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,nv:state.seenNotice||0,na:state.nAck||{},pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null},updated_at:new Date().toISOString()});
     if(error) throw error;
     syncState.err=''; syncState.last=now();
   }catch(e){ syncState.err=(e&&e.message)||String(e); }
@@ -4232,6 +4280,78 @@ function renderManageRow(){
   };
 }
 
+/* ================= 공지 · 신고 · 관리자 ================= */
+// 업데이트 공지: 새 소식을 추가할 때 v를 1 올리고 맨 앞에 항목을 넣는다.
+// v가 올라간 사용자에게는 설정 아이콘 옆에 점이 표시된다.
+const NOTICE_V = 1;
+const NOTICES = [
+  { v:1,
+    ko:'딥엔드가 새로워졌어요.\n· 영어·일본어를 온전히 지원해요\n· 철학자가 먼저 말을 거는 시간이 자연스러워졌어요\n· 구독 관리와 문의·신고를 설정에서 할 수 있어요',
+    en:'Deep End has been updated.\n· Full English and Japanese support\n· The philosophers reach out at better moments now\n· Manage your subscription and send reports from Settings',
+    ja:'ディープエンドが新しくなりました。\n· 英語と日本語に完全対応しました\n· 哲学者から声をかける間合いが自然になりました\n· 設定からサブスクの管理とお問い合わせができます' }
+];
+const noticeUnread = () => (state.seenNotice||0) < NOTICE_V;
+function showNoticeSheet(){
+  const body = NOTICES.map(n=>`<div class="nt-item"><div class="nt-v">v${n.v}</div><div class="nt-b">${(n[LANG]||n.en||'').replace(/</g,'&lt;')}</div></div>`).join('');
+  sheetBase(`<div class="sub-h1">${T.noticeT}</div><div style="max-height:52vh;overflow:auto">${body}</div>`);
+  state.seenNotice = NOTICE_V; save(); paintNoticeDot();
+}
+function paintNoticeDot(){
+  const g=$('btnSettings'); if(!g) return;
+  g.textContent = noticeUnread() ? '⚙️•' : '⚙️';
+  const n=$('stNotice'); if(n) n.innerHTML = T.noticeLink + (noticeUnread()?'<span class="st-dot"></span>':'');
+}
+
+// 문의·신고 — AI 답변 신고는 스토어 정책상 필요한 기능이라 로그인 없이도 보낼 수 있다.
+function showReportSheet(preset){
+  let kind = preset || 'content';
+  const b = sheetBase(`<div class="sub-h1">${T.reportT}</div>
+    <div class="sub-why">${T.reportD}</div>
+    <div class="rp-kinds">
+      <button class="rp-kind" data-k="content">${T.rkContent}</button>
+      <button class="rp-kind" data-k="bug">${T.rkBug}</button>
+      <button class="rp-kind" data-k="other">${T.rkOther}</button>
+    </div>
+    <textarea class="rp-ta" id="rpText" placeholder="${T.reportPh}"></textarea>
+    <button class="sub-cta" id="rpGo" style="margin-top:12px">${T.reportSend}</button>
+    <div class="sub-note">${T.reportNote}</div>`);
+  const paint=()=>b.querySelectorAll('.rp-kind').forEach(x=>x.classList.toggle('on',x.dataset.k===kind));
+  b.querySelectorAll('.rp-kind').forEach(x=>{ x.onclick=()=>{ kind=x.dataset.k; paint(); }; });
+  paint();
+  b.querySelector('#rpGo').onclick=async()=>{
+    const ta=b.querySelector('#rpText'), text=(ta.value||'').trim();
+    if(text.length<2){ ta.focus(); return; }
+    const go=b.querySelector('#rpGo'); go.disabled=true; go.textContent=T.reportSending;
+    // 신고 맥락: 지금 보고 있는 대화의 마지막 몇 줄 (답변 신고일 때만)
+    let ctx='';
+    try{
+      if(kind==='content' && state.current){
+        const h=(state.chats[state.current]||[]).slice(-6);
+        ctx=state.current+'\n'+h.map(m=>(m.role==='user'?'me: ':'ph: ')+String(m.content||'').slice(0,300)).join('\n');
+      }
+    }catch(e){}
+    try{
+      const r=await fetch('/api/report',{ method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ kind, text, context:ctx, lang:LANG, who:(sbUser&&sbUser.email)||'', version:T.version }) });
+      const j=await r.json();
+      if(j&&j.ok){ b.remove(); alert(T.reportDone); }
+      else { go.disabled=false; go.textContent=T.reportSend; alert(T.reportFail); }
+    }catch(e){ go.disabled=false; go.textContent=T.reportSend; alert(T.reportFail); }
+  };
+}
+
+// 관리자 — 아래 목록의 계정으로 로그인하면 결제 없이 기능을 열어 확인할 수 있다.
+// 기기 안에서만 열리는 것이라, 실제 결제 기록(서버)과는 무관하다.
+const ADMIN_EMAILS = ['intellee0707@gmail.com'];
+const isAdmin = () => !!(sbUser && sbUser.email && ADMIN_EMAILS.indexOf(String(sbUser.email).toLowerCase())>=0);
+function adminUnlock(days){
+  if(!isAdmin()) return false;
+  state.sub=state.sub||{};
+  state.sub.paidUntil=now()+(days||30)*86400000;
+  save(); renderFriends();
+  return true;
+}
+
 /* ================= 설정 화면 ================= */
 function applyLangUI(){
   document.documentElement.lang=LANG;
@@ -4249,6 +4369,7 @@ function applyLangUI(){
   $('input').placeholder=T.inputPh;
   $('cmManage').textContent=T.menuManage;
   $('cmRename').textContent=T.menuRename;
+  $('cmReport').textContent=T.reportBtn;
   $('cmLeave').textContent=T.menuLeave;
   $('prNick').textContent=T.nickBtn;
   $('prChat').textContent=T.chatBtn;
@@ -4262,6 +4383,10 @@ function applyLangUI(){
   $('stReset').textContent=T.resetBtn;
   $('stPrivacy').textContent=T.privacyLink;
   renderManageRow();
+  $('stReport').textContent=T.reportLink;
+  $('stReport').onclick=()=>showReportSheet('other');
+  $('stNotice').onclick=showNoticeSheet;
+  paintNoticeDot();
   $('stPrivacy').href=LANG==='ja'?'/privacy-ja.html':LANG==='en'?'/privacy-en.html':'/privacy.html';
   $('stDisclaimer').innerHTML=T.disclaimer;
   $('stVersion').textContent=T.version;
