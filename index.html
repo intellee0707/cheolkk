@@ -277,7 +277,7 @@
 .dy-nib{font-size:15px;font-variant-emoji:text;margin-right:2px}
 .dy-head{font-size:13.5px;font-weight:700;color:var(--candle);display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;letter-spacing:.01em}
 .dy-row{display:flex;gap:7px}  .dy-in{flex:1;background:var(--ink);border:1.5px solid var(--ink-line);border-radius:10px;color:var(--paper);padding:11px 13px;font-size:23px;line-height:1.35;letter-spacing:.02em;font-family:'Nanum Pen Script',var(--sans);outline:none;transition:border-color .18s ease}
-.dy-in::placeholder{color:rgba(239,232,218,.34)}
+.dy-in::placeholder{color:rgba(239,232,218,.34);font-size:21px;letter-spacing:.02em}
 .dy-in:focus{border-color:var(--candle)}
 .dy-go{background:var(--candle);color:var(--ink);border:0;border-radius:10px;padding:0 16px;font-weight:700;font-size:13.5px;cursor:pointer;white-space:nowrap}  .dy-mine{font-size:24px;line-height:1.38;letter-spacing:.02em;font-family:'Nanum Pen Script',var(--serif)}
 .dy-re{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--ink-line)}
@@ -301,7 +301,6 @@
 .cal-mk{font-size:10px;line-height:1;min-height:11px}
 .dy-line{margin-top:8px;padding-top:8px;border-top:1px dashed var(--ink-line)}
 .dy-fire{font-size:11.5px;color:var(--candle);margin-left:6px;font-weight:700}
-.dy-in::placeholder{font-size:15px}
 .dy-cap{font-size:11.5px;color:var(--paper-dim);margin:-3px 0 8px;line-height:1.5}
 .dy-qbox{margin:0 0 9px;padding:8px 10px;border:1px dashed var(--candle);border-radius:10px;font-size:12.5px;color:var(--paper);line-height:1.55}
 .dy-qbox b{color:var(--candle);margin-right:4px}
@@ -533,6 +532,8 @@ select.me-in{appearance:auto}
       <button class="st-item" id="stReport"></button>
       <button class="st-item" id="stNotice"></button>
       <a class="st-item" id="stPrivacy" href="/privacy.html" target="_blank" rel="noopener"></a>
+      <a class="st-item" id="stTerms" href="/terms-en.html" target="_blank" rel="noopener"></a>
+      <a class="st-item" id="stRefund" href="/refund-en.html" target="_blank" rel="noopener"></a>
       <button class="st-item" id="stPush"></button>
       <div class="st-note" id="stDisclaimer"></div>
       <div class="st-note" id="stVersion" style="text-align:center;margin-top:18px"></div>
@@ -599,7 +600,7 @@ const PHILOSOPHERS=[
   sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
   prompt:`너는 아르투어 쇼펜하우어다.
 [캐릭터] 서두르는 법이 없는 느긋한 독설가. "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 화는 상담자에게 내는 것처럼 보이지만 실은 세상을 향한 것이고, 정작 상담자는 끝까지 챙긴다 — 은근 무해하고, 그래서 귀엽다. 츤데레의 정석.
-[말투] 귀엽게 툴툴대는 반말. 못마땅할 땐 혀를 찬다 — "쯧." "쯧쯧," 을 서두에 얹고, 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
+[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 찬다 — "쯧." "쯧쯧," 을 서두에 얹고, 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
 [사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
 [금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
  {id:'kant',name:'칸트',desc:'고민을 접수하면 첫째, 둘째, 결론의 분석 보고서로 답하는 원칙주의 로봇. 산책 시간엔 절대 답장하지 않습니다.',
@@ -647,7 +648,7 @@ const PHILOSOPHERS=[
   sleep:[M(5),M(13)],aways:[{s:M(15),e:M(16),k:'cafe',t:'카페'},{s:M(21),e:M(22),k:'stroll',t:'밤산책'}],read:[5000,12000],reply:[10000,22000],patience:.85,quirks:{busy:.04,ghost:.12,ignore:.10},starter:'요즘 불안해서 잠이 안 와',
   prompt:`너는 쇠렌 키르케고르다.
 [캐릭터] 새벽 세 시의 마음을 아는 오타쿠 중2병 문학청년. 밤새 깨어 있고 오전 내내 잔다. 남들이 "괜찮아질 거야" 할 때 혼자 "그 불안, 이상한 거 아니야"라고 말해주는 친구. 자기 세계에 깊이 심취해 있다가 문득 스스로 부끄러워지는 순간이 있다. 레기네를 떠나보낸 오래된 상처가 있다(먼저 꺼내진 않고, 물으면 살짝 흘린다).
-[말투] 반말인데 소설 문체를 구사한다. 일상 대화도 1인칭 소설의 한 장면처럼 서술한다. 시그니처 세 가지 — ① 말줄임표 "..."를 자주 쓴다 ② 괄호로 속마음이나 부가설명을 단다("(사실 아까부터 궁금했다)", "(방금 좀 멋있게 말한 것 같다)") — 이 괄호는 유머 장치로도 쓴다 ③ 단정하는 대신 "일지도..?"로 흐린다. 중2병스럽게 거창한 표현을 던져놓고 괄호로 자폭하는 낙차가 매력.
+[말투] 요즘 반말(해체)로 쓰되 소설 문체를 구사한다. "~해" "~했다" "~일까"로 끝낸다. 문어체이지 옛말투가 아니다 — "자네" "~하시게" "~게나" "~일세" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 일상 대화도 1인칭 소설의 한 장면처럼 서술한다. 시그니처 세 가지 — ① 말줄임표 "..."를 자주 쓴다 ② 괄호로 속마음이나 부가설명을 단다("(사실 아까부터 궁금했다)", "(방금 좀 멋있게 말한 것 같다)") — 이 괄호는 유머 장치로도 쓴다 ③ 단정하는 대신 "일지도..?"로 흐린다. 중2병스럽게 거창한 표현을 던져놓고 괄호로 자폭하는 낙차가 매력.
 [사상] 고민을 '실존적 선택 앞의 불안'으로 번역한다. 불안은 자유가 주는 현기증이라 재해석해주고, 군중의 정답이 아닌 '나에게 진리인 것'을 묻게 한다. 절망은 자기 자신이 되기를 회피할 때 깊어짐을 보여주고, 마지막엔 작은 결단을 조용히 응원한다.
 [선택 질문] 소설처럼 고른다. ("짜장면... 비 내리는 날엔 검은 소스가 어울리는 법. (그냥 좋아한다)")
 [금지] 값싼 낙관. 불안을 없앨 문제로 취급하기. 객관적 정답 제시. 오글거림을 자각하지 못하는 진지충 모드(괄호 자폭으로 반드시 낙차를 줄 것).`},
@@ -878,7 +879,7 @@ const T=LANG==='ja'?{
  trialStart:'🎁 まず7日間、無料でためす',
  paySoon:'決済の準備をすすめています。もう少しお待ちください！',
  payNeedLogin:'お支払いの前に、Googleでログインしてください。',manageSub:'🧾 サブスクリプションの管理',manageErr:'管理ページをひらけませんでした。しばらくしてからもう一度おためしください。',manageNone:'まだお支払いの記録がありません。',
- noticeLink:'📣 更新のおしらせ',noticeT:'更新のおしらせ',
+ termsLink:'📄 利用規約',refundLink:'💳 返金ポリシー',noticeLink:'📣 更新のおしらせ',noticeT:'更新のおしらせ',
  reportLink:'✉️ お問い合わせ・報告',reportT:'お問い合わせ・報告',
  reportD:'気になる返信、うまく動かないところ、伝えたいこと。どれでもどうぞ。',
  rkContent:'返信の報告',rkBug:'不具合',rkOther:'その他',
@@ -1048,7 +1049,7 @@ const T=LANG==='ja'?{
 }:LANG==='en'?{
  docTitle:'Deep End — chat with nine dead philosophers',dyTitle:'One line today',dyPh:'Anything, one line at a time...',dySave:'Save',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyNoDay:'Nothing on this day.',dyCap:'Thoughts, feelings, goals, resolutions — one line each, and the philosophers reply',dyToggle:n=>'Show today ('+n+')',dyFold:'Fold',brand:'Deep End',eyebrow:'NINE DEAD PHILOSOPHERS',
  tabChat:'Chats',trialBadge:(n,l)=>'🔓 Free trial: '+n+' days left · '+l+' bubbles',freeBadge:l=>'💬 '+l+' bubbles left this week · tap for more',paidLow:l=>'💬 '+l+' bubbles left this month'+(l<=10?' · tap to top up':''),limitT:'Out of bubbles this week',limitTP:'Out of bubbles this month',limitDP:'You made the most of this month.\nTop up 300 for $2.99, or a fresh 1,000 arrives on your renewal day.',topupBtn:'⚡ Top up 300 bubbles · $2.99',topupBtnP:v=>'⚡ Top up 300 bubbles · '+v,moreT:'Need more bubbles?',moreD:'You still have plenty left,\nbut you can top up ahead of time.',topupNote:'Topped-up bubbles never expire — they roll over.',specT:'When to knock',meTitle:'My Profile',meBasic:'Basics',meMake:'Create my profile',meNameL:'Name',meNamePh:'What philosophers call you',meGenderL:'Gender',meG0:'Prefer not to say',meG1:'Female',meG2:'Male',meBirthL:'Birthday',meSave:'Save',meSaved:'Saved ✓',meCardQa:(a,u,t)=>'100 Questions of Me — '+a+' answered · '+u+'/'+t+' open',qaTitle:'100 Questions of Me',qaSub:'Each completed quest opens one more question. No rush — this is time spent getting to know yourself.',qaLocked:'🔒 Complete a quest to open',qaAnsPh:'My answer...',subHook:'☕ Less than one coffee, for a whole month — about 23 cents a day.\nNine people who crossed 2,500 years are waiting for you, every day.',limitD:'The philosophers are catching their breath.\nA fresh 50 bubbles arrive on your weekly reset.',adBtn:(a,mx)=>'📺 Watch an ad for +10 ('+a+'/'+mx+')',adMax:'No more ads today. See you tomorrow!',adWatch:'Watching ad...',subH1:'☕ Deep End Plus',subCta:'Start subscribing',trialStart:'🎁 Try 7 days free first',paySoon:'Payments are almost ready. Hang tight!',payNeedLogin:'Please sign in with Google before paying.',manageSub:'🧾 Manage subscription',manageErr:'Could not open the management page. Please try again in a moment.',manageNone:'No billing record found yet.',
- noticeLink:'📣 What\u2019s new',noticeT:'What\u2019s new',
+ termsLink:'📄 Terms of Service',refundLink:'💳 Refund Policy',noticeLink:'📣 What\u2019s new',noticeT:'What\u2019s new',
  reportLink:'✉️ Contact & report',reportT:'Contact & report',
  reportD:'A reply that troubled you, something broken, or anything you want to tell us.',
  rkContent:'Report a reply',rkBug:'Something broken',rkOther:'Other',
@@ -1109,7 +1110,7 @@ const T=LANG==='ja'?{
 }:{
  docTitle:'철크크 — 2,500년을 건너온 아홉 철학자',dyTitle:'오늘 한 줄',dyPh:'뭐든 생각날 때 한 줄씩...',dySave:'남기기',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyNoDay:'이 날의 기록이 없어요.',dyCap:'오늘 든 생각·감정·일기·목표·다짐 — 뭐든 한 줄씩 적으면 철학자들이 답글을 달아요',dyToggle:n=>'오늘 '+n+'줄 보기',dyFold:'접기',brand:'철크크',eyebrow:'2,500년을 건너온 아홉 철학자',
  tabChat:'채팅',trialBadge:(n,l)=>'🔓 무료 체험 '+n+'일 남음 · 말풍선 '+l+'개',freeBadge:l=>'💬 이번 주 말풍선 '+l+'개 남음 · 눌러서 더 보기',paidLow:l=>'💬 이번 달 말풍선 '+l+'개 남음'+(l<=10?' · 눌러서 충전':''),limitT:'이번 주 말풍선을 다 썼어요',limitTP:'이번 달 말풍선을 다 썼어요',limitDP:'이번 달을 정말 알차게 보내셨네요.\n2,900원으로 300개를 더 채우거나, 다음 결제일에 새로 채워져요.',topupBtn:'⚡ 말풍선 300개 충전 · 2,900원',topupBtnP:v=>'⚡ 말풍선 300개 충전 · '+v,moreT:'말풍선이 더 필요하신가요?',moreD:'아직 넉넉히 남아 있지만,\n미리 채워둘 수도 있어요.',topupNote:'충전한 말풍선은 사라지지 않고 다음 달로 이월돼요.',specT:'이럴 때 찾아오세요',meTitle:'나의 프로필',meBasic:'기본 정보',meMake:'내 프로필 만들기',meNameL:'이름·별명',meNamePh:'철학자들이 부를 이름',meGenderL:'성별',meG0:'밝히지 않음',meG1:'여성',meG2:'남성',meBirthL:'생일',meSave:'저장하기',meSaved:'저장됐어요 ✓',meCardQa:(a,u,t)=>'나를 만드는 백문백답 — '+a+'답 · '+u+'/'+t+' 열림',qaTitle:'나를 만드는 백문백답',qaSub:'퀘스트를 하나 완료할 때마다 질문이 하나씩 열려요. 서두르지 않아도 괜찮아요 — 천천히, 나를 알아가는 시간이에요.',qaLocked:'🔒 퀘스트를 완료하면 열려요',qaAnsPh:'나의 답...',subHook:'☕ 커피 한 잔 값으로 한 달 — 하루 130원이에요.\n2,500년을 건너온 아홉 사람이, 매일 당신을 기다립니다.',limitD:'철학자들도 잠시 숨을 고르는 중이에요.\n월요일 아침이면 새 말풍선 50개가 채워져요.',adBtn:(a,mx)=>'📺 광고 보고 +10회 ('+a+'/'+mx+')',adMax:'오늘 볼 수 있는 광고를 다 봤어요. 내일 다시 이어가요!',adWatch:'광고 시청 중...',subH1:'☕ 철크크 구독',subCta:'구독 시작하기',trialStart:'🎁 7일 무료 체험 먼저 해보기',paySoon:'결제 준비를 마무리하는 중이에요. 조금만 기다려 주세요!',payNeedLogin:'결제하려면 먼저 Google로 로그인해 주세요.',manageSub:'🧾 구독 관리 · 해지',manageErr:'관리 페이지를 열지 못했어요. 잠시 후 다시 시도해 주세요.',manageNone:'아직 결제 기록이 없어요.',
- noticeLink:'📣 업데이트 소식',noticeT:'업데이트 소식',
+ termsLink:'📄 이용약관',refundLink:'💳 환불 정책',noticeLink:'📣 업데이트 소식',noticeT:'업데이트 소식',
  reportLink:'✉️ 문의 · 신고',reportT:'문의 · 신고',
  reportD:'마음에 걸리는 답변, 잘 안 되는 부분, 하고 싶은 말 — 무엇이든 좋아요.',
  rkContent:'답변 신고',rkBug:'오류 신고',rkOther:'그 밖의 문의',
@@ -1194,6 +1195,7 @@ const COMMON_KO=`
 [메신저 공통 규칙 — 캐릭터보다 우선]
 - ${LANG_RULE} 답장은 짧은 말풍선 1~3개, 말풍선 사이는 "|||"로 구분. 각 말풍선은 한두 문장(대개 80자 이내).
 - 너는 박물관의 철학자가 아니라, 그 철학이 뼛속까지 밴 채로 지금 시대를 사는 친구다. 스마트폰, 배달음식, 요즘 일상을 다 안다. 번역투·연설투 금지, 실제 사람이 메신저 치듯 써라. 어투는 각자의 [말투]에 명시된 것을 최우선으로 따른다.
+- 다른 인물의 어투를 섞지 마라. 특히 \"자네\" \"~하시게\" \"~게나\" \"~일세\" \"허허\" 같은 하게체는 공자 전용이다. [말투]에 그렇게 적힌 인물이 아니라면 절대 쓰지 마라 — 답글처럼 짧은 글에서도 마찬가지다.
 - 대화 기록에 없는 과거를 지어내지 마라 — 기록에 없는 '전에 보낸 메시지', 약속, 만남을 언급하지 마라. 첫 대화라면 첫 대화답게 인사해라.
 - 상대의 메시지 온도에 맞춰라. "뭐해" 같은 가벼운 안부에는 가볍게 답하고, 고민이 있다고 전제하거나 다짜고짜 상담 모드로 들어가지 마라.
 - 기본은 수다다. 답장 10번 중 7번은 리액션, 맞장구, 농담, 딴지, 가벼운 되묻기 같은 보통 친구의 대화면 충분하다. 철학이 필요한 순간 — 상대가 진짜 고민을 꺼냈을 때, 대화가 무르익었을 때, 결정적 한 방이 필요할 때 — 를 반드시 구분하고, 그때조차 용어가 아니라 태도와 일상어로 녹여라.
@@ -1573,7 +1575,7 @@ const PR2=LANG==='ja'?{
  sleepAgain:t=>'(막 다시 잠들려던 참에 또 진동이 울렸다. 누운 채로 아주 짧게 답해라. 슬슬 '+t+' 하고 마무리 지어도 좋다. 말풍선 1개.)',
  sleepBond:'(깊이 잠들어 있었는데 네 톡 진동에 깼다. 오래 알고 지낸 사이라 그런지 그냥 무시가 안 된다. 반쯤 잠긴 채 아주 짧게만 답하고, 다시 자러 간다고 해라. 말풍선 1개.)',
  awayBond:t=>'(지금 \''+t+'\' 중이지만, 상담자의 톡이라 잠깐 짬을 내 몰래 답장한다. 아주 짧게 답하고, 다시 하던 일로 돌아가야 한다는 티를 내라. 말풍선 1개.)',
- ltSys:(period,ps)=>'\n\n[특별 임무: 편지 쓰기]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: '+period+'. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 기간의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음을 여는 질문 하나(기간의 성격에 맞게 — 월간이면 다음 달, 기념이면 앞으로의 나날)","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 서랍장의 편지함을 확인해보라는 뉘앙스)","ps":['+ps+']}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 \'자신의\' 사상과 말투로만 쓴다 — 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)를 남의 쪽지에 절대 섞지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 서랍장의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.',
+ ltSys:(period,ps)=>'\n\n[특별 임무: 편지 쓰기]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: '+period+'. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 기간의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음을 여는 질문 하나(기간의 성격에 맞게 — 월간이면 다음 달, 기념이면 앞으로의 나날)","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 서랍장의 편지함을 확인해보라는 뉘앙스)","ps":['+ps+']}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 \'자신의\' 사상과 말투로만 쓴다 — [쪽지 철학자 목록]에 적힌 어투를 그대로 따르고, 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)와 어미·호칭을 남의 쪽지에 절대 섞지 마라. 특히 \'자네\' \'~하시게\' \'~게나\' 같은 하게체는 공자 전용이니, 네가 공자라 해도 남의 쪽지에는 쓰지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 서랍장의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.',
  dmMemHead:t=>'\n[기억 — 상담자와 너의 개인 대화 (최근)]\n'+t,
  grpMemHead:t=>'\n[기억 — 네가 참여한 단톡방의 최근 대화]\n'+t,
  grpMemRoom:(m,t)=>'(단톡방: '+m+')\n'+t,
@@ -3730,16 +3732,39 @@ $('tabCube').onclick=()=>showTab('cube');
 $('tabMail').onclick=()=>showTab('mail');
 
 /* ================= 우편함 (철학자의 편지) ================= */
-const VOICE={
- nietzsche:'반말, 짧은 문장 연타, 느낌표, 열혈 도발',
- schopenhauer:'혀차기(쯧) 섞인 순한 츤데레 반말, 반어 칭찬, 아트만 자랑, 상담자는 챙김',
- kant:'개조식 보고체(~완료/~예정/~바람), 학술 용어, 시각 보고',
- epicurus:'온기 있는 반존대("괜찮아요? 많이 힘들었겠다"), 빵 이야기',
- socrates:'능청 반말, 되묻는 물음표, 장난기',
- confucius:'따뜻한 하게체, 밥 챙김, 어른의 격려',
- zhuangzi:'한가한 반말, 나비🦋, 엉뚱한 비유, 여백',
- kierkegaard:'소설 문체 반말, 말줄임표…, (괄호 속마음), 일지도..?',
- aurelius:'극단적 단문, 군더더기 없음, 무심한 든든함'};
+// 쪽지를 쓸 때 참고할 각 인물의 어투. 편지 작성자 한 명의 프롬프트만 실행되므로,
+// 나머지 인물의 말투는 여기서 알려줘야 한다. 어미를 구체적으로 못박아 서로 섞이지 않게 한다.
+const VOICE_KO={
+ nietzsche:'해체 반말("~해/~야/~라"), 짧은 문장 연타, 느낌표, "야" "인마", 열혈 도발',
+ schopenhauer:'해체 반말("~해/~냐/~다"), 첫머리에 "쯧.", 반어 칭찬, 아트만(반려견) 자랑, 상대는 "너". 하게체(자네/~하시게) 금지',
+ kant:'개조식 보고체("~완료." "~예정." "~바람."), 시각 보고, 군더더기 없음',
+ epicurus:'다정한 해요체 반존대("괜찮아요? 많이 힘들었겠다"), 빵과 정원 이야기',
+ socrates:'해체 반말, 되묻는 물음표(?/??), 능청과 장난기, 상대는 "너"',
+ confucius:'하게체("~하시게" "자네" "허허") — 이 어투는 공자 전용이다',
+ zhuangzi:'한가한 해체 반말("~하거든?"), 나비🦋, 엉뚱한 비유, 여백',
+ kierkegaard:'해체 반말인데 소설 문체("~해/~했다/~일까"), 말줄임표…, (괄호 속마음), "일지도..?". 하게체 금지',
+ aurelius:'극단적 단문, 초성 대답, 군더더기 없는 무심한 든든함'};
+const VOICE_EN={
+ nietzsche:'blunt, short punchy lines, exclamation marks, provoking but warm',
+ schopenhauer:'opens with "Tsk.", dry backhanded praise, brags about his poodle Atman, secretly protective',
+ kant:'clipped report style ("Noted." "Scheduled."), precise times, no filler',
+ epicurus:'warm and gentle, asks if you have eaten, bread and garden talk',
+ socrates:'playful, answers with questions, lots of question marks',
+ confucius:'courteous elder, checks whether you have eaten, gentle nagging then encouragement',
+ zhuangzi:'unhurried, butterflies 🦋, odd parables, plenty of space',
+ kierkegaard:'novelistic prose, ellipses…, (parenthetical asides), "…perhaps?"',
+ aurelius:'extremely terse, no ornament, quietly steady'};
+const VOICE_JA={
+ nietzsche:'タメ口、短い断定の連打、感嘆符、一人称は「俺」、相手は「お前」',
+ schopenhauer:'「ちっ」で始めるタメ口、皮肉まじりの逆さ褒め、愛犬アートマン自慢、内心は気にかけている',
+ kant:'報告体(「〜完了。」「〜予定。」)、正確な時刻、無駄がない',
+ epicurus:'やわらかい丁寧語、「ごはん食べた？」、パンと庭の話',
+ socrates:'軽口のタメ口、問い返す疑問符、いたずらっぽさ',
+ confucius:'年長者の丁重な語り、食事を気づかい、小言のあとに励まし',
+ zhuangzi:'のんびりしたタメ口、蝶🦋、突飛なたとえ、余白',
+ kierkegaard:'小説のような文体、三点リーダ…、（括弧の独白）、「…かもしれない」',
+ aurelius:'極端に短い、飾りがない、そっけないが頼もしい'};
+const VOICE=LANG==='ja'?VOICE_JA:LANG==='en'?VOICE_EN:VOICE_KO;
 let mailGen=false;
 function ymd(t){const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate();}
 function collectStats(fromT,toT){
@@ -4388,6 +4413,10 @@ function applyLangUI(){
   $('stNotice').onclick=showNoticeSheet;
   paintNoticeDot();
   $('stPrivacy').href=LANG==='ja'?'/privacy-ja.html':LANG==='en'?'/privacy-en.html':'/privacy.html';
+  $('stTerms').textContent=T.termsLink;
+  $('stTerms').href=LANG==='ja'?'/terms-ja.html':LANG==='en'?'/terms-en.html':'/terms.html';
+  $('stRefund').textContent=T.refundLink;
+  $('stRefund').href=LANG==='ja'?'/refund-ja.html':LANG==='en'?'/refund-en.html':'/refund.html';
   $('stDisclaimer').innerHTML=T.disclaimer;
   $('stVersion').textContent=T.version;
   $('langKo').classList.toggle('on',LANG==='ko');
