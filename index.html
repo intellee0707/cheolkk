@@ -59,6 +59,9 @@
   .cube-info b{color:var(--paper);font-size:14px}
   .trait{display:inline-block;background:rgba(239,232,218,.07);border-radius:8px;padding:2.5px 9px;margin:6px 4px 0 0;font-size:11px}
   .cube-pr{margin-top:10px;background:none;border:1px solid var(--candle);color:var(--candle);border-radius:10px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--sans)}
+  .cube-tools{display:flex;gap:8px;margin:14px 12px 4px}
+  .cube-tool{flex:1;background:var(--ink-soft);border:1px solid rgba(217,160,91,.35);border-radius:11px;color:var(--candle);padding:11px 8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+  .cube-tool:hover{background:rgba(217,160,91,.1)}
   .cube-foot{font-size:10.5px;color:rgba(239,232,218,.3);text-align:center;line-height:1.6;padding:18px 0 10px}
   .gcell .dot{top:7px;left:7px;right:auto;bottom:auto;width:12px;height:12px;border-width:2.5px}
   .splash{position:absolute;inset:0;z-index:50;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s}
@@ -392,6 +395,10 @@ select.me-in{appearance:auto}
   <div class="cube-view" id="cubeView" style="display:none">
     <div class="cube-cap" id="cubeCap"></div>
     <div id="cubeRows"></div>
+    <div class="cube-tools">
+      <button class="cube-tool" id="cbQuiz"></button>
+      <button class="cube-tool" id="cbTeams"></button>
+    </div>
     <div class="cube-info" id="cubeInfo">철학자를 눌러 서로 비교해 보세요.</div>
     <div class="cube-foot">철학적 사유를 빌린 대화 도구이며, 심리 상담·치료가 아닙니다.<br>마음이 많이 힘들다면 전문 상담기관의 도움을 받아 보세요.</div>
   </div>
@@ -879,7 +886,7 @@ const T=LANG==='ja'?{
  trialStart:'🎁 まず7日間、無料でためす',
  paySoon:'決済の準備をすすめています。もう少しお待ちください！',
  payNeedLogin:'お支払いの前に、Googleでログインしてください。',manageSub:'🧾 サブスクリプションの管理',manageErr:'管理ページをひらけませんでした。しばらくしてからもう一度おためしください。',manageNone:'まだお支払いの記録がありません。',
- termsLink:'📄 利用規約',refundLink:'💳 返金ポリシー',noticeLink:'📣 更新のおしらせ',noticeT:'更新のおしらせ',
+ closeBtn:'とじる',termsLink:'📄 利用規約',refundLink:'💳 返金ポリシー',noticeLink:'📣 更新のおしらせ',noticeT:'更新のおしらせ',
  reportLink:'✉️ お問い合わせ・報告',reportT:'お問い合わせ・報告',
  reportD:'気になる返信、うまく動かないところ、伝えたいこと。どれでもどうぞ。',
  rkContent:'返信の報告',rkBug:'不具合',rkOther:'その他',
@@ -1049,7 +1056,7 @@ const T=LANG==='ja'?{
 }:LANG==='en'?{
  docTitle:'Deep End — chat with nine dead philosophers',dyTitle:'One line today',dyPh:'Anything, one line at a time...',dySave:'Save',dyQuest:'Small quest',dyDoneBtn:'Did it ✓',dyEmpty:'No entries yet.',dySeg1:'Diary',dySeg2:'Letters',dyStreakCur:n=>n+'-day streak',dyStreakMax:n=>'best '+n,dyWk:['S','M','T','W','T','F','S'],dyNoDay:'Nothing on this day.',dyCap:'Thoughts, feelings, goals, resolutions — one line each, and the philosophers reply',dyToggle:n=>'Show today ('+n+')',dyFold:'Fold',brand:'Deep End',eyebrow:'NINE DEAD PHILOSOPHERS',
  tabChat:'Chats',trialBadge:(n,l)=>'🔓 Free trial: '+n+' days left · '+l+' bubbles',freeBadge:l=>'💬 '+l+' bubbles left this week · tap for more',paidLow:l=>'💬 '+l+' bubbles left this month'+(l<=10?' · tap to top up':''),limitT:'Out of bubbles this week',limitTP:'Out of bubbles this month',limitDP:'You made the most of this month.\nTop up 300 for $2.99, or a fresh 1,000 arrives on your renewal day.',topupBtn:'⚡ Top up 300 bubbles · $2.99',topupBtnP:v=>'⚡ Top up 300 bubbles · '+v,moreT:'Need more bubbles?',moreD:'You still have plenty left,\nbut you can top up ahead of time.',topupNote:'Topped-up bubbles never expire — they roll over.',specT:'When to knock',meTitle:'My Profile',meBasic:'Basics',meMake:'Create my profile',meNameL:'Name',meNamePh:'What philosophers call you',meGenderL:'Gender',meG0:'Prefer not to say',meG1:'Female',meG2:'Male',meBirthL:'Birthday',meSave:'Save',meSaved:'Saved ✓',meCardQa:(a,u,t)=>'100 Questions of Me — '+a+' answered · '+u+'/'+t+' open',qaTitle:'100 Questions of Me',qaSub:'Each completed quest opens one more question. No rush — this is time spent getting to know yourself.',qaLocked:'🔒 Complete a quest to open',qaAnsPh:'My answer...',subHook:'☕ Less than one coffee, for a whole month — about 23 cents a day.\nNine people who crossed 2,500 years are waiting for you, every day.',limitD:'The philosophers are catching their breath.\nA fresh 50 bubbles arrive on your weekly reset.',adBtn:(a,mx)=>'📺 Watch an ad for +10 ('+a+'/'+mx+')',adMax:'No more ads today. See you tomorrow!',adWatch:'Watching ad...',subH1:'☕ Deep End Plus',subCta:'Start subscribing',trialStart:'🎁 Try 7 days free first',paySoon:'Payments are almost ready. Hang tight!',payNeedLogin:'Please sign in with Google before paying.',manageSub:'🧾 Manage subscription',manageErr:'Could not open the management page. Please try again in a moment.',manageNone:'No billing record found yet.',
- termsLink:'📄 Terms of Service',refundLink:'💳 Refund Policy',noticeLink:'📣 What\u2019s new',noticeT:'What\u2019s new',
+ closeBtn:'Close',termsLink:'📄 Terms of Service',refundLink:'💳 Refund Policy',noticeLink:'📣 What\u2019s new',noticeT:'What\u2019s new',
  reportLink:'✉️ Contact & report',reportT:'Contact & report',
  reportD:'A reply that troubled you, something broken, or anything you want to tell us.',
  rkContent:'Report a reply',rkBug:'Something broken',rkOther:'Other',
@@ -1110,7 +1117,7 @@ const T=LANG==='ja'?{
 }:{
  docTitle:'철크크 — 2,500년을 건너온 아홉 철학자',dyTitle:'오늘 한 줄',dyPh:'뭐든 생각날 때 한 줄씩...',dySave:'남기기',dyQuest:'작은 미션',dyDoneBtn:'했어요 ✓',dyEmpty:'아직 기록이 없어요.',dySeg1:'일기',dySeg2:'편지',dyStreakCur:n=>'연속 '+n+'일',dyStreakMax:n=>'최고 '+n+'일',dyWk:['일','월','화','수','목','금','토'],dyNoDay:'이 날의 기록이 없어요.',dyCap:'오늘 든 생각·감정·일기·목표·다짐 — 뭐든 한 줄씩 적으면 철학자들이 답글을 달아요',dyToggle:n=>'오늘 '+n+'줄 보기',dyFold:'접기',brand:'철크크',eyebrow:'2,500년을 건너온 아홉 철학자',
  tabChat:'채팅',trialBadge:(n,l)=>'🔓 무료 체험 '+n+'일 남음 · 말풍선 '+l+'개',freeBadge:l=>'💬 이번 주 말풍선 '+l+'개 남음 · 눌러서 더 보기',paidLow:l=>'💬 이번 달 말풍선 '+l+'개 남음'+(l<=10?' · 눌러서 충전':''),limitT:'이번 주 말풍선을 다 썼어요',limitTP:'이번 달 말풍선을 다 썼어요',limitDP:'이번 달을 정말 알차게 보내셨네요.\n2,900원으로 300개를 더 채우거나, 다음 결제일에 새로 채워져요.',topupBtn:'⚡ 말풍선 300개 충전 · 2,900원',topupBtnP:v=>'⚡ 말풍선 300개 충전 · '+v,moreT:'말풍선이 더 필요하신가요?',moreD:'아직 넉넉히 남아 있지만,\n미리 채워둘 수도 있어요.',topupNote:'충전한 말풍선은 사라지지 않고 다음 달로 이월돼요.',specT:'이럴 때 찾아오세요',meTitle:'나의 프로필',meBasic:'기본 정보',meMake:'내 프로필 만들기',meNameL:'이름·별명',meNamePh:'철학자들이 부를 이름',meGenderL:'성별',meG0:'밝히지 않음',meG1:'여성',meG2:'남성',meBirthL:'생일',meSave:'저장하기',meSaved:'저장됐어요 ✓',meCardQa:(a,u,t)=>'나를 만드는 백문백답 — '+a+'답 · '+u+'/'+t+' 열림',qaTitle:'나를 만드는 백문백답',qaSub:'퀘스트를 하나 완료할 때마다 질문이 하나씩 열려요. 서두르지 않아도 괜찮아요 — 천천히, 나를 알아가는 시간이에요.',qaLocked:'🔒 퀘스트를 완료하면 열려요',qaAnsPh:'나의 답...',subHook:'☕ 커피 한 잔 값으로 한 달 — 하루 130원이에요.\n2,500년을 건너온 아홉 사람이, 매일 당신을 기다립니다.',limitD:'철학자들도 잠시 숨을 고르는 중이에요.\n월요일 아침이면 새 말풍선 50개가 채워져요.',adBtn:(a,mx)=>'📺 광고 보고 +10회 ('+a+'/'+mx+')',adMax:'오늘 볼 수 있는 광고를 다 봤어요. 내일 다시 이어가요!',adWatch:'광고 시청 중...',subH1:'☕ 철크크 구독',subCta:'구독 시작하기',trialStart:'🎁 7일 무료 체험 먼저 해보기',paySoon:'결제 준비를 마무리하는 중이에요. 조금만 기다려 주세요!',payNeedLogin:'결제하려면 먼저 Google로 로그인해 주세요.',manageSub:'🧾 구독 관리 · 해지',manageErr:'관리 페이지를 열지 못했어요. 잠시 후 다시 시도해 주세요.',manageNone:'아직 결제 기록이 없어요.',
- termsLink:'📄 이용약관',refundLink:'💳 환불 정책',noticeLink:'📣 업데이트 소식',noticeT:'업데이트 소식',
+ closeBtn:'닫기',termsLink:'📄 이용약관',refundLink:'💳 환불 정책',noticeLink:'📣 업데이트 소식',noticeT:'업데이트 소식',
  reportLink:'✉️ 문의 · 신고',reportT:'문의 · 신고',
  reportD:'마음에 걸리는 답변, 잘 안 되는 부분, 하고 싶은 말 — 무엇이든 좋아요.',
  rkContent:'답변 신고',rkBug:'오류 신고',rkOther:'그 밖의 문의',
@@ -1906,10 +1913,11 @@ function mainOnboard(pre,note){
 }
 
 /* --- 매칭 테스트: 결과는 큐브에 표시만 --- */
-function startQuiz(prevSel){
+function startQuiz(prevSel,fromProfile){
   const scores={};
+  const close=()=>$('picker').classList.remove('on');
   const step=i=>{
-    resetOv(); backTo(i===0?()=>mainOnboard(prevSel):()=>step(i-1));
+    resetOv(); backTo(i===0?(fromProfile?close:()=>mainOnboard(prevSel)):()=>step(i-1));
     $('pkTitle').textContent=T.quizTitle;
     $('pkDesc').textContent='';
     const g=$('pkGrid'); g.className='center-col';
@@ -1944,15 +1952,15 @@ function startQuiz(prevSel){
       <div class="res-trio">${trio.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
       <div class="res-line" style="margin-top:8px">${trio.map(id=>P(id).name).join(' · ')}</div>`;
     const go=$('pkGo'); go.style.display=''; go.disabled=false;
-    go.textContent=T.backToCube;
-    go.onclick=()=>mainOnboard(trio,T.quizNote);
+    go.textContent=fromProfile?T.closeBtn:T.backToCube;
+    go.onclick=fromProfile?close:()=>mainOnboard(trio,T.quizNote);
   };
   step(0);
 }
 
 /* --- 추천 조합: 선택하면 큐브에 표시만 --- */
-function showTeams(prevSel){
-  resetOv(); backTo(()=>mainOnboard(prevSel));
+function showTeams(prevSel,fromProfile){
+  resetOv(); backTo(fromProfile?()=>$('picker').classList.remove('on'):()=>mainOnboard(prevSel));
   $('pkTitle').textContent=T.teamsTitle;
   $('pkDesc').textContent=T.teamsDesc;
   const g=$('pkGrid');
@@ -1961,7 +1969,7 @@ function showTeams(prevSel){
     b.className='team';
     b.innerHTML=`<div class="t-avs">${t.m.map(id=>`<div class="avatar">${av(id)}</div>`).join('')}</div>
       <div><div class="t-name">${t.name}</div><div class="t-desc">${t.desc}</div></div>`;
-    b.onclick=()=>mainOnboard([...t.m],T.teamNote(t.name));
+    b.onclick=fromProfile?()=>$('picker').classList.remove('on'):()=>mainOnboard([...t.m],T.teamNote(t.name));
     g.appendChild(b);
   });
 }
@@ -3691,6 +3699,8 @@ function traits(p){
 }
 function renderCube(){
   const cc=$('cubeCap'); if(cc) cc.textContent=T.cubeCap;
+  const q=$('cbQuiz'); if(q) q.textContent=T.helperQuiz;
+  const tm=$('cbTeams'); if(tm) tm.textContent=T.helperTeams;
   const rows=$('cubeRows'); rows.innerHTML='';
   try{ rows.appendChild(meCard()); }catch(e){}
   for(let r=0;r<3;r++){
@@ -3729,6 +3739,8 @@ function showTab(t){
 }
 $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
+$('cbQuiz').onclick=()=>{ startQuiz(state.friends||[],true); $('picker').classList.add('on'); };
+$('cbTeams').onclick=()=>{ showTeams(state.friends||[],true); $('picker').classList.add('on'); };
 $('tabMail').onclick=()=>showTab('mail');
 
 /* ================= 우편함 (철학자의 편지) ================= */
