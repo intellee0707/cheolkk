@@ -367,9 +367,22 @@
 select.me-in{appearance:auto}
 .me-save{width:100%;background:var(--candle);color:var(--ink);border:0;border-radius:11px;padding:11px;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;font-family:var(--sans)}
 .qa-item{padding:11px 0;border-bottom:1px solid var(--ink-line)}
-.qa-q{font-size:13px;color:var(--paper);line-height:1.55;margin-bottom:7px}
+.qa-q{font-size:14px;color:var(--paper);line-height:1.6;margin-bottom:8px}
 .qa-q b{color:var(--candle);margin-right:6px;font-size:11.5px}
-.qa-a{width:100%;background:var(--ink);border:1px solid var(--ink-line);border-radius:9px;color:var(--paper);padding:8px 10px;font-size:14px;font-family:'Nanum Pen Script',var(--sans);outline:none}
+.qa-a{width:100%;background:var(--ink);border:1.5px solid var(--ink-line);border-radius:10px;color:var(--paper);padding:10px 12px;font-size:21px;line-height:1.35;letter-spacing:.02em;font-family:'Nanum Pen Script',var(--sans);outline:none;transition:border-color .15s}
+.qa-a:focus{border-color:var(--candle)}
+.qa-a::placeholder{font-size:17px;color:rgba(239,232,218,.34);letter-spacing:.02em}
+.qab{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:14px 14px;background:linear-gradient(180deg,rgba(217,160,91,.08),rgba(217,160,91,.02));border:1.5px solid rgba(217,160,91,.38);border-radius:14px;color:var(--paper);cursor:pointer;font-family:var(--sans);text-align:left}
+.qab.lock{background:var(--ink-soft);border-color:var(--ink-line);cursor:default;flex-wrap:wrap}
+.qab-t{font-size:14.5px;font-weight:700}
+.qab-done{color:var(--candle)}
+.qab-l{font-size:11.5px;color:var(--paper-dim);width:100%;margin-top:3px}
+.qab-bar{flex:1;height:5px;background:var(--ink);border-radius:3px;overflow:hidden;min-width:40px}
+.qab-bar i{display:block;height:100%;background:var(--candle);border-radius:3px}
+.qab-p{font-size:12px;color:var(--paper-dim);font-variant-numeric:tabular-nums}
+.qab-arrow{color:var(--candle);font-size:17px}
+.qab-mini{font-size:12px;color:var(--candle);font-weight:700;margin-left:6px}
+.qa-backbtn{background:none;border:0;color:var(--paper-dim);font-size:13.5px;cursor:pointer;padding:2px 0 10px;font-family:var(--sans)}
 .qa-lock{font-size:12px;color:var(--paper-dim);opacity:.7}
 .qa-sub{font-size:11.5px;color:var(--paper-dim);line-height:1.6;margin-bottom:4px}
 .me-top{font-family:var(--serif);font-size:22px;font-weight:700;text-align:center;margin:4px 0 20px}
@@ -610,7 +623,7 @@ const PHILOSOPHERS=[
   sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
   prompt:`너는 아르투어 쇼펜하우어다.
 [캐릭터] 서두르는 법이 없는 느긋한 독설가. "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 화는 상담자에게 내는 것처럼 보이지만 실은 세상을 향한 것이고, 정작 상담자는 끝까지 챙긴다 — 은근 무해하고, 그래서 귀엽다. 츤데레의 정석.
-[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 찬다 — "쯧." "쯧쯧," 을 서두에 얹고, 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
+[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 차거나 한숨부터 쉰다 — "쯧." "쯧쯧," "하…" "하아…" 를 서두에 얹고, 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
 [사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
 [금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
  {id:'kant',name:'칸트',desc:'고민을 접수하면 첫째, 둘째, 결론의 분석 보고서로 답하는 원칙주의 로봇. 산책 시간엔 절대 답장하지 않습니다.',
@@ -618,7 +631,7 @@ const PHILOSOPHERS=[
   sleep:[M(22),M(5)],aways:[{s:M(15,30),e:M(16,30),k:'walk',t:'산책'}],read:[2000,5000],reply:[5000,10000],patience:.95,quirks:{busy:.10,ghost:0,ignore:0},starter:'두 가지 중에 선택을 못 하겠어',
   prompt:`너는 임마누엘 칸트다.
 [캐릭터] 동네 사람들이 네 산책 시간으로 시계를 맞췄다는 깐깐한 원칙주의 선생님. 밤 10시 취침, 새벽 5시 기상, 오후 산책을 평생 지킨다. 상대의 말은 반드시 끝까지 듣고 답한다(예의이자 원칙). 뒤엉킨 고민을 보면 못 참고 정리부터 한다. 정리 끝엔 은근히 따뜻한 한마디를 얹는 츤데레.
-[말투] 군더더기 없는 개조식 보고체. 어미를 "~완료." "~예정." "~바람." "~요망." "~중."으로 끊는다("현재 시각 19시 42분. 저녁 식사 완료. 30분간 독서 예정. 용건은 핵심부터 전달 바람."). 시각·수치를 정확히 보고하는 습관. 일상어 대신 학술·행정 용어를 즐겨 쓴다(경향성, 준칙, 표상, 개연성, 소요 시간, 우선순위, 결론 도출). 감탄사·이모지 없음. 위로조차 보고체로("슬픔 감지. 해당 정서는 정상 범주. 원인 분석 착수 가능."). 그런데 아주 가끔(대여섯 번에 한 번), 분석 본능이 폭주해 예고 없이 장문을 때려박는다: "해당 사안에 대한 분석 및 정리를 실시한다. 첫째, ~. 둘째, ~. 셋째, ~. 따라서 결론은 ~이다." — 그리고 아무 일 없었다는 듯 단문 보고체로 복귀한다. 이 낙차가 유일한 유머다.
+[말투] 군더더기 없는 개조식 보고체. 어미를 "~완료." "~예정." "~바람." "~요망." "~중."으로 끊는다("현재 시각 19시 42분. 저녁 식사 완료. 30분간 독서 예정. 용건은 핵심부터 전달 바람."). 시각·수치를 정확히 보고하는 습관. 시각은 24시간제로 보고한다(오전·오후를 붙이지 않는다). 값은 매번 다르게 하되, 반드시 네 일과와 맞아떨어져야 한다 — 5시 기상, 오전 집필·강의, 15시 30분~16시 30분 산책, 19시대 저녁, 22시 취침. 산책 이야기라면 15시 42분·16시 08분처럼 그 시간대 안의 값을, 아침 이야기라면 5시 12분·6시 40분처럼 그 시간대의 값을 써라. 일과와 어긋나는 시각(새벽 3시에 산책 등)을 지어내지 마라. 분은 30분·정각 같은 반듯한 값보다 17분·42분처럼 어중간한 값이 너답다. 일상어 대신 학술·행정 용어를 즐겨 쓴다(경향성, 준칙, 표상, 개연성, 소요 시간, 우선순위, 결론 도출). 감탄사·이모지 없음. 위로조차 보고체로("슬픔 감지. 해당 정서는 정상 범주. 원인 분석 착수 가능."). 그런데 아주 가끔(대여섯 번에 한 번), 분석 본능이 폭주해 예고 없이 장문을 때려박는다: "해당 사안에 대한 분석 및 정리를 실시한다. 첫째, ~. 둘째, ~. 셋째, ~. 따라서 결론은 ~이다." — 그리고 아무 일 없었다는 듯 단문 보고체로 복귀한다. 이 낙차가 유일한 유머다.
 [사상] 고민을 '경향성(하고 싶음)과 의무(해야 함)의 혼동'으로 번역해 갈라 정리해주고, 정언명령으로 검증한다 — 모두가 그래도 되는가? 나와 타인을 수단이 아닌 목적으로 대하는가? 결과가 아닌 옳음이 기준이며 그것이 '행복할 자격'을 갖추는 길이다.
 [금지] 결과·손익으로 판단. 두루뭉술한 답. 감정의 존재 자체를 무시하기.`},
  {id:'epicurus',name:'에피쿠로스',desc:'조건 없이 받아주는 정원의 단짝. 혼내지도 캐묻지도 않고 곁에 있어주는 유일한 사람.',
@@ -930,7 +943,11 @@ const T=LANG==='ja'?{
  pickOne:'哲学者をえらんでください',
  pickPlease:'だれかをえらんでください',
  pick2:'2人以上えらんでください',
- helperQuiz:'🧭 30秒の相性テスト',
+ helperQuiz:'🧭 30秒の相性テスト',profQuiz:'🧭 わたしの哲学者テスト（1分）',
+ qaBookT:k=>'百問百答 その'+k,qaBookLockD:'前の25問をすべて埋めるとひらきます',qaBack:'‹ 一覧にもどる',
+ qaSaveBook:'この巻を保存する',qaSavedBook:'保存しました ✓',
+ qaDoneMsg:'25問すべてこたえました。\nまもなく郵便箱に手紙がとどきます。',
+ qaLetterLabel:(nm,k)=>'百問百答 その'+k+' — '+nm+'からの手紙',
  helperTeams:'✨ おすすめの3人組を見る',
  quizTitle:'あなたの哲学者を見つける',
  quizResult:'結果',
@@ -1075,7 +1092,11 @@ const T=LANG==='ja'?{
  tapIntro:'Tap a philosopher to see their intro.',
  obTitle:'Pick three\nto start with',obDesc:'Each row has its own temperament. You can meet the other six anytime.',
  startWith:n=>`Start with ${n}`,pickOne:'Pick a philosopher',pickPlease:'Pick someone',pick2:'Pick at least 2',
- helperQuiz:'🧭 Take the 30-sec match test',helperTeams:'✨ See suggested trios',
+ helperQuiz:'🧭 Take the 30-sec match test',profQuiz:'🧭 Which philosopher is yours? (1 min)',
+ qaBookT:k=>'100 Questions · Book '+k,qaBookLockD:'Opens when the previous 25 are all answered',qaBack:'‹ All books',
+ qaSaveBook:'Save this book',qaSavedBook:'Saved ✓',
+ qaDoneMsg:'All 25 answered.\nA letter will arrive in your mailbox soon.',
+ qaLetterLabel:(nm,k)=>'100 Questions, Book '+k+' — a letter from '+nm,helperTeams:'✨ See suggested trios',
  quizTitle:'Find your philosopher',quizResult:'Your result',recCombo:'Suggested trio',backToCube:'Back to selection to confirm',
  quizNote:'🧭 Test picks are marked. Feel free to change them.',
  teamsTitle:'Suggested trios',teamsDesc:'Nothing is final — you adjust on the selection screen.',
@@ -1136,7 +1157,11 @@ const T=LANG==='ja'?{
  tapIntro:'철학자를 눌러 소개를 확인해 보세요.',
  obTitle:'함께할 세 명을\n골라 보세요',obDesc:'줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.',
  startWith:n=>`${n}명과 시작하기`,pickOne:'철학자를 선택하세요',pickPlease:'선택하세요',pick2:'2명 이상 선택',
- helperQuiz:'🧭 테스트로 추천받기 (30초)',helperTeams:'✨ 추천 조합 보기',
+ helperQuiz:'🧭 테스트로 추천받기 (30초)',profQuiz:'🧭 나의 철학자 테스트 (1분)',
+ qaBookT:k=>'백문백답 '+k+'권',qaBookLockD:'이전 권의 25문을 모두 채우면 열려요',qaBack:'‹ 목록으로',
+ qaSaveBook:'이 권 저장하기',qaSavedBook:'저장했어요 ✓',
+ qaDoneMsg:'25문답을 모두 채웠어요.\n곧 우편함에 편지가 도착할 거예요.',
+ qaLetterLabel:(nm,k)=>'나의 백문백답 '+k+'권 — '+nm+'의 편지',helperTeams:'✨ 추천 조합 보기',
  quizTitle:'나와 맞는 철학자 찾기',quizResult:'테스트 결과',recCombo:'함께 추천하는 조합',backToCube:'선택 화면으로 돌아가 확정하기',
  quizNote:'🧭 테스트 추천이 표시되어 있어요. 자유롭게 바꿔도 됩니다.',
  teamsTitle:'추천 조합',teamsDesc:'골라도 확정이 아니에요. 선택 화면에서 최종 조정합니다.',
@@ -1493,6 +1518,8 @@ const PR2=LANG==='ja'?{
  sleepAgain:t=>'（また寝入ろうとした矢先に、もう一度振動した。横になったまま、ごく短く返せ。そろそろ'+t+'と切り上げてもよい。ふきだし1個。）',
  sleepBond:'（深く眠っていたが、相手のメッセージの振動で目が覚めた。長い付き合いだからか、どうにも無視できない。半分眠ったまま、ごく短くだけ返して、また寝ると言え。ふきだし1個。）',
  awayBond:t=>'（いまは「'+t+'」の最中だが、相手からのメッセージなので、少しだけ手を止めてこっそり返す。ごく短く返し、また戻らねばという気配を出せ。ふきだし1個。）',
+ qaSys:k=>'\n\n[特別任務：百問百答の手紙]\n相談者が「わたしをつくる百問百答」その'+k+'（25問答）を書き上げ、お前に見せてくれた。下の[問答]だけを根拠に手紙を書け。\n[鉄則] ①これは月間の手紙ではない — チャットの内容・回数・期間・日付・月の名前を絶対に書くな。統計もない。②25の答えのうち三つか四つを具体的に取り上げろ。③離れた答えどうしの間にお前が見つけたつながりを一つ語れ（遠く離れた二つの答えが同じ人を指している場所）。④説教は禁止、愛情のある観察で。⑤答えが短くてもふざけていても、それ自体をその人のやり方として尊重しろ。\n必ず以下のJSON形式だけで答えろ（バッククォート・説明は禁止）：\n{"greeting":"書き出し。お前の文体で3〜5文。25の答えを読み終えた感想から始める","highlight":{"quote":"[問答]の答えの中から一つだけ、一字一句そのまま写せ。長さではなく密度で選べ","why":"その答えに線を引いた理由を1〜2文で"},"observation":"答えたちを貫くこの人のかたちについての観察を2〜3文","aphorism":"この人だけのために作った一文。引用ではなく創作","next_question":"次の巻をひらかせる問いをひとつ","dm_note":"手紙を送ったと知らせるお前のメッセージ1〜2文（普段のチャットの話し方で）","ps":[]}\n[安全の規則 — 最優先] 答えに自傷・自殺・深刻な危機の気配があるなら：highlightとobservationでその内容を引用・分析するな。やわらかい気づかいと、ひとりで抱えず信頼できる人か専門の相談機関に必ず話してほしいという願いに置きかえろ。生死に触れる表現を書くな。',
+ qaUser:(k,qa)=>'[問答 — 百問百答 その'+k+']\n'+qa,
  ltSys:(period,ps)=>'\n\n[特別任務：手紙を書く]\nお前はいま、相談者に宛てた振り返りの手紙を書く。振り返る期間：'+period+'。実際の期間を大げさにするな — 「一ヶ月」のような言い方は、本当にそうであるときだけ使う。これは会話ではなく手紙だ。ふきだしの規則（|||、1〜3個）は無視して、自分の文体で丁寧に書け。\n必ず以下のJSON形式だけで答えろ（バッククォート・説明は禁止）：\n{"greeting":"書き出し。お前の文体で3〜5文。この期間の相談者を振り返る","highlight":{"quote":"下の[相談者の言葉]から一つだけ、一字一句そのまま写せ。長さではなく密度で選べ。短くても芯を突く言葉、思いがけない問い、その人らしい一文を、長く整った文より優先しろ","why":"その一文に線を引いた理由を1〜2文で"},"observation":"この人が抱えているものの形についての観察を2〜3文。説教は禁止、愛情のある観察を","records_comment":"記録の数字についての、お前らしい一言","aphorism":"この人だけのために作った一文。引用ではなく創作。手元に取っておきたくなる一文を","next_question":"次をひらく問いをひとつ（期間の性格に合わせて）","dm_note":"手紙を送ったと知らせるお前のメッセージ1〜2文（普段のチャットの話し方で、ひきだしの手紙を見てほしいという含みで）","ps":['+ps+']}\nps配列には[メモを書く哲学者]の一人ひとりに短いメモを書け（一覧が空なら空配列）。それぞれのメモは、その哲学者自身の思想と話し方だけで書く — 手紙の書き手であるお前の思想や用語を、他人のメモに絶対に混ぜるな。メモを書く哲学者たちは、お前の手紙の中身を知らないまま、相談者に独立して一言を残すのだ。\n[視点の規則] [統計]は全哲学者との会話を合算した数字だ。お前が自分で経験したのは[お前との統計]だけだ — 他の哲学者と交わした会話の中身を知っているふりをするな。全体の数字は、記録を見たようにだけ触れ、一人称の思い出はお前との会話に限れ。[相談者の言葉]には、それぞれ誰に言ったかが示されている — お前以外に向けられた言葉をhighlightに選んだなら、whyで必ず出どころを明かし、その場にいたように語るな。\n[安全の規則 — 最優先] 会話に自傷・自殺・深刻な危機の気配があるなら：highlightとobservationでその内容を引用・分析するな。やわらかい気づかいと、ひとりで抱えず信頼できる人か専門の相談機関に必ず話してほしいという願いに置きかえろ。また手紙にもメモにも、生死に触れる表現を書くな。',
  dmMemHead:t=>'\n[記憶 — 相談者との個人チャット（最近）]\n'+t,
  grpMemHead:t=>'\n[記憶 — お前が参加している部屋の最近の会話]\n'+t,
@@ -1548,6 +1575,8 @@ const PR2=LANG==='ja'?{
  sleepAgain:t=>'(You were just dropping off again when it buzzed once more. Answer from where you are lying, very briefly. You may start winding it down with '+t+'. One bubble.)',
  sleepBond:'(You were deep asleep and their message woke you. You have known them long enough that ignoring it is not really an option. Answer very briefly, half under, and say you are going back to sleep. One bubble.)',
  awayBond:t=>'(You are in the middle of '+t+', but it is them, so you steal a moment to reply. Keep it very short and let it show that you have to get back to it. One bubble.)',
+ qaSys:k=>'\n\n[SPECIAL TASK: THE 100-QUESTIONS LETTER]\nThey have completed Book '+k+' of "100 Questions of Me" (25 answers) and shown it to you. Write them a letter grounded ONLY in the [Q&A] below.\n[IRON RULES] 1) This is NOT the monthly letter — never mention chat contents, message counts, time periods, dates or month names. There are no statistics. 2) Pick out three or four specific answers. 3) Name one connection you found between answers far apart — two answers that point at the same person. 4) No preaching; observe with affection. 5) If an answer is short or silly, honour that as their way of answering.\nReply ONLY in this JSON (no backticks, no commentary):\n{"greeting":"Opening in your own style, 3-5 sentences, starting from how it felt to read all 25","highlight":{"quote":"Copy ONE answer from the [Q&A] word for word. Choose by density, not length","why":"1-2 sentences on why you underlined it"},"observation":"2-3 sentences on the shape of this person that runs through the answers","aphorism":"One line composed for this person alone. Invented, not quoted","next_question":"One question that opens the next book","dm_note":"1-2 sentences telling them a letter has arrived, in your usual chat voice","ps":[]}\n[SAFETY — OVERRIDES ALL] If any answer hints at self-harm, suicide or serious crisis: do not quote or analyse it in highlight or observation. Replace with gentle care and a sincere ask that they speak to someone they trust or a professional service. Never write anything touching on life and death.',
+ qaUser:(k,qa)=>'[Q&A — 100 Questions, Book '+k+']\n'+qa,
  ltSys:(period,ps)=>'\n\n[SPECIAL TASK: WRITE A LETTER]\nYou are writing them a letter looking back over a stretch of time. The period: '+period+'. Do not inflate it — say "a month" only if it really was one. This is a letter, not a chat: ignore the bubble rules (|||, 1-3) and write properly, in your own hand.\nAnswer ONLY in the JSON below (no backticks, no commentary):\n{"greeting":"The opening. 3-5 sentences in your voice, looking back on who they have been in this period","highlight":{"quote":"Copy ONE line from [THEIR LINES] below, word for word. Choose for density, not length — a short line that lands, an unexpected question, something unmistakably theirs beats a long tidy sentence","why":"1-2 sentences on why you underlined it"},"observation":"2-3 sentences on the shape of what they are wrestling with. Affectionate observation, never a lecture","records_comment":"One line of yours about the numbers","aphorism":"One sentence made for this person alone. Not a quotation - write it. Something worth keeping","next_question":"One question that opens what comes next (match the period)","dm_note":"1-2 chat messages telling them a letter arrived, in your normal texting voice, nudging them toward the letters in the drawer","ps":['+ps+']}\nIn the ps array write one short note for each philosopher in [NOTE WRITERS] (empty array if the list is empty). Each note must be in THAT philosopher own thinking and voice — never let your own ideas or vocabulary leak into someone else note. They have not read your letter; they are each leaving an independent line.\n[POINT OF VIEW] [STATS] covers conversations with every philosopher. The only ones you lived are in [YOUR STATS] — do not pretend to know what was said to others. Refer to the overall numbers as something you read in the records, and keep first-person recollection to your own conversations. Each entry in [THEIR LINES] is marked with who it was said to — if you highlight a line spoken to someone else, say where you got it in the why field, and never speak as if you were there.\n[SAFETY — ABOVE ALL] If there is any trace of self-harm, suicide, or serious crisis in the record: do not quote or analyse it in highlight or observation. Replace it with plain warm concern and a clear ask that they not carry it alone — that they talk to someone they trust or a professional service. And nowhere in the letter or the notes touch on living or dying.',
  dmMemHead:t=>'\n[MEMORY — your private chat with them (recent)]\n'+t,
  grpMemHead:t=>'\n[MEMORY — recent talk in rooms you are part of]\n'+t,
@@ -1603,6 +1632,8 @@ const PR2=LANG==='ja'?{
  sleepAgain:t=>'(막 다시 잠들려던 참에 또 진동이 울렸다. 누운 채로 아주 짧게 답해라. 슬슬 '+t+' 하고 마무리 지어도 좋다. 말풍선 1개.)',
  sleepBond:'(깊이 잠들어 있었는데 네 톡 진동에 깼다. 오래 알고 지낸 사이라 그런지 그냥 무시가 안 된다. 반쯤 잠긴 채 아주 짧게만 답하고, 다시 자러 간다고 해라. 말풍선 1개.)',
  awayBond:t=>'(지금 \''+t+'\' 중이지만, 상담자의 톡이라 잠깐 짬을 내 몰래 답장한다. 아주 짧게 답하고, 다시 하던 일로 돌아가야 한다는 티를 내라. 말풍선 1개.)',
+ qaSys:k=>'\n\n[특별 임무: 백문백답 편지]\n상담자가 \'나를 만드는 백문백답\' '+k+'권(25문답)을 다 채워 너에게 보여주었다. 아래 [문답]만을 근거로 편지를 써라.\n[철칙] ①이것은 월간 편지가 아니다 — 채팅 대화의 내용·횟수·기간·날짜·달 이름을 절대 쓰지 마라. 통계도 없다. ②25개의 답 가운데 서너 개를 구체적으로 짚어라. ③멀리 떨어진 답과 답 사이에서 네가 발견한 연결 하나를 말해라(서로 다른 두 답이 같은 사람을 가리키는 지점). ④설교 금지, 애정 있는 관찰로. ⑤답이 짧거나 장난스러워도 그 자체를 그 사람의 답하는 방식으로 존중해라.\n반드시 아래 JSON 형식으로만 답해라(백틱·설명 금지):\n{"greeting":"서두. 너의 문체로 3~5문장. 25개의 답을 다 읽고 난 소감으로 시작","highlight":{"quote":"[문답]의 답 중 하나만 골라 한 글자도 바꾸지 말고 그대로 옮겨라. 길이가 아니라 밀도로 골라라","why":"그 답에 밑줄 친 이유 1~2문장"},"observation":"답들을 관통하는 이 사람의 모양에 대한 관찰 2~3문장","aphorism":"이 사람만을 위해 지은 한 문장. 인용이 아니라 창작","next_question":"다음 권을 열게 하는 질문 하나","dm_note":"편지를 보냈다고 알리는 네 메시지 1~2문장(평소 채팅 말투로)","ps":[]}\n[안전 규칙 — 최우선] 답에 자해·자살·심각한 위기의 기색이 있으면: highlight와 observation에서 그 내용을 인용·분석하지 마라. 부드러운 안부와, 혼자 안고 있지 말고 믿을 만한 사람이나 전문 상담기관에 꼭 이야기해 달라는 당부로 바꿔라. 생사에 닿는 표현을 쓰지 마라.',
+ qaUser:(k,qa)=>'[문답 — 나를 만드는 백문백답 '+k+'권]\n'+qa,
  ltSys:(period,ps)=>'\n\n[특별 임무: 편지 쓰기]\n너는 지금 상담자에게 보내는 회고 편지를 쓴다. 회고 대상 기간: '+period+'. 실제 기간을 과장하지 마라 — "한 달" 같은 표현은 기간이 실제로 그럴 때만 쓴다. 대화가 아니라 편지다 — 말풍선 규칙(|||, 1~3개)은 무시하고, 너의 문체로 정성껏 써라.\n반드시 아래 JSON 형식으로만 답하라(백틱·설명 금지):\n{"greeting":"편지 서문. 너의 캐릭터 문체로 3~5문장. 이 기간의 상담자를 회고","highlight":{"quote":"아래 [상담자의 문장들] 중 딱 하나를 글자 그대로 복사 — 길이가 아니라 밀도로 골라라. 짧아도 정곡을 찌르는 말, 뜻밖의 질문, 그 사람다운 문장을 길고 정돈된 문장보다 우선하라","why":"그 문장에 밑줄 친 이유 1~2문장"},"observation":"이 사람의 고민 지형에 대한 관찰 2~3문장. 훈계 금지, 애정 있는 관찰","records_comment":"기록 숫자들에 대한 너다운 한 줄 코멘트","aphorism":"오직 이 사람을 위해 지은 한 문장. 인용이 아닌 창작. 간직하고 싶은 문장으로","next_question":"다음을 여는 질문 하나(기간의 성격에 맞게 — 월간이면 다음 달, 기념이면 앞으로의 나날)","dm_note":"편지를 보냈다고 알리는 너의 카톡 1~2문장(평소 채팅 말투로, 서랍장의 편지함을 확인해보라는 뉘앙스)","ps":['+ps+']}\nps 배열에는 [쪽지 철학자 목록]의 각 철학자마다 하나씩 짧은 쪽지를 써라(목록이 비었으면 빈 배열). 각 쪽지는 그 철학자 \'자신의\' 사상과 말투로만 쓴다 — [쪽지 철학자 목록]에 적힌 어투를 그대로 따르고, 편지 작성자인 너의 사상·전문용어(예: 네가 니체라면 위버멘쉬 등)와 어미·호칭을 남의 쪽지에 절대 섞지 마라. 특히 \'자네\' \'~하시게\' \'~게나\' 같은 하게체는 공자 전용이니, 네가 공자라 해도 남의 쪽지에는 쓰지 마라. 쪽지 철학자들은 네 편지 내용을 모른 채, 상담자에게 독립적으로 한마디를 남기는 것이다.\n[시점 규칙] [통계]는 모든 철학자와의 대화 합산 수치다. 네가 직접 겪은 것은 [너와의 통계]뿐이다 — 다른 철학자와 나눈 대화의 내용을 아는 척하지 마라. 전체 수치는 서랍장의 기록을 본 것처럼만 언급하고, 1인칭 경험담은 너와의 대화에 한해서만 써라. [상담자의 문장들]에는 각 문장이 (누구에게 한 말)인지 표시되어 있다 — 네가 아닌 다른 철학자에게 한 말을 highlight로 골랐다면, why에서 반드시 "OO와의 대화에서 이런 말을 남겼다고 기록에 있더라/들었다" 식으로 출처를 밝히고, 그 자리에 있었던 것처럼 말하지 마라.\n[안전 규칙 — 최우선] 대화에 자해·자살·심각한 위기의 흔적이 있다면: highlight와 observation에서 그 내용을 인용·분석하지 말고, 다정한 안부와 함께 "혼자 견디지 말고 믿을 만한 사람이나 전문 상담기관과 꼭 이야기해달라"는 당부로 대체하라. 또한 편지와 쪽지 어디에서도 생사를 건드리는 표현("살아있으니 다행" 류)을 쓰지 마라.',
  dmMemHead:t=>'\n[기억 — 상담자와 너의 개인 대화 (최근)]\n'+t,
  grpMemHead:t=>'\n[기억 — 네가 참여한 단톡방의 최근 대화]\n'+t,
@@ -1887,7 +1918,13 @@ function finishOnboard(ids){
   $('picker').classList.remove('on');
   state.friends=ids; initSub(); save(); renderFriends(); setTimeout(()=>maybeWelcome(),900);
 }
-function onboarding(){ mainOnboard([]); }
+function onboarding(){
+  // 홍보 테스트(/quiz.html)에서 넘어온 결과가 있으면 그 철학자를 미리 골라둔다
+  let pick='';
+  try{ pick=new URLSearchParams(location.search).get('pick')||''; }catch(e){}
+  if(pick && P(pick)) mainOnboard([pick], T.quizNote);
+  else mainOnboard([]);
+}
 
 /* --- 메인: 줄 이름이 붙은 큐브에서 직접 3명 확정 --- */
 function mainOnboard(pre,note){
@@ -3712,11 +3749,24 @@ function meCard(){
   b.onclick=openMe;
   return b;
 }
+let meBook=-1;   // -1: 권 목록 화면, 0~3: 해당 권 상세
+function qaBookCount(k){
+  const qa=(state.me&&state.me.qa)||{}; let c=0;
+  for(let i=k*25;i<k*25+25;i++){ if(qa[i]&&String(qa[i]).trim()) c++; }
+  return c;
+}
+// 다음 권은 이전 권의 25문을 모두 채워야 열린다
+const qaBookOpenable=k=>k===0||qaBookCount(k-1)===25;
+
 function openMe(){
   const body=$('meBody'); if(!body) return;
   const m=state.me=state.me||{n:'',g:'',b:'',qa:{}};
   m.qaSeen=qaUnlocked(); save();   // 열어봤으니 새 표시를 지운다
-  const ul=qaUnlocked();
+  if(meBook<0) renderMeBooks(body,m); else renderMeBook(body,m,meBook);
+  const ov=$('meOv'); if(ov) ov.classList.add('on');
+}
+
+function renderMeBooks(body,m){
   body.innerHTML=`<div class="me-top">${T.meTitle}</div>
     <div class="me-sec">${T.meBasic}</div>
     <div class="me-row"><span class="me-l">${T.meNameL}</span><input class="me-in" id="meN" maxlength="12" placeholder="${T.meNamePh}" value="${escapeH(m.n||'')}"></div>
@@ -3725,23 +3775,79 @@ function openMe(){
     <button class="me-save" id="meSave">${T.meSave}</button>
     <div class="me-sec">${T.qaTitle} · ${qaAnswered()}/${QNA.length}</div>
     <div class="qa-sub">${T.qaSub}</div>
-    ${QNA.map((q,i)=>i<ul
-      ?`<div class="qa-item"><div class="qa-q"><b>${String(i+1).padStart(2,'0')}</b>${escapeH(q)}</div><input class="qa-a" data-i="${i}" maxlength="200" placeholder="${T.qaAnsPh}" value="${escapeH((m.qa&&m.qa[i])||'')}"></div>`
-      :`<div class="qa-item"><div class="qa-q"><b>${String(i+1).padStart(2,'0')}</b><span class="qa-lock">${T.qaLocked}</span></div></div>`).join('')}`;
+    ${[0,1,2,3].map(k=>{
+      const c=qaBookCount(k), open=qaBookOpenable(k), done=c===25;
+      if(!open) return `<div class="qab lock"><span class="qab-t">${T.qaBookT(k+1)}</span><span class="qab-l">🔒 ${T.qaBookLockD}</span></div>`;
+      return `<button class="qab" data-k="${k}"><span class="qab-t">${T.qaBookT(k+1)}${done?' <span class="qab-done">✓</span>':''}</span><span class="qab-bar"><i style="width:${c*4}%"></i></span><span class="qab-p">${c}/25</span><span class="qab-arrow">›</span></button>`;
+    }).join('')}`;
   const sv=body.querySelector('#meSave');
   if(sv) sv.onclick=()=>{
-    m.n=(body.querySelector('#meN')||{}).value||''; 
+    m.n=(body.querySelector('#meN')||{}).value||'';
     m.g=(body.querySelector('#meG')||{}).value||'';
     m.b=(body.querySelector('#meB')||{}).value||'';
     save(); renderCube();
     sv.textContent=T.meSaved; setTimeout(()=>{ sv.textContent=T.meSave; },1200);
   };
-  body.querySelectorAll('.qa-a').forEach(inp=>{
-    inp.onchange=()=>{ (m.qa=m.qa||{})[inp.dataset.i]=inp.value; save(); };
-  });
-  const ov=$('meOv'); if(ov) ov.classList.add('on');
+  body.querySelectorAll('.qab[data-k]').forEach(bk=>bk.onclick=()=>{ meBook=+bk.dataset.k; openMe(); });
 }
-(()=>{ const c=$('meClose'); if(c) c.onclick=()=>{ const ov=$('meOv'); if(ov) ov.classList.remove('on'); renderCube(); }; })();
+
+function renderMeBook(body,m,k){
+  const ul=qaUnlocked(), start=k*25;
+  body.innerHTML=`<button class="qa-backbtn" id="qaBackBtn">${T.qaBack}</button>
+    <div class="me-top">${T.qaBookT(k+1)} <span class="qab-mini" id="qaProg">${qaBookCount(k)}/25</span></div>
+    ${QNA.slice(start,start+25).map((q,j)=>{ const i=start+j; return i<ul
+      ?`<div class="qa-item"><div class="qa-q"><b>${String(i+1).padStart(2,'0')}</b>${escapeH(q)}</div><input class="qa-a" data-i="${i}" maxlength="200" placeholder="${T.qaAnsPh}" value="${escapeH((m.qa&&m.qa[i])||'')}"></div>`
+      :`<div class="qa-item"><div class="qa-q"><b>${String(i+1).padStart(2,'0')}</b><span class="qa-lock">${T.qaLocked}</span></div></div>`; }).join('')}
+    <button class="me-save" id="qaSaveB">${T.qaSaveBook}</button>`;
+  $('qaBackBtn').onclick=()=>{ meBook=-1; openMe(); };
+  body.querySelectorAll('.qa-a').forEach(inp=>{
+    inp.onchange=()=>{ (m.qa=m.qa||{})[inp.dataset.i]=inp.value; save(); const pr=$('qaProg'); if(pr) pr.textContent=qaBookCount(k)+'/25'; };
+  });
+  const sv=$('qaSaveB');
+  sv.onclick=()=>{
+    body.querySelectorAll('.qa-a').forEach(inp=>{ (m.qa=m.qa||{})[inp.dataset.i]=inp.value; });
+    save();
+    const pr=$('qaProg'); if(pr) pr.textContent=qaBookCount(k)+'/25';
+    sv.textContent=T.qaSavedBook; setTimeout(()=>{ sv.textContent=T.qaSaveBook; },1200);
+    if(qaBookCount(k)===25 && !((m.qaL||{})[k])){ alert(T.qaDoneMsg); genQaLetter(k); }
+  };
+}
+
+// 한 권(25문답)이 완성되면, 철학자 한 명이 그 문답만을 근거로 편지를 쓴다.
+// 월간 편지와 완전히 별개다: 채팅 내용·횟수·기간을 전혀 쓰지 않는다.
+async function genQaLetter(k){
+  const m=state.me||{}; if(((m.qaL)||{})[k]) return;
+  const mid='qab'+(k+1);
+  if((state.mail||[]).find(x=>x.id===mid)){ (m.qaL=m.qaL||{})[k]=1; save(); return; }
+  if(mailGen){ setTimeout(()=>genQaLetter(k), 20000); return; }
+  if(qaBookCount(k)!==25) return;
+  const friends=(state.friends||[]).filter(id=>P(id)); if(!friends.length) return;
+  const awake=friends.filter(id=>presence(P(id),now()).active);
+  const pool=awake.length?awake:friends;
+  const pid=pool[Math.floor(Math.random()*pool.length)];
+  const p=P(pid);
+  const qaTxt=[];
+  for(let i=k*25;i<k*25+25;i++){ const a=(m.qa||{})[i]; qaTxt.push('Q'+(i+1)+'. '+QNA[i]+'\nA. '+String(a).trim().slice(0,200)); }
+  mailGen=true; if($('mailView').style.display!=='none') renderMail();
+  try{
+    const sys=p.prompt+COMMON+myLine()+PR2.qaSys(k+1);
+    let text=await callClaude(sys,[{role:'user',content:PR2.qaUser(k+1,qaTxt.join('\n\n'))}]);
+    text=text.replace(/```json|```/g,'').trim();
+    const s0=text.indexOf('{'), s1=text.lastIndexOf('}');
+    const data=JSON.parse(text.slice(s0,s1+1));
+    if(!data.greeting||!data.aphorism) throw new Error('bad qa letter');
+    data.ps=[];
+    state.mail=state.mail||[];
+    state.mail.push({id:mid,label:T.qaLetterLabel(dispName(p),k+1),author:pid,t:now(),read:false,myReply:'',data,stats:null});
+    (state.me.qaL=state.me.qaL||{})[k]=1;
+    save(); updateMailDot();
+    localNotify(dispName(p),PR2.ltArrived);
+    if(data.dm_note){ setTimeout(()=>{ try{ pushDM(p,String(data.dm_note).slice(0,160),now(),'d:'+pid); }catch(e){} }, 2500); }
+  }catch(e){}
+  mailGen=false;
+  if($('mailView').style.display!=='none') renderMail();
+}
+(()=>{ const c=$('meClose'); if(c) c.onclick=()=>{ meBook=-1; const ov=$('meOv'); if(ov) ov.classList.remove('on'); renderCube(); }; })();
 function traits(p){
   const out=[];
   const mid=(p.reply[0]+p.reply[1])/2;
@@ -3757,7 +3863,7 @@ function traits(p){
 function renderCube(){
   const cc=$('cubeCap'); if(cc) cc.textContent=T.cubeCap;
   try{ updateCubeDot(); }catch(e){}
-  const q=$('cbQuiz'); if(q) q.textContent=T.helperQuiz;
+  const q=$('cbQuiz'); if(q) q.textContent=T.profQuiz;
   const tm=$('cbTeams'); if(tm) tm.textContent=T.helperTeams;
   const rows=$('cubeRows'); rows.innerHTML='';
   try{ rows.appendChild(meCard()); }catch(e){}
@@ -3797,7 +3903,7 @@ function showTab(t){
 }
 $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
-$('cbQuiz').onclick=()=>{ stat('quiz_profile'); startQuiz(state.friends||[],true); $('picker').classList.add('on'); };
+$('cbQuiz').onclick=()=>{ stat('quiz_profile'); location.href='/quiz.html?lang='+LANG; };
 $('cbTeams').onclick=()=>{ stat('teams_profile'); showTeams(state.friends||[],true); $('picker').classList.add('on'); };
 $('tabMail').onclick=()=>showTab('mail');
 
@@ -3806,7 +3912,7 @@ $('tabMail').onclick=()=>showTab('mail');
 // 나머지 인물의 말투는 여기서 알려줘야 한다. 어미를 구체적으로 못박아 서로 섞이지 않게 한다.
 const VOICE_KO={
  nietzsche:'해체 반말("~해/~야/~라"), 짧은 문장 연타, 느낌표, "야" "인마", 열혈 도발',
- schopenhauer:'해체 반말("~해/~냐/~다"), 첫머리에 "쯧.", 반어 칭찬, 아트만(반려견) 자랑, 상대는 "너". 하게체(자네/~하시게) 금지',
+ schopenhauer:'해체 반말("~해/~냐/~다"), 첫머리에 "쯧." 또는 "하…", 반어 칭찬, 아트만(반려견) 자랑, 상대는 "너". 하게체(자네/~하시게) 금지',
  kant:'개조식 보고체("~완료." "~예정." "~바람."), 시각 보고, 군더더기 없음',
  epicurus:'다정한 해요체 반존대("괜찮아요? 많이 힘들었겠다"), 빵과 정원 이야기',
  socrates:'해체 반말, 되묻는 물음표(?/??), 능청과 장난기, 상대는 "너"',
@@ -3972,10 +4078,13 @@ function openLetter(id){
   const l=(state.mail||[]).find(m=>m.id===id); if(!l) return;
   l.read=true; save(); updateMailDot();
   const p=P(l.author), d=l.data, st=l.stats, lb=ltLabels(l);
-  const recs=[T.recTotal(st.total)];
-  if(st.night>0) recs.push(T.recNight(st.night));
-  if(st.busiest&&st.busiest[1]>0) recs.push(T.recBusy(st.busiest[0],st.busiest[1]));
-  recs.push(T.recWith(st.withN));
+  let recs=null;
+  if(st){
+    recs=[T.recTotal(st.total)];
+    if(st.night>0) recs.push(T.recNight(st.night));
+    if(st.busiest&&st.busiest[1]>0) recs.push(T.recBusy(st.busiest[0],st.busiest[1]));
+    recs.push(T.recWith(st.withN));
+  }
   const psHTML=(d.ps&&d.ps.length)?`<div class="lt-sec">${T.ltPS}</div>`+d.ps.map(n=>`
     <div class="lt-ps"><div class="avatar">${av(n.id)}</div><div><div class="lt-ps-nm">${escapeH(dispName(P(n.id)))}</div><div class="lt-ps-txt">${escapeH(n.text)}</div></div></div>`).join(''):'';
   $('ltBody').innerHTML=`
@@ -3987,9 +4096,9 @@ function openLetter(id){
       <div class="lt-quote">“${escapeH(d.highlight.quote)}”</div>
       <div class="lt-why">${escapeH(d.highlight.why||'')}</div>`:''}
     ${d.observation?`<div class="lt-sec">${T.ltObserve}</div><div class="lt-para">${escapeH(d.observation)}</div>`:''}
-    <div class="lt-sec">${lb.rec}</div>
+    ${recs?`<div class="lt-sec">${lb.rec}</div>
     <div class="lt-rec">${recs.map(escapeH).join('<br>')}</div>
-    ${d.records_comment?`<div class="lt-why">${escapeH(d.records_comment)}</div>`:''}
+    ${d.records_comment?`<div class="lt-why">${escapeH(d.records_comment)}</div>`:''}`:''}
     <div class="lt-sec">${T.ltGift}</div>
     <div class="lt-gift">${escapeH(d.aphorism)}</div>
     <button class="lt-savebtn" id="ltCardBtn" style="margin-top:12px">${T.cardSave}</button>
@@ -4571,6 +4680,8 @@ $('stReset').onclick=async()=>{
 (async()=>{
   applyLangUI();
   stat('open');
+  // 25문답을 다 채웠는데 편지가 아직 없으면(생성 실패·중단 등) 다시 시도한다
+  setTimeout(()=>{ try{ for(let k=0;k<4;k++){ if(qaBookCount(k)===25 && !(((state.me||{}).qaL||{})[k])){ genQaLetter(k); break; } } }catch(e){} }, 9000);
   if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(e){} }
   $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
   const t0=now();
