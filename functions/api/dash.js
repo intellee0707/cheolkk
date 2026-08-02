@@ -11,7 +11,8 @@ const EV_KO = {
   ob_done:'온보딩 완료', msg:'메시지 전송', diary:'한 줄 일기', letter_read:'편지 열람',
   limit_hit:'한도 도달', trial_start:'체험 시작', sub_open:'구독창 열람', sub_done:'구독 결제',
   topup_done:'충전 결제', push_on:'알림 허용', report:'신고·문의',
-  quiz_profile:'프로필·성향테스트', teams_profile:'프로필·추천조합'
+  quiz_profile:'프로필·성향테스트', teams_profile:'프로필·추천조합',
+  quiz_start:'홍보테스트 시작', quiz_done:'홍보테스트 완료', quiz_share:'홍보테스트 공유', quiz_to_app:'테스트→앱 이동'
 };
 const PH_KO = {
   nietzsche:'니체', schopenhauer:'쇼펜하우어', kant:'칸트', epicurus:'에피쿠로스',
@@ -80,7 +81,7 @@ export async function onRequest(context) {
   // ---- 집계 ----
   const now = Date.now();
   const devAll = new Set(), dev7 = new Set(), dev1 = new Set();
-  const byEv = {}, byEvDev = {}, byPh = {}, byDate = {}, byLang = {}, byDay = {};
+  const byEv = {}, byEvDev = {}, byPh = {}, byQuiz = {}, byDate = {}, byLang = {}, byDay = {};
   const funnel = { limit_hit: new Set(), sub_open: new Set(), sub_done: new Set(), trial_start: new Set() };
 
   for (const x of rows) {
@@ -92,6 +93,7 @@ export async function onRequest(context) {
     byEv[x.ev] = (byEv[x.ev] || 0) + 1;
     (byEvDev[x.ev] = byEvDev[x.ev] || new Set()).add(x.device);
     if (x.ev === 'msg' && x.meta) byPh[x.meta] = (byPh[x.meta] || 0) + 1;
+    if (x.ev === 'quiz_done' && x.meta) byQuiz[x.meta] = (byQuiz[x.meta] || 0) + 1;
     if (x.ev === 'open') {
       const d = x.created_at.slice(0, 10);
       (byDate[d] = byDate[d] || new Set()).add(x.device);
@@ -137,6 +139,19 @@ export async function onRequest(context) {
         <td><div class="bar" style="width:${Math.round(n / pmax * 100)}%"></div></td></tr>`;
     }
     h += `</table>`;
+  }
+
+  // 홍보 테스트 결과 분포
+  const qz = sortDesc(byQuiz);
+  if (qz.length) {
+    const qmax = qz[0][1];
+    h += `<h2>홍보 테스트 결과 분포</h2><table><tr><th>철학자</th><th>명</th><th style="width:40%"></th></tr>`;
+    for (const [id, n] of qz) {
+      h += `<tr><td>${esc(PH_KO[id] || id)}</td><td class="num">${n}</td>
+        <td><div class="bar" style="width:${Math.round(n / qmax * 100)}%"></div></td></tr>`;
+    }
+    const fun = ['quiz_start','quiz_done','quiz_to_app'].map(k=>(byEvDev[k]&&byEvDev[k].size)||0);
+    h += `</table><div class="note">시작 ${fun[0]} → 완료 ${fun[1]} → 앱 이동 ${fun[2]}</div>`;
   }
 
   // 날짜별

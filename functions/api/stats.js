@@ -27,7 +27,11 @@ const EVENTS = new Set([
   'topup_done',  // 충전 결제 완료
   'push_on',     // 알림 허용
   'report',      // 신고 제출 (meta=종류)
-  'quiz_profile','teams_profile' // 프로필 화면에서 테스트/조합 재사용
+  'quiz_profile','teams_profile', // 프로필 화면에서 테스트/조합 재사용
+  'quiz_start',   // 홍보 테스트 시작
+  'quiz_done',    // 홍보 테스트 완료 (meta=결과 철학자)
+  'quiz_share',   // 홍보 테스트 공유 (meta=결과 철학자)
+  'quiz_to_app'   // 테스트 → 앱 이동
 ]);
 
 export async function onRequest(context) {
