@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>나의 철학자 테스트 — 철크크 · Deep End</title>
-<meta name="description" content="2,500년을 건너온 아홉 철학자 중, 내 얘길 들어줄 사람은 누굴까. 12문항 1분 테스트.">
-<meta property="og:title" content="나의 철학자 테스트 — Deep End">
-<meta property="og:description" content="아홉 명의 죽은 철학자 중, 내 얘길 들어줄 사람은? 12문항 1분.">
+<title>わたしの哲学者テスト — 哲チャ</title>
+<meta name="description" content="2,500年を渡ってきた九人の哲学者のうち、あなたの話を聞くのは誰？12問・1分のテスト。">
+<meta property="og:title" content="わたしの哲学者テスト — 哲チャ">
+<meta property="og:description" content="亡くなった九人の哲学者のうち、あなたの話を聞くのは誰？12問・1分。">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#12141d">
 <link rel="icon" href="/icon-192.png">
@@ -148,7 +148,7 @@ const face=(id,box)=>{ box.innerHTML='<svg viewBox="0 0 80 80">'+AV[id]+'</svg>'
 // ── 언어 결정: ?lang → 브라우저 언어 → 영어
 const params=new URLSearchParams(location.search);
 let LANG=params.get('lang');
-if(!['ko','en','ja'].includes(LANG)){ LANG='ko'; }   // 이 파일의 기본 언어(공유 미리보기와 일치시킴)
+if(!['ko','en','ja'].includes(LANG)){ LANG='ja'; }   // このファイルの既定言語（シェア時のプレビューと一致）
 let T=DATA[LANG];
 
 // ── 익명 통계 (앱과 같은 기기 표식을 공유해 유입 흐름이 이어진다)

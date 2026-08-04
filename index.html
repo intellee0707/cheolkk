@@ -167,7 +167,7 @@
   .ginfo .gi-sched{font-size:11px;opacity:.75;margin-top:3px}
 
   /* ===== 프로필 ===== */
-  .pr-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:6px}
+  .pr-body{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 20px 28px;text-align:center;gap:6px}
   .pr-body .avatar{width:128px;height:128px;border-radius:44px}
   .pr-body .dot{width:22px;height:22px;border-width:4px;right:2px;bottom:2px}
   .pr-name{font-family:var(--serif);font-size:24px;font-weight:700;margin-top:14px}
@@ -600,7 +600,7 @@ function av(id){
     kant:`<rect width="80" height="80" fill="#3f5573"/><circle cx="40" cy="39" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><circle cx="20.5" cy="30" r="4.6" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><circle cx="18.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><circle cx="59.5" cy="30" r="4.6" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><circle cx="61.5" cy="38.5" r="4.1" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><path d="M24 31 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#f4f1ea" stroke="#1d1f28" stroke-width="1.1"/><path d="M30 36 q3 -2 7 0 M43 36 q4 -2 7 0" stroke="#1d1f28" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="41" r="2" fill="#1d1f28"/><circle cx="47" cy="41" r="2" fill="#1d1f28"/><path d="M36 50 h8" stroke="#1d1f28" stroke-width="2.2" stroke-linecap="round"/><path d="M33.5 57.9 q6.5 2 13 0 l-.3 6 q-6.2 3 -12.4 0z" fill="#fff" stroke="#1d1f28" stroke-width=".9"/>`,
     epicurus:`<rect width="80" height="80" fill="#c9944a"/><circle cx="40" cy="37" r="19" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M24 29 q2 -13 16 -13 q14 0 16 13 q-6 -5 -16 -5 q-10 0 -16 5z" fill="#e8d5aa" stroke="#1d1f28" stroke-width="1.1"/><path d="M29 25 q2 -4 5 -6 M38.5 21 q1.5 -2 3 -3 M51 25 q-2 -4 -5 -6" stroke="#c9a76a" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M28 44.5 q3.5 -6.5 12 -6.5 q8.5 0 12 6.5 q1 3.5 .5 6 q0 5 -4 5 q-1 4 -5 4 q-2 2 -3.5 2 q-1.5 0 -3.5 -2 q-4 0 -5 -4 q-4 0 -4 -5 q-.5 -2.5 .5 -6z" fill="#e8d5aa" stroke="#1d1f28" stroke-width="1.1"/><path d="M37 41 q-2.5 1.5 -3.5 3.5 M43 41 q2.5 1.5 3.5 3.5 M32.5 42.5 q-2 1.5 -2.5 3.5 M47.5 42.5 q2 1.5 2.5 3.5" stroke="#c9a76a" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M33.5 50.5 q1 3 0 5 M40 52.5 q1 3.5 0 6 M46.5 50.5 q-1 3 0 5" stroke="#c9a76a" stroke-width="1.2" fill="none"/><path d="M29 34 q4 4 8 0 M43 34 q4 4 8 0" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M34 47 q6 5 12 0" stroke="#1d1f28" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="65" cy="65" rx="7" ry="6" fill="#e8c07d" stroke="#8a5f28" stroke-width="1.3"/><path d="M62 62.5 l2.5 2.5 M64.5 61 l2.5 2.5 M67 59.5 l2.5 2.5" stroke="#8a5f28" stroke-width="1.1" stroke-linecap="round"/>`,
     zhuangzi:`<rect width="80" height="80" fill="#4e7d6b"/><circle cx="40" cy="41" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><circle cx="40" cy="15" r="6" fill="#6b675c"/><path d="M46 9.5 q-6 -4.5 -7.5 0 q-.5 3.2 3.5 3.7 q3 .3 4 -3.7z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M47 9.5 q6 -4.5 7.5 0 q.5 3.2 -3.5 3.7 q-3 .3 -4 -3.7z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M46 12.8 q-4.5 2.4 -3 4.8 q1.6 1.8 3.5 -1.2z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M47 12.8 q4.5 2.4 3 4.8 q-1.6 1.8 -3.5 -1.2z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><ellipse cx="46.5" cy="11.5" rx="1" ry="2.8" fill="#8a5f28"/><path d="M46 8.6 q-1.5 -2 -2.6 -2.4 M47 8.6 q1.5 -2 2.6 -2.4" stroke="#8a5f28" stroke-width=".8" fill="none" stroke-linecap="round"/><path d="M46 17 q6 3 7 10 M44 19 q4 4 4 9" stroke="#6b675c" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M27 38 q4 3 8 0" stroke="#1d1f28" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="49" cy="38" r="2.2" fill="#1d1f28"/><path d="M45 32 q4 -2 7 0" stroke="#6b675c" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M35 44 q-5 -1 -8 3 q-1 3 2 3 M45 44 q5 -1 8 3 q1 3 -2 3" stroke="#6b675c" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M31 47 q9 8 18 0" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M36.5 57 q3.5 10 3.5 15 q0 -5 3.5 -15 q-3.5 2 -7 0z" fill="#6b675c"/>`,
-    schopenhauer:`<rect width="80" height="80" fill="#5a5561"/><circle cx="40" cy="41" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M30 25 q-4 -8 -11 -6 q-6 2 -5 9 q1 5 6 6 q3 1 6 -1 q3 -4 4 -8z" fill="#f6f4f0" stroke="#1d1f28" stroke-width="1.1"/><path d="M50 25 q4 -8 11 -6 q6 2 5 9 q-1 5 -6 6 q-3 1 -6 -1 q-3 -4 -4 -8z" fill="#f6f4f0" stroke="#1d1f28" stroke-width="1.1"/><path d="M28 34 l9 4 M52 34 l-9 4" stroke="#1d1f28" stroke-width="2.5" stroke-linecap="round"/><path d="M38 31 v4 M42 31 v4" stroke="#1d1f28" stroke-width="1.5" stroke-linecap="round"/><circle cx="32" cy="42" r="2" fill="#1d1f28"/><circle cx="48" cy="42" r="2" fill="#1d1f28"/><path d="M32 52.5 q7 -1.2 15 0" stroke="#1d1f28" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cx="61" cy="65" r="6" fill="#fff"/><circle cx="67" cy="59" r="4.5" fill="#fff"/><circle cx="63.5" cy="57" r="2.6" fill="#fff"/><circle cx="70.5" cy="57" r="2.6" fill="#fff"/><circle cx="66.5" cy="58.5" r=".9" fill="#1d1f28"/><circle cx="69.5" cy="58.5" r=".9" fill="#1d1f28"/>`,
+    schopenhauer:`<rect width="80" height="80" fill="#5a5561"/><circle cx="40" cy="41" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M30 25 q-4 -8 -11 -6 q-6 2 -5 9 q1 5 6 6 q3 1 6 -1 q3 -4 4 -8z" fill="#f6f4f0" stroke="#1d1f28" stroke-width="1.1"/><path d="M50 25 q4 -8 11 -6 q6 2 5 9 q-1 5 -6 6 q-3 1 -6 -1 q-3 -4 -4 -8z" fill="#f6f4f0" stroke="#1d1f28" stroke-width="1.1"/><path d="M28 34 l9 4 M52 34 l-9 4" stroke="#1d1f28" stroke-width="2.5" stroke-linecap="round"/><path d="M38 31 v4 M42 31 v4" stroke="#1d1f28" stroke-width="1.5" stroke-linecap="round"/><circle cx="32" cy="42" r="2" fill="#1d1f28"/><circle cx="48" cy="42" r="2" fill="#1d1f28"/><ellipse cx="40" cy="53" rx="6.5" ry="2.6" fill="#1d1f28"/><circle cx="61" cy="65" r="6" fill="#fff"/><circle cx="67" cy="59" r="4.5" fill="#fff"/><circle cx="63.5" cy="57" r="2.6" fill="#fff"/><circle cx="70.5" cy="57" r="2.6" fill="#fff"/><circle cx="66.5" cy="58.5" r=".9" fill="#1d1f28"/><circle cx="69.5" cy="58.5" r=".9" fill="#1d1f28"/>`,
     confucius:`<rect width="80" height="80" fill="#9c7135"/><circle cx="40" cy="40" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M31 23 q-2 -7 4 -10 q3 -2 5 -1 q4 0 6 2 q3 3 2 6 q-1 2 -2 2 q-7 -1 -15 1z" fill="#1d1f28"/><path d="M35 16 q3 -2 5 -1" stroke="#4a5163" stroke-width="1.1" fill="none"/><path d="M33 20 q-6 5 -6 16 M34.5 21.5 q-4 6 -4 13" stroke="#1d1f28" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M26 34 q6 -4 12 -1 M42 33 q6 -3 12 1" stroke="#1d1f28" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="33" cy="38" r="2.1" fill="#1d1f28"/><circle cx="47" cy="38" r="2.1" fill="#1d1f28"/><path d="M37.5 43 q-4 .5 -5.5 6 M42.5 43 q4 .5 5.5 6" stroke="#1d1f28" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M36 46 q4 3 8 0" stroke="#1d1f28" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M35 51 q-1 11 5 19 q6 -8 5 -19 q-2 2 -5 2 q-3 0 -5 -2z" fill="#1d1f28"/><path d="M38 55 v10 M40 56 v12 M42 55 v10" stroke="#4a5163" stroke-width="1.1"/><g transform="matrix(0.01778 0 0 -0.01778 58.23 23.11)"><path d="M354 642 363 610H896C912 610 923 614 926 626C880 669 803 732 803 732L736 642ZM306 44 315 13H941C957 13 968 18 971 29C924 72 845 136 845 136L776 44ZM234 850C190 653 102 453 15 328L27 320C72 353 114 390 153 433V-89H175C221 -89 269 -63 271 -54V531C290 535 298 542 302 551L256 568C296 630 331 700 362 777C386 776 398 785 402 797Z" fill="#1d1f28"/></g>`,
     aurelius:`<rect width="80" height="80" fill="#6b4e8a"/><circle cx="40" cy="40" r="20" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M22 36 q-2 -4 2 -5 q-1 -4 3 -5 q0 -4 4 -4 q1 -4 5 -3 q2 -3 4 -3 q2 0 4 3 q4 -1 5 3 q4 0 4 4 q4 1 3 5 q4 1 2 5 q-8 -7 -18 -7 q-10 0 -18 7z" fill="#7a6248" stroke="#1d1f28" stroke-width="1.1"/><path d="M26 51 q-1 4 3 5 q0 4 4 4 q1 3 4 3 q2 2 3 2 q1 0 3 -2 q3 0 4 -3 q4 0 4 -4 q4 -1 3 -5 q-7 4 -14 4 q-7 0 -14 -4z" fill="#7a6248" stroke="#1d1f28" stroke-width="1.1"/><path d="M18 39 q-2.5 -5 1.5 -7.5 q2.5 4.5 -1.5 7.5z M22 32.5 q-1.5 -5.5 3 -7 q1.5 5 -3 7z M27.5 27 q-.5 -5.5 4 -6.3 q.5 5.2 -4 6.3z M62 39 q2.5 -5 -1.5 -7.5 q-2.5 4.5 1.5 7.5z M58 32.5 q1.5 -5.5 -3 -7 q-1.5 5 3 7z M52.5 27 q.5 -5.5 -4 -6.3 q-.5 5.2 4 6.3z" fill="#d9a05b" stroke="#8a5f28" stroke-width=".8"/><path d="M29 37 h8 M43 37 h8" stroke="#1d1f28" stroke-width="2.4" stroke-linecap="round"/><circle cx="33" cy="42" r="2" fill="#1d1f28"/><circle cx="47" cy="42" r="2" fill="#1d1f28"/><path d="M40 46.5 q-4.5 -1.5 -7 1.5 q3 1.5 7 1 q4 .5 7 -1 q-2.5 -3 -7 -1.5z" fill="#7a6248" stroke="#1d1f28" stroke-width="1"/><path d="M36 52 h8" stroke="#1d1f28" stroke-width="2.2" stroke-linecap="round"/>`,
     kierkegaard:`<rect width="80" height="80" fill="#37474f"/><circle cx="40" cy="43" r="19" fill="#f0e6d3" stroke="#1d1f28" stroke-width="1.1"/><path d="M23 39 q-3 -14 7 -18 q4 -4 10 -4 q6 0 10 4 q10 4 7 18 q-3 -4 -7 -6 q1 3 -1 4 q-4 -5 -9 -5 q-5 0 -9 5 q-2 -1 -1 -4 q-4 2 -7 6z" fill="#1d1f28"/><path d="M31 24 q4 -4 9 -4 M40 20 q5 0 9 4" stroke="#2c333b" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M29 40 l8 -3 M51 40 l-8 -3" stroke="#1d1f28" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="44" r="2" fill="#1d1f28"/><circle cx="47" cy="44" r="2" fill="#1d1f28"/><path d="M31 48 q2 2 4 1 M45 49 q2 1 4 -1" stroke="#1d1f28" stroke-width="1" fill="none" opacity=".5"/><path d="M36 55 q4 1.5 8 0" stroke="#1d1f28" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M38 63.5 q-6.5 -1.5 -9.5 -7.5 q-3.5 5 -1 9.5z" fill="#fff" stroke="#1d1f28" stroke-width=".9"/><path d="M42 63.5 q6.5 -1.5 9.5 -7.5 q3.5 5 1 9.5z" fill="#fff" stroke="#1d1f28" stroke-width=".9"/><circle cx="66" cy="13" r="5.5" fill="#e8c07d"/><circle cx="68.3" cy="11.2" r="4.6" fill="#37474f"/>`
@@ -986,6 +986,7 @@ const T=LANG==='ja'?{
  trBusy:'📅 予定が最優先',
  trCut:'✂️ 話にかぶせてくる',
  trListen:'🙇 最後まで聞く',
+ trPoint:'🎯 要点だけ話す',trEasy:'🙂 気楽に話せる',trPatient:'🌿 のんびり聞いてくれる',
  profileChat:'プロフィール · チャット',
  activeTime:'活動時間',
  activeShort:'活動',
@@ -1113,6 +1114,7 @@ const T=LANG==='ja'?{
  emptyDM:n=>`Say your first hello to ${n}`,emptyGroup:'Throw in a worry.<br>Watch the answers collide.',
  chipsDM:["I've been struggling with something","Can I ask you something?"],chipsGroup:['Can I drop a worry here?','Debate this topic:'],lostReply:'…(the reply got lost on the way. Say something again.)',
  trFast:'⚡ Instant replies',trMid:'💬 Normal pace',trSlow:'🐢 Slow & easy',trGhost:'👀 Leaves you on read',trVanish:'🫥 Sometimes vanishes',trBusy:'📅 Schedule first',trCut:'✂️ Interrupts you',trListen:'🙇 Hears you out',
+ trPoint:'🎯 Gets to the point',trEasy:'🙂 Easy to talk to',trPatient:'🌿 Patient listener',
  profileChat:'Profile · Chat',activeTime:'Active',activeShort:'Active',sleepEvt:'Sleep',
  gActive:n=>`${n} active now`,
  wcTitle:'Before we begin',wcLoginT:'Keep your conversations safe',wcLoginD:'Sign in with Google and your talks and memories are saved to your account. Change phones or reinstall — the philosophers will still remember you.',wcLoginBtn:'Continue with Google',wcTrialNote:'Your records are saved to your account. Start the 7-day free trial whenever you like.',wcGuestWarn:'You can use it without signing in, but your records vanish if you switch devices or delete the app. Signing in later carries everything over.',wcPushT:'Let philosophers reach you first',wcPushD:'You will be notified the moment a reply arrives, and a philosopher reaching out first happens at most once a day. You can turn it off anytime.',wcPushBtn:'Allow notifications',wcLater:'Maybe later',
@@ -1179,6 +1181,7 @@ const T=LANG==='ja'?{
  emptyDM:n=>`${n}에게 처음으로 말을 걸어 보세요`,emptyGroup:'고민을 던져 보세요.<br>서로 다른 답이 충돌할 겁니다.',
  chipsDM:['요즘 고민이 있어','궁금한 게 있는데'],chipsGroup:['고민 하나 던져도 돼?','이 주제로 토론해봐:'],lostReply:'…(답장이 길을 잃었습니다. 다시 말을 걸어 주세요.)',
  trFast:'⚡ 즉답형',trMid:'💬 답장 보통',trSlow:'🐢 느긋한 답장',trGhost:'👀 읽씹 장인',trVanish:'🫥 가끔 잠수',trBusy:'📅 일과 우선',trCut:'✂️ 말 끊고 들어옴',trListen:'🙇 끝까지 듣는 편',
+ trPoint:'🎯 요점만 말함',trEasy:'🙂 무난하게 받아줌',trPatient:'🌿 여유 있게 들어줌',
  profileChat:'프로필 · 채팅하기',activeTime:'활동 시간',activeShort:'활동',sleepEvt:'취침',
  gActive:n=>`${n}명 활동 중`,
  wcTitle:'시작하기 전에',wcLoginT:'대화를 안전하게 보관하기',wcLoginD:'구글로 로그인하면 대화와 추억이 계정에 저장돼요.\n폰을 바꾸거나 앱을 지워도, 철학자들은 당신을 기억합니다.',wcLoginBtn:'Google로 계속하기',wcTrialNote:'기록이 계정에 저장돼요.\n7일 무료 체험은 원할 때 직접 시작할 수 있어요.',wcGuestWarn:'로그인 없이도 쓸 수 있지만, 기기를 바꾸거나 앱을 지우면 기록이 사라져요.\n나중에 로그인하면 지금까지 쌓인 기록도 그대로 옮겨집니다.',wcPushT:'철학자의 선톡 받기',wcPushD:'답장이 도착하면 바로 알려드리고, 철학자가 먼저 거는 안부 연락은 하루 1번을 넘지 않아요. 언제든 끌 수 있어요.',wcPushBtn:'알림 허용하기',wcLater:'나중에 할게요',
@@ -1980,7 +1983,7 @@ function mainOnboard(pre,note){
   }
   const helpers=document.createElement('div'); helpers.className='helper-row';
   const h1=document.createElement('button'); h1.className='helper-btn'; h1.textContent=T.helperQuiz;
-  h1.onclick=()=>{ stat('ob_quiz'); startQuiz([...sel]); };
+  h1.onclick=()=>{ stat('ob_quiz'); location.href=(LANG==='ja'?'/quiz-ja.html':LANG==='en'?'/quiz-en.html':'/quiz.html'); };
   const h2=document.createElement('button'); h2.className='helper-btn'; h2.textContent=T.helperTeams;
   h2.onclick=()=>{ stat('ob_teams'); showTeams([...sel]); };
   helpers.appendChild(h1); helpers.appendChild(h2);
@@ -3902,7 +3905,10 @@ function traits(p){
   if(q.ignore>=.1) out.push(T.trVanish);
   if(q.busy>=.1) out.push(T.trBusy);
   if(p.patience<.4) out.push(T.trCut);
-  else if(p.patience>.9) out.push(T.trListen);
+  else if(p.patience<.55) out.push(T.trPoint);
+  else if(p.patience<.75) out.push(T.trEasy);
+  else if(p.patience<.9) out.push(T.trPatient);
+  else out.push(T.trListen);
   return out;
 }
 function renderCube(){
@@ -3910,6 +3916,7 @@ function renderCube(){
   const q=$('cbQuiz'); if(q) q.textContent=T.profQuiz;
   const tm=$('cbTeams'); if(tm) tm.textContent=T.helperTeams;
   const rows=$('cubeRows'); rows.innerHTML='';
+  let cubeLastTap=null;
   try{ rows.appendChild(meCard()); }catch(e){}
   const cap=document.createElement('div'); cap.className='cube-cap'; cap.id='cubeCap'; cap.textContent=T.cubeCap;
   rows.appendChild(cap);
@@ -3923,6 +3930,8 @@ function renderCube(){
       b.className='gcell';
       b.innerHTML=`<span class="dot${dotClsPr(pr)}"></span><div class="avatar">${av(p.id)}</div><div class="gname">${dispName(p)}</div><div class="gtag">${((LANG==='ja'?(SPECS[p.id]||{}).tj:LANG==='en'?(SPECS[p.id]||{}).te:(SPECS[p.id]||{}).tk)||[])[0]||''}</div>`;
       b.onclick=()=>{
+        if(cubeLastTap===p.id){ openProfile(p.id); return; }
+        cubeLastTap=p.id;
         const tags=traits(p).map(t=>`<span class="trait">${t}</span>`).join('')
           +`<span class="trait">🕐 ${schedText(p).split('\n')[0].replace(T.activeTime+' · ',T.activeShort+' ')}</span>`;
         $('cubeInfo').innerHTML=`<div class="ci-name">${dispName(p)}</div>
@@ -3949,7 +3958,7 @@ function showTab(t){
 }
 $('tabChat').onclick=()=>showTab('chat');
 $('tabCube').onclick=()=>showTab('cube');
-$('cbQuiz').onclick=()=>{ stat('quiz_profile'); location.href='/quiz.html?lang='+LANG; };
+$('cbQuiz').onclick=()=>{ stat('quiz_profile'); location.href=(LANG==='ja'?'/quiz-ja.html':LANG==='en'?'/quiz-en.html':'/quiz.html'); };
 $('cbTeams').onclick=()=>{ stat('teams_profile'); showTeams(state.friends||[],true); $('picker').classList.add('on'); };
 $('tabMail').onclick=()=>showTab('mail');
 
