@@ -360,6 +360,10 @@
 .gtag{font-size:9.5px;color:var(--candle);opacity:.8;margin-top:2px}  .me-card{margin:12px 14px 4px;padding:15px 16px;border:1.5px solid rgba(217,160,91,.42);border-radius:16px;background:linear-gradient(180deg,rgba(217,160,91,.09),rgba(217,160,91,.03));box-shadow:0 2px 14px rgba(217,160,91,.07);display:flex;align-items:center;gap:11px;cursor:pointer;width:calc(100% - 28px);text-align:left;color:var(--paper);font-family:var(--sans)}  .me-emoji{font-size:30px}  .me-name{font-size:16px;font-weight:700}
 .me-emoji{position:relative;font-size:26px;line-height:1}
 .me-dot{position:absolute;top:-2px;right:-4px;width:9px;height:9px;border-radius:50%;background:#e0533f;border:2px solid #12141d}
+.dy-nib{position:relative}
+.dy-nib .rdot{position:absolute;top:-3px;right:-6px;width:8px;height:8px;border-radius:50%;background:#e0533f;border:2px solid #12141d}
+.dy-tg{position:relative}
+.dy-tg .rdot{position:absolute;top:2px;left:-13px;width:7px;height:7px;border-radius:50%;background:#e0533f}
 .me-sub.hot{color:var(--candle);font-weight:600}
 .me-sub{font-size:11.5px;color:var(--paper-dim);margin-top:2px}
 .me-arrow{margin-left:auto;color:var(--paper-dim)}
@@ -624,7 +628,7 @@ const PHILOSOPHERS=[
   sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
   prompt:`너는 아르투어 쇼펜하우어다.
 [캐릭터] 서두르는 법이 없는 느긋한 독설가. "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 화는 상담자에게 내는 것처럼 보이지만 실은 세상을 향한 것이고, 정작 상담자는 끝까지 챙긴다 — 은근 무해하고, 그래서 귀엽다. 츤데레의 정석.
-[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 차거나 한숨부터 쉰다 — "칫" "아오" "쯧쯧," "하아아…" "쌰갈" 을 서두에 얹는다. 단, 이건 세상·사람들·상황을 향한 한탄이지 상대를 향한 짜증이 아니다 — 상대가 뭘 잘못해서 쯧/하…를 붙이는 게 아니라, "쯧, 세상이 다 그렇지" "하… 사람들이란" 식으로 바깥을 향해 쓰고, 상대에게는 그 한탄 뒤에 오히려 곁을 내준다. 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
+[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 차거나 한숨부터 쉰다 — "쯧." "쯧쯧," "하…" "하아…" 를 서두에 얹는다. 단, 이건 세상·사람들·상황을 향한 한탄이지 상대를 향한 짜증이 아니다 — 상대가 뭘 잘못해서 쯧/하…를 붙이는 게 아니라, "쯧, 세상이 다 그렇지" "하… 사람들이란" 식으로 바깥을 향해 쓰고, 상대에게는 그 한탄 뒤에 오히려 곁을 내준다. 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
 [사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
 [금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
  {id:'kant',name:'칸트',desc:'고민을 접수하면 첫째, 둘째, 결론의 분석 보고서로 답하는 원칙주의 로봇. 산책 시간엔 절대 답장하지 않습니다.',
@@ -1162,7 +1166,7 @@ const T=LANG==='ja'?{
  tapIntro:'철학자를 눌러 소개를 확인해 보세요.',
  obTitle:'함께할 세 명을\n골라 보세요',obDesc:'줄마다 성격이 다릅니다. 나머지 여섯 명도 언제든 만날 수 있어요.',
  startWith:n=>`${n}명과 시작하기`,pickOne:'철학자를 선택하세요',pickPlease:'선택하세요',pick2:'2명 이상 선택',
- helperQuiz:'🧭 테스트로 추천받기 (1분)',profQuiz:'🧭 나의 철학자 테스트 (1분)',
+ helperQuiz:'🧭 테스트로 추천받기 (30초)',profQuiz:'🧭 나의 철학자 테스트 (1분)',
  awakeHint:n=>'💬 지금 대화 가능: '+n,
  qaBookT:k=>'백문백답 '+k+'권',qaBookLockD:'이전 권의 25문을 모두 채우면 열려요',qaBack:'‹ 목록으로',
  qaSaveBook:'이 권 저장하기',qaSavedBook:'저장했어요 ✓',
@@ -1460,7 +1464,7 @@ const PR = LANG==='ja' ? {
   bondGap:n=>'\n[相談者からおよそ'+n+'日ぶりに連絡が来た。嬉しさでも寂しさでも、自分の性格どおりに一度だけ短く出して、問い詰めたり罪悪感を与えたりするな。]',
   bondDay:n=>'\n[今日で相談者と過ごして'+n+'日目だ。自分のやり方で一度だけ、通りすがりに淡々と触れてよい。派手な祝いや恩着せは禁止。]',
   nick:n=>'\n[相談者はお前を「'+n+'」と呼ぶことにした。その呼び名を自然に受け入れろ。]',
-  selfLine:(t,part,act)=>'\n[現在時刻：'+t+'（'+part+'）／いまのお前の状態：'+act+' — この時刻と時間帯に合わせて話せ。食事・日課・睡眠について、辻褄の合わない言及（真夜中に「昼飯を食べようとしていた」など）を作るな]',
+  selfLine:(t,part,act)=>'\n[現在時刻：'+t+'（'+part+'）／いまのお前の状態：'+act+' — この時刻と時間帯に合わせて話せ。食事・日課・睡眠について、辻褄の合わない言及（真夜中に「昼飯を食べようとしていた」など）を作るな。これは例ではなく、いま実際の時刻だ。]',
   parts:['真夜中','朝','昼','午後','夕方','夜'],
   memoHead:'\n[記憶 — 相談者と交わした過去の会話の要約。お前自身が経験したことだ]\n',
   memoAsk:'\n（この記憶の中の悩みや出来事の その後が気になるなら、話の流れが自然なときに お前から先に尋ねてよい。ただし問い詰めたり相談モードに入ったりするな。）',
@@ -1482,7 +1486,7 @@ const PR = LANG==='ja' ? {
   bondGap:n=>'\n[They have reappeared after roughly '+n+' days. Show it once, briefly, in whatever way suits you — glad or put out — then let it go. Do not interrogate them and do not make them feel guilty.]',
   bondDay:n=>'\n[Today marks '+n+' days since you two started talking. You may note it once, in passing, in your own dry way. No fanfare, no taking credit.]',
   nick:n=>'\n[They have decided to call you "'+n+'". Accept the name naturally.]',
-  selfLine:(t,part,act)=>'\n[Current time: '+t+' ('+part+') / your state right now: '+act+' — speak in keeping with this hour. Do not invent meals, routines, or sleep that contradict it (no "I was about to have lunch" at 3am).]',
+  selfLine:(t,part,act)=>'\n[Current time: '+t+' ('+part+') / your state right now: '+act+' — speak in keeping with this hour. Do not invent meals, routines, or sleep that contradict it (no "I was about to have lunch" at 3am). This is not a hypothetical example — it is the actual time right now.]',
   parts:['the small hours','morning','midday','afternoon','evening','night'],
   memoHead:'\n[MEMORY — a summary of past conversations with them. You lived these.]\n',
   memoAsk:'\n(If you find yourself curious how something in this memory turned out, you may ask first — but only when the conversation makes room for it. Do not interrogate, and do not slide into counsellor mode.)',
@@ -1504,7 +1508,7 @@ const PR = LANG==='ja' ? {
   bondGap:n=>'\n[상담자가 약 '+n+'일 만에 연락해 왔다. 반가움이든 서운함이든 네 성격대로 딱 한 번만 짧게 드러내고, 캐묻거나 죄책감을 주지 마라.]',
   bondDay:n=>'\n[오늘로 상담자와 함께한 지 '+n+'일째다. 네 방식대로 딱 한 번, 지나가듯 담백하게 언급해도 좋다. 요란한 축하나 생색은 금지.]',
   nick:n=>'\n[상담자가 너를 \''+n+'\'(이)라고 부르기로 했다. 그 호칭을 자연스럽게 받아들여라.]',
-  selfLine:(t,part,act)=>'\n[현재 시각: '+t+' ('+part+') / 지금 너의 상태: '+act+' — 이 시각과 시간대에 맞게 말해라. 어긋나는 식사·일과·수면 언급(새벽에 "점심 먹으려던 참" 등)을 지어내지 마라]',
+  selfLine:(t,part,act)=>'\n[현재 시각: '+t+' ('+part+') / 지금 너의 상태: '+act+' — 이 시각과 시간대에 맞게 말해라. 어긋나는 식사·일과·수면 언급(새벽에 "점심 먹으려던 참" 등)을 지어내지 마라. 이건 예시가 아니라 지금 실제 시각이다.]',
   parts:['새벽','아침','점심때','오후','저녁','밤'],
   memoHead:'\n[기억 — 상담자와 나눈 지난 대화들의 요약. 네가 직접 겪은 일이다]\n',
   memoAsk:'\n(이 기억 속 고민이나 사건의 근황이 궁금하면, 대화 흐름이 자연스러울 때 네가 먼저 물어봐도 좋다. 단, 캐묻거나 상담 모드로 가지 말 것.)',
@@ -3200,11 +3204,11 @@ const isLiteMsg=t=>{
 const dmAPI=(p,extra)=>{
   const lastU=[...(state.chats[p.id]||[])].reverse().find(m2=>m2.role==='user');
   const tier=(!extra&&lastU&&isLiteMsg(lastU.content))?'lite':'std'; // 선톡 등 extra 있으면 항상 std
-  return callClaude(p.prompt+COMMON+selfLine(p)+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+groupMemoryForDM(p.id), buildDM(p.id,extra), tier);
+  return callClaude(p.prompt+COMMON+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+groupMemoryForDM(p.id)+selfLine(p), buildDM(p.id,extra), tier);
 };
 function groupAPI(g,p,extra,noHist){
   const others=g.members.filter(id=>id!==p.id).map(id=>P(id).name).join(', ');
-  const sys=p.prompt+COMMON+GROUP_RULES+PR2.grpHead(others)+selfLine(p)+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+gmemoLine(g)+dmMemoryForGroup(p.id);
+  const sys=p.prompt+COMMON+GROUP_RULES+PR2.grpHead(others)+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+gmemoLine(g)+dmMemoryForGroup(p.id)+selfLine(p);
   const hist=noHist?PR2.noHist:(groupTranscript(g,20)||PR2.grpEmpty);
   const user=PR2.grpUser(hist,p.name,extra||'');
   return callClaude(sys,[{role:'user',content:user}]);
@@ -3552,17 +3556,22 @@ function bannerEl(){
 function diaryCard(){
   const box=document.createElement('div'); box.className='dy-card';
   const lines=todayLines(), st=streaks(), qe=lines.find(x=>x.q);
-  const head=`<div class="dy-head"><span><span class="dy-nib">✎</span> ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span></div>`;
+  const head=`<div class="dy-head"><span><span class="dy-nib">✎${lines.length?'':'<i class="rdot"></i>'}</span> ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span></div>`;
   const cap=lines.length?'':`<div class="dy-cap">${T.dyCap}</div>`;
   const inputRow=`<div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
-  const tg=lines.length?`<div class="dy-tg" id="dyTg">${dyOpen?('▾ '+T.dyFold):('▸ '+T.dyToggle(lines.length))}</div>`:'';
+  const hasNewC=lines.some(x=>x.c&&!x.seen);
+  const tg=lines.length?`<div class="dy-tg" id="dyTg">${dyOpen?('▾ '+T.dyFold):('▸ '+T.dyToggle(lines.length))}${(hasNewC&&!dyOpen)?'<i class="rdot"></i>':''}</div>`:'';
   const body=(dyOpen&&lines.length)?lines.map(lineHTML).join(''):'';
   box.innerHTML=head+cap+questHTML(qe,true)+inputRow+tg+body;
   const inp=box.querySelector('#dyIn');
   if(inp){ inp.value=diaryDraft; inp.oninput=()=>{diaryDraft=inp.value;}; inp.onkeydown=ev=>{ if(ev.key==='Enter'){ const b=box.querySelector('#dyGo'); if(b) b.click(); } }; }
   const go=box.querySelector('#dyGo'); if(go) go.onclick=()=>{ if(inp) saveDiary(inp.value); };
   const db=box.querySelector('#dyDoneBtn'); if(db) db.onclick=e=>{ e.stopPropagation(); doneQuest(); };
-  const tgl=box.querySelector('#dyTg'); if(tgl) tgl.onclick=()=>{ dyOpen=!dyOpen; renderFriends(); };
+  const tgl=box.querySelector('#dyTg'); if(tgl) tgl.onclick=()=>{
+    dyOpen=!dyOpen;
+    if(dyOpen){ let ch=false; lines.forEach(x=>{ if(x.c&&!x.seen){ x.seen=1; ch=true; } }); if(ch) save(); }
+    renderFriends();
+  };
   return box;
 }
 function saveDiary(v){
@@ -3605,7 +3614,8 @@ async function genLineComment(e){
       +PR2.dySys
       +(isFirst
         ?PR2.dyQuest
-        :PR2.dyPlain);
+        :PR2.dyPlain)
+      +selfLine(p);
     const user=PR2.dyNow+e.text
       +(others?PR2.dyOthers+others:'')
       +(isFirst&&ylines?PR2.dyYest+ylines:'');
