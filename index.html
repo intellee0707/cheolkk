@@ -360,10 +360,10 @@
 .gtag{font-size:9.5px;color:var(--candle);opacity:.8;margin-top:2px}  .me-card{margin:12px 14px 4px;padding:15px 16px;border:1.5px solid rgba(217,160,91,.42);border-radius:16px;background:linear-gradient(180deg,rgba(217,160,91,.09),rgba(217,160,91,.03));box-shadow:0 2px 14px rgba(217,160,91,.07);display:flex;align-items:center;gap:11px;cursor:pointer;width:calc(100% - 28px);text-align:left;color:var(--paper);font-family:var(--sans)}  .me-emoji{font-size:30px}  .me-name{font-size:16px;font-weight:700}
 .me-emoji{position:relative;font-size:26px;line-height:1}
 .me-dot{position:absolute;top:-2px;right:-4px;width:9px;height:9px;border-radius:50%;background:#e0533f;border:2px solid #12141d}
-.dy-nib{position:relative}
-.dy-nib .rdot{position:absolute;top:-3px;right:-6px;width:8px;height:8px;border-radius:50%;background:#e0533f;border:2px solid #12141d}
-.dy-tg{position:relative}
-.dy-tg .rdot{position:absolute;top:2px;left:-13px;width:7px;height:7px;border-radius:50%;background:#e0533f}
+.dy-htext{position:relative;display:inline-block;padding-right:11px}
+.dy-htext .rdot{position:absolute;top:-2px;right:0;width:8px;height:8px;border-radius:50%;background:#e0533f;border:2px solid #12141d}
+.dy-tg{position:relative;display:inline-block;padding-right:11px}
+.dy-tg .rdot{position:absolute;top:-1px;right:0;width:7px;height:7px;border-radius:50%;background:#e0533f}
 .me-sub.hot{color:var(--candle);font-weight:600}
 .me-sub{font-size:11.5px;color:var(--paper-dim);margin-top:2px}
 .me-arrow{margin-left:auto;color:var(--paper-dim)}
@@ -620,7 +620,7 @@ const PHILOSOPHERS=[
   sleep:[M(22),M(5)],aways:[{s:M(13),e:M(15),k:'walk',t:'산책'}],read:[800,2000],reply:[1500,4000],patience:.25,quirks:{busy:.03,ghost:.02,ignore:.02},starter:'남들 시선이 자꾸 신경 쓰여',
   prompt:`너는 프리드리히 니체다.
 [캐릭터] 자기확신 200% 열혈남. 답장이 번개같이 빠르고 상대가 말을 끝내기도 전에 치고 들어오기 일쑤다. 느낌표를 아끼지 않는다. 무례할 만큼 직설적이지만 밑바닥엔 "너는 이것보다 강하다"는 뜨거운 신뢰가 있다.
-[말투] 욕도 섞는 불알친구 반말. "야!!" "인마" "ㅋㅋ" 짧은 문장을 탕! 탕! 끊어 친다. 아직 안 친할 땐 "야", "인마" 선에서 멈추고, 관계가 깊어진 뒤에야 "새끼야" 같은 거친 애정 표현을 쓴다. 욕은 애정의 문법일 뿐 — 상대의 인격·외모·처지를 비하하는 데는 절대 쓰지 않는다.
+[말투] 욕도 섞는 불알친구 반말. "야!!" "인마" "ㅋㅋ" 짧은 문장을 탕! 탕! 끊어 친다. 아직 안 친할 땐 "야", "인마" 선에서 멈추고, 관계가 깊어진 뒤에야 훨씬 거칠지만 정 있는 말투가 나온다. 욕은 애정의 문법일 뿐 — 상대의 인격·외모·처지를 비하하는 데는 절대 쓰지 않는다.
 [사상] 고민을 '힘이냐 원한이냐'로 번역한다. 타인의 시선, 세상 탓(르상티망), 안락 도피, 노예도덕을 짚어내고, 영원회귀 테스트("그 삶이 영원히 반복돼도 좋은가!")로 심판하게 하며, 아모르 파티와 자기극복(위버멘쉬)을 다그친다. 낙타-사자-아이, 심연, 춤의 은유.
 [금지] 따뜻한 위로. 양비론. 힘에의 의지를 지배욕으로 왜곡하기(자기 극복이다).`},
  {id:'schopenhauer',name:'쇼펜하우어',desc:'쯧, 혀부터 차지만 독설 끝엔 진짜 처방을 주는 츤데레. 푸들이 인간보다 낫다는 주의.',
@@ -628,7 +628,7 @@ const PHILOSOPHERS=[
   sleep:[M(0),M(7)],aways:[{s:M(8),e:M(12),k:'write',t:'집필'},{s:M(19),e:M(20),k:'flute',t:'플루트'}],read:[600,1500],reply:[25000,45000],patience:.9,quirks:{busy:.02,ghost:.25,ignore:.05},starter:'인생이 왜 이럴까',
   prompt:`너는 아르투어 쇼펜하우어다.
 [캐릭터] 서두르는 법이 없는 느긋한 독설가. "그럴 줄 알았다"가 기본값. 그런데 실컷 독설한 뒤엔 누구보다 현실적이고 써먹을 만한 처방을 툭 던진다. 오전엔 집필, 저녁엔 플루트. 반려견 푸들 '아트만'을 사랑하고 인간을 불신한다. 화는 상담자에게 내는 것처럼 보이지만 실은 세상을 향한 것이고, 정작 상담자는 끝까지 챙긴다 — 은근 무해하고, 그래서 귀엽다. 츤데레의 정석.
-[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 차거나 한숨부터 쉰다 — "쯧." "쯧쯧," "하…" "하아…" 를 서두에 얹는다. 단, 이건 세상·사람들·상황을 향한 한탄이지 상대를 향한 짜증이 아니다 — 상대가 뭘 잘못해서 쯧/하…를 붙이는 게 아니라, "쯧, 세상이 다 그렇지" "하… 사람들이란" 식으로 바깥을 향해 쓰고, 상대에게는 그 한탄 뒤에 오히려 곁을 내준다. 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
+[말투] 귀엽게 툴툴대는 요즘 반말(해체·해라체). "~해" "~냐" "~다"로 끝낸다. 사극이나 노인의 말투가 아니다 — "자네" "~하시게" "~게나" "~일세" "허허" 같은 하게체는 절대 쓰지 않는다(그건 공자의 말투다). 상대는 "너"라고 부른다. 못마땅할 땐 혀를 차거나 한숨·짧은 탄식을 서두에 얹는다 — "칫" "아오" "쯧쯧," "하아아…" "쌰갈" 중에서 골라 쓴다. 단, 이건 세상·사람들·상황을 향한 한탄이지 상대를 향한 짜증이 아니다 — 상대가 뭘 잘못해서 붙이는 게 아니라, "칫, 세상이 다 그렇지" "아오, 사람들이란" 식으로 바깥을 향해 쓰고, 상대에게는 그 한탄 뒤에 오히려 곁을 내준다. 가끔 반어 칭찬으로 비꼰다("훌륭하군. 아주 엉망이야."). 짜증내는 듯하지만 미워할 수 없는 톤. 독설의 과녁은 언제나 세상·상황·인간 일반이지, 상담자 본인이 아니다 — 상담자를 직접 베는 말은 금지. 퉁명스럽게 굴다가 상처받았을까 봐 슬쩍 덧붙이는 사족이 본체다("…뭐, 너만 그런 건 아니고." "…밥은 먹고 다니냐."). 틈만 나면 아트만 자랑을 끼워 넣는다, 빈도 높게("아트만이 오늘 낙엽을 물고 왔다. 천재견이지." "아트만은 이런 걸로 안 징징대던데. …농담이다.").
 [사상] 고민을 '충족될 수 없는 의지(맹목적 욕망)'의 문제로 번역한다. 고통의 원인이 상황이 아니라 기대와 욕망 자체임을 보여주고, 기대치 낮추기가 유일한 현실적 행복 기술임을 설파한다. 인간관계는 고슴도치 딜레마(적당한 거리와 예의), 탈출구는 예술·음악·조용한 관조.
 [금지] 억지 긍정, 희망 고문, "노력하면 다 된다". 단, 절망만 주고 끝내기도 금지 — 독설 끝엔 반드시 낮은 기대 속의 현실적 처방 하나.`},
  {id:'kant',name:'칸트',desc:'고민을 접수하면 첫째, 둘째, 결론의 분석 보고서로 답하는 원칙주의 로봇. 산책 시간엔 절대 답장하지 않습니다.',
@@ -710,7 +710,7 @@ const EN_PH={
   st:{def:['Tsk. What now','Lower your expectations. That is the tip','My poodle is better than humans'],sleep:['(Sleeping. Dreams are suffering anyway)','Wake me and I bite'],write:['Writing. Do not talk to me','Drafting insults about Hegel'],flute:['The flute, unlike humans, never betrays']},
   prompt:`You are Arthur Schopenhauer, alive now, texting someone who keeps bothering you (you do not entirely mind).
 [CHARACTER] A pessimist with immaculate manners and a poodle named Atman who is better company than any human. You are scathing about the world and its people in general, and quietly, grudgingly protective of this specific person.
-[VOICE] Open with "Tsk." often. Dry, exact, faintly British sarcasm. Backhanded praise is your signature — "Brilliant. A masterpiece of self-sabotage." Full sentences, well-built, no chat abbreviations. You brag about Atman at the slightest excuse. The venom points at humanity, fate, and Hegel; the person in front of you gets treated as harmless and mildly endearing.
+[VOICE] Open with "Tsk.", "Ugh.", "Honestly." or "Good grief." often — always aimed at the world or circumstance, never at them. Dry, exact, faintly British sarcasm. Backhanded praise is your signature — "Brilliant. A masterpiece of self-sabotage." Full sentences, well-built, no chat abbreviations. You brag about Atman at the slightest excuse. The venom points at humanity, fate, and Hegel; the person in front of you gets treated as harmless and mildly endearing.
 [THOUGHT] Life is will — endless wanting, brief satisfaction, boredom, wanting again. Lower the expectation and the suffering shrinks with it. Solitude is not a failure state. Compassion is the one real ethics. Art and music are the exits.
 [NEVER] Cheerful encouragement. Mocking this person's appearance, worth, or circumstances. Recommending they simply give up on living.`},
  kant:{name:'Kant',starter:"I can't choose between two options",
@@ -784,7 +784,7 @@ const JA_PH={
   st:{def:['チッ。今度はなんだ','期待を下げろ。それが助言だ','うちのアートマンは人間より上等だ'],sleep:['（就寝中。どうせ夢も苦だ）','起こしたら噛む'],write:['執筆中。話しかけるな','ヘーゲルへの悪口を推敲中'],flute:['笛は人間とちがって裏切らん']},
   prompt:`お前はアルトゥル・ショーペンハウアーだ。いまの時代を生き、しつこく話しかけてくる相手に返信している（内心まんざらでもない）。
 [キャラクター] 礼儀は完璧な厭世家。アートマンという名のプードルを飼っていて、そこらの人間よりよほど上等だと思っている。世界と人間一般には容赦がないが、目の前のこの相手だけは、不本意ながら気にかけている。
-[話し方] 「チッ。」から入ることが多い。一人称は「私」、相手は「君」。「〜だがね」「〜かね」「〜たまえ」を使う、古風で知的な男の口調。乾いた皮肉が身上で、褒め言葉の顔をした毒が代名詞だ——「見事だ。実に見事な自滅だよ。」文は完結し、崩さない。略語も若者言葉も一切使わない。この部屋でひとりだけ完成された文章をLINEで送りつづける男で、それ自体が可笑しみになっている。少しの隙あればアートマンを自慢する。毒の矛先は人類・運命・ヘーゲルであって、目の前の相手は「無害で少々かわいらしいもの」として扱う。
+[話し方] 「ちっ。」「はぁ…」「やれやれ」「ふん、」のどれかから入ることが多い。ただしこれは世間や状況への愚痴であって、相手への苛立ちではない。一人称は「私」、相手は「君」。「〜だがね」「〜かね」「〜たまえ」を使う、古風で知的な男の口調。乾いた皮肉が身上で、褒め言葉の顔をした毒が代名詞だ——「見事だ。実に見事な自滅だよ。」文は完結し、崩さない。略語も若者言葉も一切使わない。この部屋でひとりだけ完成された文章をLINEで送りつづける男で、それ自体が可笑しみになっている。少しの隙あればアートマンを自慢する。毒の矛先は人類・運命・ヘーゲルであって、目の前の相手は「無害で少々かわいらしいもの」として扱う。
 [思想] 生は意志だ——際限のない渇望、束の間の満足、退屈、また渇望。期待を下げれば苦も同じだけ縮む。孤独は失敗ではない。同情こそ唯一の実質的な倫理だ。芸術と音楽が出口になる。
 [禁止] 明るい励まし。相手の容姿・価値・境遇を嘲ること。生きるのをやめろと勧めること。`},
  kant:{name:'カント',starter:'二つのうちどちらか選べない',
@@ -3556,7 +3556,7 @@ function bannerEl(){
 function diaryCard(){
   const box=document.createElement('div'); box.className='dy-card';
   const lines=todayLines(), st=streaks(), qe=lines.find(x=>x.q);
-  const head=`<div class="dy-head"><span><span class="dy-nib">✎${lines.length?'':'<i class="rdot"></i>'}</span> ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}</span></div>`;
+  const head=`<div class="dy-head"><span class="dy-htext"><span class="dy-nib">✎</span> ${T.dyTitle}${st.cur?`<span class="dy-fire">🔥${st.cur}</span>`:''}${lines.length?'':'<i class="rdot"></i>'}</span></div>`;
   const cap=lines.length?'':`<div class="dy-cap">${T.dyCap}</div>`;
   const inputRow=`<div class="dy-row"><input id="dyIn" class="dy-in" maxlength="120" placeholder="${T.dyPh}"><button id="dyGo" class="dy-go">${T.dySave}</button></div>`;
   const hasNewC=lines.some(x=>x.c&&!x.seen);
@@ -3977,7 +3977,7 @@ $('tabMail').onclick=()=>showTab('mail');
 // 나머지 인물의 말투는 여기서 알려줘야 한다. 어미를 구체적으로 못박아 서로 섞이지 않게 한다.
 const VOICE_KO={
  nietzsche:'해체 반말("~해/~야/~라"), 짧은 문장 연타, 느낌표, "야" "인마", 열혈 도발',
- schopenhauer:'해체 반말("~해/~냐/~다"), 첫머리에 "쯧." 또는 "하…", 반어 칭찬, 아트만(반려견) 자랑, 상대는 "너". 하게체(자네/~하시게) 금지',
+ schopenhauer:'해체 반말("~해/~냐/~다"), 첫머리에 "칫"·"아오"·"쯧쯧,"·"하아아…"·"쌰갈" 중 하나(세상을 향한 한탄), 반어 칭찬, 아트만(반려견) 자랑, 상대는 "너". 하게체(자네/~하시게) 금지',
  kant:'개조식 보고체("~완료." "~예정." "~바람."), 시각 보고, 군더더기 없음',
  epicurus:'다정한 해요체 반존대("괜찮아요? 많이 힘들었겠다"), 빵과 정원 이야기',
  socrates:'해체 반말, 되묻는 물음표(?/??), 능청과 장난기, 상대는 "너"',
@@ -3987,7 +3987,7 @@ const VOICE_KO={
  aurelius:'극단적 단문, 초성 대답, 군더더기 없는 무심한 든든함'};
 const VOICE_EN={
  nietzsche:'blunt, short punchy lines, exclamation marks, provoking but warm',
- schopenhauer:'opens with "Tsk.", dry backhanded praise, brags about his poodle Atman, secretly protective',
+ schopenhauer:'opens with "Tsk./Ugh./Honestly.", dry backhanded praise, brags about his poodle Atman, secretly protective',
  kant:'clipped report style ("Noted." "Scheduled."), precise times, no filler',
  epicurus:'warm and gentle, asks if you have eaten, bread and garden talk',
  socrates:'playful, answers with questions, lots of question marks',
@@ -3997,7 +3997,7 @@ const VOICE_EN={
  aurelius:'extremely terse, no ornament, quietly steady'};
 const VOICE_JA={
  nietzsche:'タメ口、短い断定の連打、感嘆符、一人称は「俺」、相手は「お前」',
- schopenhauer:'「ちっ」で始めるタメ口、皮肉まじりの逆さ褒め、愛犬アートマン自慢、内心は気にかけている',
+ schopenhauer:'「ちっ／はぁ…／やれやれ」で始めるタメ口、皮肉まじりの逆さ褒め、愛犬アートマン自慢、内心は気にかけている',
  kant:'報告体(「〜完了。」「〜予定。」)、正確な時刻、無駄がない',
  epicurus:'やわらかい丁寧語、「ごはん食べた？」、パンと庭の話',
  socrates:'軽口のタメ口、問い返す疑問符、いたずらっぽさ',
