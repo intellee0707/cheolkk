@@ -1523,6 +1523,7 @@ const PR2=LANG==='ja'?{
  grpUser:(h,n,x)=>'[部屋の会話]\\n'+h+'\\n\\n（さあ「'+n+'」お前の番だ。お前は'+n+'本人としてだけ話し、他の哲学者のセリフを代わりに書くな。'+(x?' '+x:'')+'）',
  grpEmpty:'（まだ何も話されていない）',
  noWords:'（相手はまだ何も言っていない）',
+ gapNote:(n,u)=>'（ここから'+n+(u==='h'?'時間':u==='d'?'日':'ヶ月')+'の空白があった。前の会話の続きだと思い込まず、特に言及がなければ新しい会話として受け止めろ。）',
  schedSoon:(m,t)=>'（参考：およそ'+m+'分後に「'+t+'」の予定がある。会話の途中なので、今回の返信に「そろそろ行かねば」という含みを短く混ぜろ。）',
  schedSoft:(m,t)=>'（参考：およそ'+m+'分後に「'+t+'」の予定がある。名残惜しさや、後ろにずらそうか迷う気配を短く出してよい。）',
  schedDelay:t=>'（本当はいま「'+t+'」の時間だが、会話が続いているので少し先延ばしにしている。その気配を少し出してよい。）',
@@ -1582,6 +1583,7 @@ const PR2=LANG==='ja'?{
  grpUser:(h,n,x)=>'[ROOM TRANSCRIPT]\\n'+h+'\\n\\n(Your turn now, '+n+'. Speak only as '+n+', and never write lines for another philosopher.'+(x?' '+x:'')+')',
  grpEmpty:'(nothing said yet)',
  noWords:'(they have not said anything yet)',
+ gapNote:(n,u)=>'(There has been a gap of '+n+' '+(u==='h'?'hour(s)':u==='d'?'day(s)':'month(s)')+' here. Do not assume this continues the earlier topic — unless referenced, treat it as a fresh conversation.)',
  schedSoon:(m,t)=>'(Note: in about '+m+' minutes you have '+t+'. You are mid-conversation, so work a short heads-up that you will have to go into this reply.)',
  schedSoft:(m,t)=>'(Note: in about '+m+' minutes you have '+t+'. You may briefly show that you would rather stay, or that you are weighing putting it off.)',
  schedDelay:t=>'(You would normally be at '+t+' right now, but the conversation is still going and you are letting it slide a little. You may let that show.)',
@@ -1641,6 +1643,7 @@ const PR2=LANG==='ja'?{
  grpUser:(h,n,x)=>'[단톡방 대화]\\n'+h+'\\n\\n(이제 \''+n+'\' 너의 차례다. 너는 '+n+' 본인으로만 말하고, 다른 철학자의 대사를 대신 쓰지 마라.'+(x?' '+x:'')+')',
  grpEmpty:'(아직 아무 말 없음)',
  noWords:'(상대는 아직 아무 말이 없다)',
+ gapNote:(n,u)=>'(여기서부터 '+n+(u==='h'?'시간':u==='d'?'일':'개월')+'의 공백이 있었다. 이어지는 대화라고 착각하지 말고, 특별한 언급이 없다면 지금부터는 새로운 대화로 받아들여라.)',
  schedSoon:(m,t)=>'(참고: 약 '+m+'분 뒤에 \''+t+'\' 일정이 있다. 대화 중이니 이번 답장에서 자연스럽게 곧 가봐야 한다는 언질을 짧게 섞어라.)',
  schedSoft:(m,t)=>'(참고: 약 '+m+'분 뒤에 \''+t+'\' 일정이 있다. 아쉬워하거나 미룰까 고민하는 티를 짧게 내도 좋다.)',
  schedDelay:t=>'(원래 지금은 \''+t+'\' 시간인데, 대화가 이어지는 중이라 조금 미루고 있다. 그런 티를 살짝 내도 좋다.)',
@@ -1822,8 +1825,8 @@ const TEAMS_KO=[
  {name:'균형팀',desc:'질문 → 격려 → 수용. 처음이라면 이 조합',m:['socrates','nietzsche','epicurus']},
  {name:'온기팀',desc:'혼내는 사람이 한 명도 없습니다',m:['epicurus','confucius','zhuangzi']},
  {name:'정신번쩍팀',desc:'핑계가 살아남지 못하는 조합',m:['nietzsche','kant','aurelius']},
- {name:'새벽팀',desc:'잠 안 오는 밤을 아는 사람들',m:['kierkegaard','schopenhauer','epicurus']},
- {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','socrates']}
+ {name:'새벽팀',desc:'밤을 새웠든 일찍 깼든, 새벽을 아는 사람들',m:['kierkegaard','schopenhauer','aurelius']},
+ {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','zhuangzi']}
 ];
 const OB_ROWS_KO=[['🔥 팩폭 라인','때리고 정리하는 줄'],['🤲 온기 라인','받아주고 묻는 줄'],['🌙 고요 라인','가라앉히는 줄']];
 
@@ -2512,8 +2515,11 @@ function send(){
   const key=state.current;
   if(key[0]==='d'){
     const pid=curId(), p=P(pid);
-    const inRoom=!!(typingFor&&typingFor.key===key); // 상대가 입력 중 = 지금 이 방을 보고 있다
-    (state.chats[pid]=state.chats[pid]||[]).push({role:'user',content:v,t:now(),read:inRoom});
+    const hArr=(state.chats[pid]=state.chats[pid]||[]);
+    const lastU=hArr[hArr.length-1];
+    const alreadyRead=!!(lastU&&lastU.role==='user'&&lastU.read); // 직전 내 메시지를 이미 읽은 상태 = 아직 이 방에 있는 것
+    const inRoom=!!(typingFor&&typingFor.key===key)||alreadyRead; // 상대가 입력 중이거나, 이미 읽고 있던 중 = 지금 이 방을 보고 있다
+    hArr.push({role:'user',content:v,t:now(),read:inRoom});
     markBondDay(pid);
     renderMsgs(); renderChips(); save();
     if(state.stage[key]==='gen'){ state.pendingAfter[key]=true; return; }
@@ -2526,8 +2532,10 @@ function send(){
     const g=getGroup(curId());
     const reads={}, tNow=now();
     const typerId=(typingFor&&typingFor.key===key)?typingFor.pid:null; // 입력 중인 멤버는 방에 있다
+    const lastMe=[...g.msgs].reverse().find(m=>m.who==='me');
     g.members.forEach(id=>{
-      if(id===typerId){ reads[id]=tNow-1; return; } // 이미 읽음 처리
+      const alreadyRead=!!(lastMe&&lastMe.reads&&lastMe.reads[id]!==undefined&&tNow>=lastMe.reads[id]);
+      if(id===typerId||alreadyRead){ reads[id]=tNow-1; return; } // 이미 읽음 처리(입력 중이거나, 직전 메시지를 이미 읽은 상태)
       const pp=P(id), pr=presence(pp,tNow);
       const lastM=[...g.msgs].reverse().find(m=>m.who===id);
       const hot=pr.active&&lastM&&(tNow-lastM.t<hotMs(id));
@@ -2906,8 +2914,13 @@ function dmTranscript(pid,n){
     (m.role==='user'?PR2.meTag:PR2.youTag)+m.content.replace(/\|\|\|/g,' / ')).join('\n');
 }
 function groupTranscript(g,n){
-  return g.msgs.slice(-n).map(m=>
-    (m.who==='me'?PR2.meTag:m.who==='sys'?PR2.sysTag:P(m.who).name+': ')+m.content.replace(/\|\|\|/g,' / ')).join('\n');
+  const arr=g.msgs.slice(-n); let prevT=null;
+  return arr.map(m=>{
+    let c=m.content.replace(/\|\|\|/g,' / ');
+    if(prevT!==null&&m.t-prevT>GAP_MS){ const gu=gapUnits(m.t-prevT); c=PR2.gapNote(gu.n,gu.u)+'\n'+c; }
+    prevT=m.t;
+    return (m.who==='me'?PR2.meTag:m.who==='sys'?PR2.sysTag:P(m.who).name+': ')+c;
+  }).join('\n');
 }
 function dmMemoryForGroup(pid){
   const t=dmTranscript(pid,10);
@@ -2922,11 +2935,22 @@ function groupMemoryForDM(pid){
 }
 
 /* ================= API ================= */
+const GAP_MS=6*3600000;
+function gapUnits(ms){
+  const h=ms/3600000;
+  if(h<24) return {n:Math.max(1,Math.round(h)),u:'h'};
+  const d=h/24;
+  if(d<30) return {n:Math.round(d),u:'d'};
+  return {n:Math.max(1,Math.round(d/30)),u:'mo'};
+}
 function buildDM(pid,extra){
-  const out=[];
+  const out=[]; let prevT=null;
   (state.chats[pid]||[]).slice(-HIST_MAX).forEach(m=>{
-    if(out.length&&out[out.length-1].role===m.role) out[out.length-1].content+='\n'+m.content;
-    else out.push({role:m.role,content:m.content});
+    let c=m.content;
+    if(prevT!==null&&m.t-prevT>GAP_MS){ const gu=gapUnits(m.t-prevT); c=PR2.gapNote(gu.n,gu.u)+'\n'+c; }
+    prevT=m.t;
+    if(out.length&&out[out.length-1].role===m.role) out[out.length-1].content+='\n'+c;
+    else out.push({role:m.role,content:c});
   });
   if(extra){
     if(out.length&&out[out.length-1].role==='user') out[out.length-1].content+='\n'+extra;
