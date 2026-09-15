@@ -41,13 +41,16 @@ self.addEventListener('push', e => {
   }));
 });
 
-/* 알림 클릭 → 앱 열기/포커스 */
+/* 알림 클릭 → 앱 열기/포커스 (이미 열려있으면 어디로 갈지 postMessage로 알려준다) */
 self.addEventListener('notificationclick', e => {
   e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/';
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      for (const c of list) { if ('focus' in c) return c.focus(); }
-      return clients.openWindow((e.notification.data && e.notification.data.url) || '/');
+      for (const c of list) {
+        if ('focus' in c) { try { c.postMessage({ url }); } catch (err) {} return c.focus(); }
+      }
+      return clients.openWindow(url);
     })
   );
 });
