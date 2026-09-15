@@ -1,7 +1,7 @@
 {
-  "name": "Deep End — chat with nine dead philosophers",
-  "short_name": "Deep End",
-  "description": "Chat with nine dead philosophers",
+  "name": "철크크 — 2,500년을 건너온 아홉 철학자",
+  "short_name": "철크크",
+  "description": "2,500년을 건너온 아홉 철학자와의 대화",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#12141d",
