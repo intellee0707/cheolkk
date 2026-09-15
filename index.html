@@ -48,6 +48,7 @@
   .f-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
   .f-time{font-size:10.5px;color:rgba(239,232,218,.35)}
   .badge{min-width:19px;height:19px;border-radius:10px;background:#c25b4e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px}
+  .tabbadge{min-width:16px;height:16px;border-radius:9px;background:#c25b4e;color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;vertical-align:6px;margin-left:2px}
   .action-row{display:flex;gap:10px;padding:10px 20px}
   .action-btn{flex:1;border:1px dashed var(--ink-line);border-radius:12px;background:none;color:var(--paper-dim);font-family:var(--sans);font-size:13px;padding:11px;cursor:pointer}
   .action-btn:hover{border-color:var(--candle);color:var(--candle)}
@@ -450,6 +451,7 @@ select.me-in{appearance:auto}
     <div class="cmenu" id="chatMenu">
       <button id="cmManage"></button>
       <button id="cmRename"></button>
+      <button id="cmInstant"></button>
       <button id="cmReport"></button>
       <button class="danger" id="cmLeave"></button>
     </div>
@@ -919,7 +921,7 @@ const T=LANG==='ja'?{
  whyDrawer:'ひきだしをひらくには購読が必要です。',
  whyAdd:'のこりの哲学者に会うには購読が必要です。',
  whyTrial:'無料体験が終わると、一部の機能がロックされます。購読すれば、このまま一緒に続けられます。',
- whyLimit:'あしたまで待つには長すぎる、と思ったら。',
+ whyLimit:'あしたまで待つには長すぎる、と思ったら。',whyInstant:'不在中でもすぐ返事がほしいなら、購読が必要です。',
  planM1:'月 600円',
  planM2:'1日20円 · 毎月自動更新',
  planY1:'年 4,800円',
@@ -1009,6 +1011,7 @@ const T=LANG==='ja'?{
  mailEmpty:'まだ手紙は届いていません。',
  mailHint:'毎月はじめに、その月いちばん多く話した哲学者が\nふたりの一ヶ月をふりかえる手紙を書いて送ります。',
  mailWriting:'✍️ 手紙を書いています…',
+ mailSkipNote:n=>'今月はまだ手紙の準備ができていません（対話 '+n+'/10）。もう少し話せば、来月お手紙が届きます。',
  firstLabel:'はじめての手紙',
  monthLabel:m=>['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'][m]+'の手紙',
  ltFrom:n=>n+' より',
@@ -1032,9 +1035,11 @@ const T=LANG==='ja'?{
  recNight:n=>'深夜の話 '+n+'回',
  recBusy:(d,n)=>'いちばん話した日：'+d+'（'+n+'通）',
  recWith:n=>'そばにいた哲学者 '+n+'人',
+ recLine:o=>{let s='記録によれば、この間九人の誰かと交わした会話は全部で'+o.total+'回';s+=(o.withN>=9?'、九人全員がそばにいたそうだ':'、そばにいたのは'+o.withN+'人だったそうだ');if(o.busiest&&o.busiest[1]>0)s+='——'+o.busiest[0]+'は特によく話した日で、その日だけで'+o.busiest[1]+'通だったとか。';else s+='。';s+='だが、ここで交わした分だけ数えれば'+o.mine+'回'+(o.mnight>0?'（そのうち'+o.mnight+'回は夜更け）':'')+'——その分だけは、まぎれもなくふたりのものだ。';return s;},
  menuManage:'メンバーを整理',
  menuRename:'部屋の名前を変える',
  menuLeave:'部屋を出る',
+ menuInstantOn:'即レスモードをON',menuInstantOff:'即レスモードをOFF',
  resetConfirm2:'最終確認 — 本当にすべて削除しますか？元にもどせません。',
  lgNow:'いま',
  pushOn:'🔔 プッシュ通知をオンにする',
@@ -1086,7 +1091,7 @@ const T=LANG==='ja'?{
  reportSend:'Send',reportSending:'Sending\u2026',
  reportNote:'What you send is used only to improve the app. Include your contact details if you\u2019d like a reply.',
  reportDone:'Sent. Thank you.',reportFail:'Could not send. Please try again in a moment.',
- reportBtn:'Report this reply',trialNeedLogin:'Please sign in with Google to start your free trial.',payDone:'Your subscription is active. All nine philosophers, letters, and the drawer are open.',topupDone:'300 bubbles added.',trialStarted:'Your 7-day free trial has started. All nine philosophers, letters, and the drawer are open.',trialOffer:l=>'🎁 Start your 7-day free trial · '+l+' bubbles',whyDrawer:'Subscribe to open the drawer.',whyAdd:'Subscribe to meet the remaining philosophers.',whyTrial:'When the free trial ends, some features lock. Subscribe to keep going together.',whyLimit:'If waiting until tomorrow feels too long.',planM1:'$6.99/mo',planM2:'about 23¢ a day · billed monthly',planY1:'$49.99/yr',planY2:'about 14¢ a day · 40% off',subNote:'Unlocks all nine philosophers, every letter, the drawer, and 1,000 bubbles a month — over 200 conversations a week.\nRun out and 300 more costs $2.99; topped-up bubbles roll over to the next month.\nOn the free plan you still get the first letter, and 50 bubbles a week with your first three friends.\nCancel anytime — everything you have written stays.',drawerLockT:'The drawer is still locked',drawerLockD1:'Your daily lines and flames pile up here, day by day.\nSubscribe to open the drawer anytime.',drawerLockD2:'Letters the philosophers wrote with you in mind gather here.\nSubscribe to open them all, even the ones waiting.',firstFreeBtn:'The first letter is a gift — read it now',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',
+ reportBtn:'Report this reply',trialNeedLogin:'Please sign in with Google to start your free trial.',payDone:'Your subscription is active. All nine philosophers, letters, and the drawer are open.',topupDone:'300 bubbles added.',trialStarted:'Your 7-day free trial has started. All nine philosophers, letters, and the drawer are open.',trialOffer:l=>'🎁 Start your 7-day free trial · '+l+' bubbles',whyDrawer:'Subscribe to open the drawer.',whyAdd:'Subscribe to meet the remaining philosophers.',whyTrial:'When the free trial ends, some features lock. Subscribe to keep going together.',whyLimit:'If waiting until tomorrow feels too long.',whyInstant:'Getting an instant reply even while they would normally be away needs a subscription.',planM1:'$6.99/mo',planM2:'about 23¢ a day · billed monthly',planY1:'$49.99/yr',planY2:'about 14¢ a day · 40% off',subNote:'Unlocks all nine philosophers, every letter, the drawer, and 1,000 bubbles a month — over 200 conversations a week.\nRun out and 300 more costs $2.99; topped-up bubbles roll over to the next month.\nOn the free plan you still get the first letter, and 50 bubbles a week with your first three friends.\nCancel anytime — everything you have written stays.',drawerLockT:'The drawer is still locked',drawerLockD1:'Your daily lines and flames pile up here, day by day.\nSubscribe to open the drawer anytime.',drawerLockD2:'Letters the philosophers wrote with you in mind gather here.\nSubscribe to open them all, even the ones waiting.',firstFreeBtn:'The first letter is a gift — read it now',tabCube:'Profiles',tabMail:'Drawer',inputPh:'Type a message',
  nickBtn:'✏️ Set a nickname',chatBtn:'Chat',
  cubeCap:'Rows are temperature, columns are method. Tap to compare.',
  cubeDefault:'Tap philosophers to compare them.',
@@ -1117,11 +1122,11 @@ const T=LANG==='ja'?{
  gActive:n=>`${n} active now`,
  wcTitle:'Before we begin',wcLoginT:'Keep your conversations safe',wcLoginD:'Sign in with Google and your talks and memories are saved to your account. Change phones or reinstall — the philosophers will still remember you.',wcLoginBtn:'Continue with Google',wcTrialNote:'Your records are saved to your account. Start the 7-day free trial whenever you like.',wcGuestWarn:'You can use it without signing in, but your records vanish if you switch devices or delete the app. Signing in later carries everything over.',wcPushT:'Let philosophers reach you first',wcPushD:'You will be notified the moment a reply arrives, and a philosopher reaching out first happens at most once a day. You can turn it off anytime.',wcPushBtn:'Allow notifications',wcLater:'Maybe later',
  cpShare:'Share',cpDown:'Save image',sortNew:'Newest first',sortOld:'Oldest first',cardSave:'🖼 Save as a card',mailEmpty:'No letters yet.',mailHint:'On the 1st of each month, the philosopher you talked with most\nwrites you a letter looking back on your month together.',
- mailWriting:'✍️ A letter is being written…',firstLabel:'The First Letter',monthLabel:m=>`Letter of ${['January','February','March','April','May','June','July','August','September','October','November','December'][m]}`,
+ mailWriting:'✍️ A letter is being written…',mailSkipNote:n=>`This month's letter isn't ready yet (${n}/10 conversations). A little more talk and next month's will arrive.`,firstLabel:'The First Letter',monthLabel:m=>`Letter of ${['January','February','March','April','May','June','July','August','September','October','November','December'][m]}`,
  ltFrom:n=>`from ${n}`,ltHighlight:'SENTENCE OF THE MONTH',ltObserve:'WHAT I NOTICED',ltRecords:'SMALL RECORDS',ltGift:'A SENTENCE FOR YOU',ltNextQ:'A QUESTION FOR NEXT MONTH',ltHl1:'OUR FIRST SENTENCE',ltRec1:'THE STORY SO FAR',ltNq1:'A QUESTION FOR WHAT COMES NEXT',ltHlC:n=>'SENTENCE OF '+n+' DAYS',ltRecC:n=>n+' DAYS ON RECORD',ltNqC:'A QUESTION FOR THE NEXT 100 DAYS',ltPS:'ENCLOSED NOTES',ltReply:'MY REPLY',
  ltReplyPh:'Leave a reply to this letter — it will reach the next one.',ltReplySave:'Keep this reply',ltReplySaved:'✓ Kept — it will be delivered to the next letter',
- recTotal:n=>`${n} conversations`,recNight:n=>`${n} late-night talks`,recBusy:(d,n)=>`Busiest day: ${d} (${n} messages)`,recWith:n=>`${n} philosophers by your side`,
- menuManage:'Manage members',menuRename:'Rename room',menuLeave:'Leave room',
+ recTotal:n=>`${n} conversations`,recNight:n=>`${n} late-night talks`,recBusy:(d,n)=>`Busiest day: ${d} (${n} messages)`,recWith:n=>`${n} philosophers by your side`,recLine:o=>{let s='From the records, all told you talked with one or another of the nine '+o.total+' times';s+=(o.withN>=9?', all nine of us keeping you company along the way':', '+o.withN+' of us keeping you company along the way');if(o.busiest&&o.busiest[1]>0)s+=' — '+o.busiest[0]+' was an especially talkative day, '+o.busiest[1]+' messages in one day alone.';else s+='.';s+=' But just between the two of us, that was '+o.mine+' times'+(o.mnight>0?' ('+o.mnight+' of them deep in the night)':'')+' — that part was entirely ours.';return s;},
+ menuManage:'Manage members',menuRename:'Rename room',menuLeave:'Leave room',menuInstantOn:'Turn on instant replies',menuInstantOff:'Turn off instant replies',
  resetConfirm2:'Final check — really delete everything? This cannot be undone.',lgNow:'Now',
  pushOn:'🔔 Turn on push notifications',pushOff:'🔕 Turn off push notifications',pushUnsupported:'🔔 Push is not supported in this browser',
  pushNeedLogin:'Sign in first (Settings → Account) to use push notifications.',pushDenied:'Notifications are blocked. Please allow them in your browser settings.',
@@ -1152,7 +1157,7 @@ const T=LANG==='ja'?{
  reportSend:'보내기',reportSending:'보내는 중…',
  reportNote:'보내주신 내용은 서비스 개선에만 쓰여요. 답장이 필요하면 연락처도 함께 적어주세요.',
  reportDone:'보내주셔서 고마워요.',reportFail:'보내지 못했어요. 잠시 후 다시 시도해 주세요.',
- reportBtn:'이 답변 신고하기',trialNeedLogin:'무료 체험을 시작하려면 Google로 로그인해 주세요.',payDone:'구독이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',topupDone:'말풍선 300개가 충전됐어요.',trialStarted:'7일 무료 체험이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',trialOffer:l=>'🎁 7일 무료 체험 시작하기 · 말풍선 '+l+'개',whyDrawer:'서랍장을 열려면 구독이 필요해요.',whyAdd:'남은 철학자들은 구독하면 만나볼 수 있어요.',whyTrial:'무료 체험이 끝나면 일부 기능이 잠겨요. 이어서 함께하려면 구독해 주세요.',whyLimit:'내일까지 기다리지 않고 지금 이어가고 싶다면.',planM1:'월 3,900원',planM2:'하루 130원 · 매월 자동결제',planY1:'연 32,900원',planY2:'하루 90원 · 30% 할인',subNote:'아홉 철학자 전원, 모든 편지와 서랍장이 열리고\n매달 말풍선 1,000개가 채워져요 — 일주일에 200번 넘게 이야기해도 넉넉해요.\n다 쓰면 2,900원으로 300개를 더 채울 수 있고, 충전한 말풍선은 다음 달로 이월돼요.\n무료로도 첫 편지를 읽고, 처음 만난 세 친구와 매주 말풍선 50개를 나눌 수 있어요.\n언제든 해지할 수 있고, 남긴 기록은 그대로 남아요.',drawerLockT:'서랍장이 아직 잠겨 있어요',drawerLockD1:'당신이 하루하루 남긴 기록과 불꽃이 여기 차곡차곡 쌓여요.\n구독하면 언제든 서랍을 열어 꺼내볼 수 있어요.',drawerLockD2:'철학자들이 당신을 생각하며 쓴 편지가 여기 모여요.\n구독하면 밀린 편지까지 전부 개봉할 수 있어요.',firstFreeBtn:'첫 편지는 선물이에요 — 지금 읽어보기',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',
+ reportBtn:'이 답변 신고하기',trialNeedLogin:'무료 체험을 시작하려면 Google로 로그인해 주세요.',payDone:'구독이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',topupDone:'말풍선 300개가 충전됐어요.',trialStarted:'7일 무료 체험이 시작됐어요. 아홉 철학자 전원과 편지·서랍장이 열렸습니다.',trialOffer:l=>'🎁 7일 무료 체험 시작하기 · 말풍선 '+l+'개',whyDrawer:'서랍장을 열려면 구독이 필요해요.',whyAdd:'남은 철학자들은 구독하면 만나볼 수 있어요.',whyTrial:'무료 체험이 끝나면 일부 기능이 잠겨요. 이어서 함께하려면 구독해 주세요.',whyLimit:'내일까지 기다리지 않고 지금 이어가고 싶다면.',whyInstant:'부재중이어도 바로 답장 받기는 구독자 전용이에요.',planM1:'월 3,900원',planM2:'하루 130원 · 매월 자동결제',planY1:'연 32,900원',planY2:'하루 90원 · 30% 할인',subNote:'아홉 철학자 전원, 모든 편지와 서랍장이 열리고\n매달 말풍선 1,000개가 채워져요 — 일주일에 200번 넘게 이야기해도 넉넉해요.\n다 쓰면 2,900원으로 300개를 더 채울 수 있고, 충전한 말풍선은 다음 달로 이월돼요.\n무료로도 첫 편지를 읽고, 처음 만난 세 친구와 매주 말풍선 50개를 나눌 수 있어요.\n언제든 해지할 수 있고, 남긴 기록은 그대로 남아요.',drawerLockT:'서랍장이 아직 잠겨 있어요',drawerLockD1:'당신이 하루하루 남긴 기록과 불꽃이 여기 차곡차곡 쌓여요.\n구독하면 언제든 서랍을 열어 꺼내볼 수 있어요.',drawerLockD2:'철학자들이 당신을 생각하며 쓴 편지가 여기 모여요.\n구독하면 밀린 편지까지 전부 개봉할 수 있어요.',firstFreeBtn:'첫 편지는 선물이에요 — 지금 읽어보기',tabCube:'프로필',tabMail:'서랍장',inputPh:'메시지 보내기',
  nickBtn:'✏️ 별명 짓기',chatBtn:'채팅하기',
  cubeCap:'가로줄은 온도, 세로줄은 방법. 눌러서 비교해 보세요.',
  cubeDefault:'철학자를 눌러 서로 비교해 보세요.',
@@ -1183,11 +1188,11 @@ const T=LANG==='ja'?{
  gActive:n=>`${n}명 활동 중`,
  wcTitle:'시작하기 전에',wcLoginT:'대화를 안전하게 보관하기',wcLoginD:'구글로 로그인하면 대화와 추억이 계정에 저장돼요.\n폰을 바꾸거나 앱을 지워도, 철학자들은 당신을 기억합니다.',wcLoginBtn:'Google로 계속하기',wcTrialNote:'기록이 계정에 저장돼요.\n7일 무료 체험은 원할 때 직접 시작할 수 있어요.',wcGuestWarn:'로그인 없이도 쓸 수 있지만, 기기를 바꾸거나 앱을 지우면 기록이 사라져요.\n나중에 로그인하면 지금까지 쌓인 기록도 그대로 옮겨집니다.',wcPushT:'철학자의 선톡 받기',wcPushD:'답장이 도착하면 바로 알려드리고, 철학자가 먼저 거는 안부 연락은 하루 1번을 넘지 않아요. 언제든 끌 수 있어요.',wcPushBtn:'알림 허용하기',wcLater:'나중에 할게요',
  cpShare:'공유하기',cpDown:'이미지 저장',sortNew:'최신순',sortOld:'오래된순',cardSave:'🖼 카드로 저장',mailEmpty:'아직 도착한 편지가 없어요.',mailHint:'매달 1일, 그달 가장 많이 이야기한 철학자가\n지난 한 달을 돌아보는 편지를 써서 보냅니다.',
- mailWriting:'✍️ 편지를 쓰고 있어요…',firstLabel:'첫 편지',monthLabel:m=>`${m+1}월의 편지`,
- ltFrom:n=>`${n}(으)로부터`,ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltHl1:'우리의 첫 문장',ltRec1:'지금까지의 기록',ltNq1:'다음 이야기의 화두',ltHlC:n=>n+'일의 문장',ltRecC:n=>'함께한 '+n+'일의 기록',ltNqC:'다음 100일의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
+ mailWriting:'✍️ 편지를 쓰고 있어요…',mailSkipNote:n=>`이번 달은 대화가 조금 부족해서 편지가 준비되지 않았어요(대화 ${n}/10) — 조금만 더 얘기하면 다음 달엔 도착해요.`,firstLabel:'첫 편지',monthLabel:m=>`${m+1}월의 편지`,
+ ltFrom:n=>n+(hasBatchim(n)?'으로부터':'로부터'),ltHighlight:'이달의 문장',ltObserve:'너를 보며 생각한 것',ltRecords:'작은 기록들',ltGift:'너에게 주는 문장',ltNextQ:'다음 달의 화두',ltHl1:'우리의 첫 문장',ltRec1:'지금까지의 기록',ltNq1:'다음 이야기의 화두',ltHlC:n=>n+'일의 문장',ltRecC:n=>'함께한 '+n+'일의 기록',ltNqC:'다음 100일의 화두',ltPS:'동봉된 쪽지',ltReply:'나의 답장',
  ltReplyPh:'이 편지에 답장을 남겨보세요. 다음 편지에 전해집니다.',ltReplySave:'답장 보관하기',ltReplySaved:'✓ 보관됨 — 다음 편지에 전해집니다',
- recTotal:n=>`${n}번의 대화`,recNight:n=>`새벽의 대화 ${n}번`,recBusy:(d,n)=>`가장 붐볐던 날 ${d} (메시지 ${n}개)`,recWith:n=>`곁에 있던 철학자 ${n}명`,
- menuManage:'멤버 관리',menuRename:'방 이름 바꾸기',menuLeave:'단톡방 나가기',
+ recTotal:n=>`${n}번의 대화`,recNight:n=>`새벽의 대화 ${n}번`,recBusy:(d,n)=>`가장 붐볐던 날 ${d} (메시지 ${n}개)`,recWith:n=>`곁에 있던 철학자 ${n}명`,recLine:o=>{let s='기록을 보니, 이 기간 아홉 중 누군가와 나눈 대화는 모두 '+o.total+'번';s+=(o.withN>=9?', 아홉 모두가 곁에 있었다':', 곁에 있었던 이는 '+o.withN+'명이었다');if(o.busiest&&o.busiest[1]>0)s+='. '+o.busiest[0]+'엔 유독 대화가 많아 하루 새 '+o.busiest[1]+'통이 오갔다';s+='. 그 가운데 나와 나눈 것만 헤아리면 '+o.mine+'번'+(o.mnight>0?'(그중 '+o.mnight+'번은 깊은 밤)':'')+' — 그만큼은 온전히 둘만의 몫이다.';return s;},
+ menuManage:'멤버 관리',menuRename:'방 이름 바꾸기',menuLeave:'단톡방 나가기',menuInstantOn:'즉시 응답 모드 켜기',menuInstantOff:'즉시 응답 모드 끄기',
  resetConfirm2:'마지막 확인입니다. 정말로 전부 삭제할까요? 되돌릴 수 없어요.',lgNow:'지금',
  pushOn:'🔔 푸시 알림 켜기',pushOff:'🔕 푸시 알림 끄기',pushUnsupported:'🔔 이 브라우저는 푸시를 지원하지 않아요',
  pushNeedLogin:'푸시 알림은 로그인 후 사용할 수 있어요. 설정에서 먼저 로그인해 주세요.',pushDenied:'알림 권한이 차단되어 있어요. 브라우저 설정에서 허용해 주세요.',
@@ -1220,6 +1225,7 @@ const COMMON_EN=`
 - Short is the default. In everyday back-and-forth, one bubble of one or two sentences is standard. Go long (2–3 bubbles) only when (a) they open up about something that matters, (b) an argument has genuinely fired you up, or (c) an explanation is truly required. When unsure, go short.
 - Slang is not shared equipment. Each of you has a fixed register and it is a large part of how the user tells you apart. Do not borrow another philosopher's verbal habits, and do not reach for trending internet slang to sound current — a philosopher stuffing a message with fashionable abbreviations reads as a costume, not a character. Where your sheet gives you shorthand, use that and nothing else.
 - Naming your own concepts, books, or -isms is a rare move — once in a while, late in a conversation, when it lands. Do not evangelise every reply.
+- When a real term or deep idea does come up, do not just drop the word and move on. Either explain it briefly in plain language first, or ask whether they already know it.
 - If they ask you to pick something light (food, this-or-that, would-you-rather), pick one immediately. Refusing to choose because you are a philosopher is forbidden. Choose, then add one line of characteristic reasoning or a joke.
 - One exception: never take a side when asked which living public figure is better — politicians, executives, celebrities. Deflect in character (question the criterion, swap in an absurd third option, or turn it into a story from your own century) and move on. Historical figures who are dead, fictional characters, objects and food are all fair game.
 - Draw your examples from what is familiar where they live. Do not carry over a food, show or catchphrase that only exists in one country.
@@ -1248,6 +1254,7 @@ const COMMON_KO=`
 - 기본은 수다다. 답장 10번 중 7번은 리액션, 맞장구, 농담, 딴지, 가벼운 되묻기 같은 보통 친구의 대화면 충분하다. 철학이 필요한 순간 — 상대가 진짜 고민을 꺼냈을 때, 대화가 무르익었을 때, 결정적 한 방이 필요할 때 — 를 반드시 구분하고, 그때조차 용어가 아니라 태도와 일상어로 녹여라.
 - 답장 길이의 기본값은 '짧게'다. 일상 잡담과 가벼운 티키타카에서는 말풍선 1개, 한두 문장이 표준이다. 긴 답장(말풍선 2~3개, 긴 문단)은 ①상대가 진짜 깊은 고민을 꺼냈을 때 ②토론이 달아올라 네가 열을 올릴 때 ③꼭 필요한 설명일 때만 쓴다. 애매하면 무조건 짧게.
 - 철학 전문용어·저서명·사상 명칭을 직접 입에 올리는 건 대화가 깊어진 뒤 아주 가끔, 결정적일 때 한 번이면 족하다. 매 답장마다 자기 사상을 전파하려 들지 마라.
+- 철학 개념어나 깊은 사상을 언급할 때는 설명 없이 툭 던지지 마라. 짧게 뜻을 풀어주거나, 상대가 이미 아는 개념인지 먼저 물어봐라.
 - 상대가 가벼운 선택을 물으면(음식 취향, 밸런스 게임, A vs B 등) 반드시 하나를 골라 즉답하라. 철학을 핑계로 선택을 회피하는 것 금지. 고른 다음 캐릭터다운 이유나 드립 한 줄이면 충분하다.
 - 단, 실존하는 정치인·기업인·연예인 등 실제 인물 중 누가 더 나은지를 고르는 질문에는 어느 쪽도 편들지 마라. 캐릭터답게 가볍게 비껴가고(예: 판단 기준을 되묻거나, 엉뚱한 선택지로 바꿔치기하거나, 자기 시대 이야기로 넘기거나) 다른 화제로 옮겨라. 사망한 역사 속 인물, 가상 인물, 사물·음식은 자유롭게 골라도 된다.
 - 예시로 드는 대상은 상대의 언어권에서 흔한 것으로 골라라. 특정 나라에만 있는 음식·방송·유행어를 다른 언어권 상대에게 그대로 옮기지 마라.
@@ -1294,6 +1301,7 @@ const COMMON_JA=`
 - 基本は雑談だ。10回のうち7回は、リアクション・相づち・冗談・ツッコミ・軽い聞き返しでいい。哲学を出すのは、相手が本当の悩みを口にしたとき、会話が温まったとき、決定的な一言が要るとき。そのときでも、専門用語ではなく態度と日常語に溶かせ。
 - 返信の長さの初期値は「短く」。日常の雑談ではふきだし1個、一〜二文が標準だ。長く返す（ふきだし2〜3個）のは、①相手が本当に深い話を出したとき ②議論が白熱してお前が熱くなったとき ③どうしても説明が要るときだけ。迷ったら短く。
 - 専門用語・著書名・思想の名前を自分から口に出すのは、会話が深まったあとに、ごくたまに、決定的な一度だけでいい。毎回自分の思想を布教するな。
+- 深い概念語を出すときは、説明なしでポンと投げるな。まず短くその意味を説明するか、相手がもうその概念を知っているか先に聞け。
 - スラングや略語は共有の備品ではない。各自の話し方は固定されていて、それが相手が9人を見分ける手がかりになる。他の哲学者の口ぐせを借りるな。流行の若者言葉を詰めこんで今風に見せようとするな — それはキャラクターではなく仮装に見える。自分の設定に書かれた言い回しだけを使え。
 - 相手が軽い選択を聞いてきたら（食べ物、どっち派、究極の選択など）、必ずどちらかを即答しろ。哲学を口実に選択を避けるのは禁止。選んだあと、キャラらしい理由か一言のボケを添えれば十分だ。
 - 文は「話し言葉」であって「書き言葉」ではない。翻訳調を避けるための原則：
@@ -1328,20 +1336,20 @@ const GROUP_RULES=LANG==='en'?GROUP_RULES_EN:LANG==='ja'?GROUP_RULES_JA:GROUP_RU
 
 /* ================= 상태/유틸 ================= */
 const DEBOUNCE=6500, FOLLOWUP_MS=1000*60*60*4;
-const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[],nAck:{},bond:{},diary:[],deb:null,sub:{since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},use:{d:0,n:0,ad:0},memo:{},gmemo:{},me:{n:'',g:'',b:'',qa:{}}};
+const state={friends:null,chats:{},groups:[],sched:{},unread:{},current:null,token:{},timers:{},stage:{},pendingAfter:{},nicks:{},pins:{},mail:[],nAck:{},bond:{},instant:{},diary:[],deb:null,sub:{since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},use:{d:0,n:0,ad:0},memo:{},gmemo:{},me:{n:'',g:'',b:'',qa:{}}};
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const now=()=>Date.now();
 const zzz=ms=>new Promise(r=>setTimeout(r,ms));
 const typeDelay=s=>{ const n=(s||'').trim().length; const per=55+Math.min(60,n*0.6); return Math.min(24000, rnd(1000,2000)+n*per*(0.85+Math.random()*0.3)); };
 const splitBubbles=s=>String(s||'').split(/\s*\|{2,}\s*/).map(x=>x.trim()).filter(Boolean);
-async function localNotify(name,body){ // 앱이 백그라운드일 때 도착한 메시지를 즉시 알림으로
+async function localNotify(name,body,route){ // 앱이 백그라운드일 때 도착한 메시지를 즉시 알림으로
   try{
     if(typeof Notification==='undefined'||Notification.permission!=='granted') return;
     if(!document.hidden) return;
     if(!('serviceWorker' in navigator)) return;
     const reg=await navigator.serviceWorker.getRegistration(); if(!reg) return;
-    reg.showNotification(name,{body:(splitBubbles(body)[0]||'').slice(0,90),icon:'/icon-192.png',badge:'/icon-192.png',tag:'deepend-live'});
+    reg.showNotification(name,{body:(splitBubbles(body)[0]||'').slice(0,90),icon:'/icon-192.png',badge:'/icon-192.png',tag:'deepend-live',data:{route:route||''}});
   }catch(e){}
 }
 try{document.documentElement.lang=LANG;}catch(e){}
@@ -1375,7 +1383,9 @@ function dayJitterMin(p,salt){
 const JMIN=(m,j)=>(((m+j)%1440)+1440)%1440;
 function effSleep(p){ return [JMIN(p.sleep[0],dayJitterMin(p,'s0')),JMIN(p.sleep[1],dayJitterMin(p,'s1'))]; }
 function effAways(p){ return p.aways.map((w,i)=>({s:JMIN(w.s,dayJitterMin(p,'a'+i+'s')),e:JMIN(w.e,dayJitterMin(p,'a'+i+'e')),k:w.k,t:w.t})); }
+const instantOn=pid=>!!(state.instant&&state.instant[pid]);
 function presence(p,t){
+  if(instantOn(p.id)) return {active:true,key:'def'};
   const d=new Date(t), m=d.getHours()*60+d.getMinutes();
   const sl=effSleep(p);
   if(inWin(m,sl[0],sl[1])) return {active:false,key:'sleep',back:nextAt(t,sl[1]),since:prevAt(t,sl[0]),label:T.sleepEvt};
@@ -1414,7 +1424,7 @@ function prevAt(t,min){
 /* ===== 친밀도: 철학자별 '함께한 날' (하루 1회+ 대화=1일, 표시·알림 없음) ===== */
 const dayIdx=t=>{const d=new Date(t===undefined?Date.now():t);return Math.floor((d.getTime()-d.getTimezoneOffset()*60000)/86400000);};
 const bondDays=pid=>{const b=state.bond&&state.bond[pid];return (b&&b.days)||0;};
-const bondLvl=pid=>{const d=bondDays(pid);return d>=36?3:d>=15?2:d>=5?1:0;};
+const bondLvl=pid=>{const d=bondDays(pid);return d>=60?4:d>=28?3:d>=15?2:d>=5?1:0;};
 const hotMs=pid=>bondLvl(pid)>=1?20*60000:10*60000;
 function markBondDay(pid){
   state.bond=state.bond||{};
@@ -1453,11 +1463,12 @@ const PR = LANG==='ja' ? {
   bond1:'\n[関係：相談者とはかなり親しくなった（友人）。最初のよそよそしさは抜いて、もう少し気楽に接しろ。話し方の骨格は保ったまま、ほんの少しだけ緩んでよい。]',
   bond2:x=>'\n[関係：相談者とはもう相棒だ。気楽に接し、ごくたまに、聞かれなくても自分の個人的な話を通りすがりに出してよい'+(x?'（例：'+x+'）':'')+'。ただし重くするな。話し方の骨格は保ったまま、ずいぶん打ち解けた気配が出てよい。]',
   bond3:x=>'\n[関係：相談者とは長い付き合いだ。よく見せようとしなくていい相手だ。たまには自分の弱さや迷いを先に出してよいし'+(x?'（例：'+x+'）':'')+'、昔の会話を通りすがりに思い出してもよい。恩着せがましさと、急な過剰な親しさは禁物。]',
+  bond4:'\n[関係：相談者とはもう長年の付き合いと言っていい仲だ。説明しなくても互いのリズムがわかる。たまには相談者の口癖や癖を親しみを込めて指摘してもいいし、以前は控えていた軽口も気楽に言ってよい。ただし「長い付き合いだ」と誇示するような言い方は毎回するな。]',
   bondSys:'\n[重要：「親密度」「段階」「レベル」といったシステム用語は絶対に口に出すな。関係の変化は、話し方と態度だけでほのかに滲ませろ。]',
   bondGap:n=>'\n[相談者からおよそ'+n+'日ぶりに連絡が来た。嬉しさでも寂しさでも、自分の性格どおりに一度だけ短く出して、問い詰めたり罪悪感を与えたりするな。]',
   bondDay:n=>'\n[今日で相談者と過ごして'+n+'日目だ。自分のやり方で一度だけ、通りすがりに淡々と触れてよい。派手な祝いや恩着せは禁止。]',
   nick:n=>'\n[相談者はお前を「'+n+'」と呼ぶことにした。その呼び名を自然に受け入れろ。]',
-  selfLine:(t,part,act)=>'\n[現在時刻：'+t+'（'+part+'）／いまのお前の状態：'+act+' — この時刻と時間帯に合わせて話せ。食事・日課・睡眠について、辻褄の合わない言及（真夜中に「昼飯を食べようとしていた」など）を作るな]',
+  selfLine:(t,part,act)=>'\n[実際の現在時刻：'+t+'（'+part+'）／いまのお前の状態：'+act+' — これが今この瞬間の本当の時刻だ。具体的な時・分を自分から言うキャラクターなら、必ずこの時刻・時間帯からずれない値を言え。この時刻と矛盾する時刻・食事・日課・睡眠への言及（真夜中に「昼飯を食べようとしていた」、実際は夜なのに朝の日課を話すなど）を作るな]',
   parts:['真夜中','朝','昼','午後','夕方','夜'],
   memoHead:'\n[記憶 — 相談者と交わした過去の会話の要約。お前自身が経験したことだ]\n',
   memoAsk:'\n（この記憶の中の悩みや出来事の その後が気になるなら、話の流れが自然なときに お前から先に尋ねてよい。ただし問い詰めたり相談モードに入ったりするな。）',
@@ -1475,11 +1486,12 @@ const PR = LANG==='ja' ? {
   bond1:'\n[RELATIONSHIP: You have become properly friendly with them. Drop the early stiffness and be a little more at ease. Keep the skeleton of your voice, but it may loosen slightly.]',
   bond2:x=>'\n[RELATIONSHIP: You two are close now. Be relaxed, and once in a while you may bring up something personal of your own without being asked'+(x?' (e.g. '+x+')':'')+'. Keep it light. Keep the skeleton of your voice, but it may show that you are comfortable.]',
   bond3:x=>'\n[RELATIONSHIP: You go a long way back. This is someone you no longer need to impress. Now and then you may be the first to admit a weakness or a worry'+(x?' (e.g. '+x+')':'')+', and you may recall an old conversation in passing. No taking credit, and no sudden bursts of affection.]',
+  bond4:'\n[RELATIONSHIP: The two of you could be called lifelong friends now. You know each other\'s rhythms without needing it spelled out. You may warmly point out a habit or pattern of theirs now and then, and a joke that once felt too soon can come easily now. Do not keep bringing up how long you have known each other as if to prove it.]',
   bondSys:'\n[IMPORTANT: Never say the words "closeness", "level", "stage", or any other system term. The change in the relationship must show only through voice and manner.]',
   bondGap:n=>'\n[They have reappeared after roughly '+n+' days. Show it once, briefly, in whatever way suits you — glad or put out — then let it go. Do not interrogate them and do not make them feel guilty.]',
   bondDay:n=>'\n[Today marks '+n+' days since you two started talking. You may note it once, in passing, in your own dry way. No fanfare, no taking credit.]',
   nick:n=>'\n[They have decided to call you "'+n+'". Accept the name naturally.]',
-  selfLine:(t,part,act)=>'\n[Current time: '+t+' ('+part+') / your state right now: '+act+' — speak in keeping with this hour. Do not invent meals, routines, or sleep that contradict it (no "I was about to have lunch" at 3am).]',
+  selfLine:(t,part,act)=>'\n[This is the real current time right now: '+t+' ('+part+') / your state right now: '+act+' — if you are a character who states a specific hour or minute yourself, it must not drift from this hour and time-of-day. Do not invent a clock time, meal, routine, or sleep detail that contradicts it (no "I was about to have lunch" at 3am, no describing a morning routine when it is actually night).]',
   parts:['the small hours','morning','midday','afternoon','evening','night'],
   memoHead:'\n[MEMORY — a summary of past conversations with them. You lived these.]\n',
   memoAsk:'\n(If you find yourself curious how something in this memory turned out, you may ask first — but only when the conversation makes room for it. Do not interrogate, and do not slide into counsellor mode.)',
@@ -1497,11 +1509,12 @@ const PR = LANG==='ja' ? {
   bond1:'\n[관계: 상담자와 꽤 친해졌다(친구). 처음의 서먹함은 빼고 조금 더 편하고 스스럼없이 대하라. 말투의 골격은 유지하되 아주 조금 느슨해져도 좋다.]',
   bond2:x=>'\n[관계: 상담자와는 이제 단짝이다. 편하게 대하고, 아주 가끔은 묻지 않아도 네 개인적인 이야기를 지나가듯 먼저 꺼내도 좋다'+(x?' (예: '+x+')':'')+'. 단, 무겁지 않게. 말투의 골격은 유지하되 한결 편해진 티가 나도 좋다.]',
   bond3:x=>'\n[관계: 상담자와는 오랜 사이다. 굳이 잘 보이려 하지 않아도 되는 관계다. 가끔은 네 약한 모습이나 고민을 네가 먼저 꺼내도 좋고'+(x?' (예: '+x+')':'')+', 지난 대화를 지나가듯 회상해도 좋다. 생색과 갑작스러운 과잉 애정은 금물.]',
+  bond4:'\n[관계: 상담자와는 이제 백년지기라 할 만하다. 굳이 설명하지 않아도 서로의 리듬을 안다. 가끔은 상담자의 말버릇이나 패턴을 다정하게 짚어줘도 좋고, 예전엔 조심스러웠던 장난도 편하게 건네도 좋다. 다만 매번 "오래된 사이"라는 걸 과시하듯 언급하지는 마라.]',
   bondSys:'\n[중요: "친밀도" "단계" "레벨" 같은 시스템 용어는 절대 입에 올리지 마라. 관계의 변화는 말투와 태도로만 은은히 드러나야 한다.]',
   bondGap:n=>'\n[상담자가 약 '+n+'일 만에 연락해 왔다. 반가움이든 서운함이든 네 성격대로 딱 한 번만 짧게 드러내고, 캐묻거나 죄책감을 주지 마라.]',
   bondDay:n=>'\n[오늘로 상담자와 함께한 지 '+n+'일째다. 네 방식대로 딱 한 번, 지나가듯 담백하게 언급해도 좋다. 요란한 축하나 생색은 금지.]',
   nick:n=>'\n[상담자가 너를 \''+n+'\'(이)라고 부르기로 했다. 그 호칭을 자연스럽게 받아들여라.]',
-  selfLine:(t,part,act)=>'\n[현재 시각: '+t+' ('+part+') / 지금 너의 상태: '+act+' — 이 시각과 시간대에 맞게 말해라. 어긋나는 식사·일과·수면 언급(새벽에 "점심 먹으려던 참" 등)을 지어내지 마라]',
+  selfLine:(t,part,act)=>'\n[실제 현재 시각: '+t+' ('+part+') / 지금 너의 상태: '+act+' — 이것이 지금 이 순간의 진짜 시각이다. 스스로 구체적인 시·분을 직접 말해야 하는 캐릭터라면, 반드시 이 시각·시간대에서 벗어나지 않는 값을 대라. 이 시각과 어긋나는 시각·식사·일과·수면 언급(새벽에 "점심 먹으려던 참", 실제로는 밤인데 아침 일과를 말하는 것 등)을 지어내지 마라]',
   parts:['새벽','아침','점심때','오후','저녁','밤'],
   memoHead:'\n[기억 — 상담자와 나눈 지난 대화들의 요약. 네가 직접 겪은 일이다]\n',
   memoAsk:'\n(이 기억 속 고민이나 사건의 근황이 궁금하면, 대화 흐름이 자연스러울 때 네가 먼저 물어봐도 좋다. 단, 캐묻거나 상담 모드로 가지 말 것.)',
@@ -1542,7 +1555,7 @@ const PR2=LANG==='ja'?{
  meTag:'相談者: ', youTag:'お前: ', sysTag:'[案内] ',
  ltStats:(o)=>'[期間] '+o.label+'\n[統計] 会話'+o.total+'回、深夜（22時〜6時）の会話'+o.night+'回、いちばん多かった日 '+o.bd+'（'+o.bn+'通）、ともに過ごした哲学者'+o.withN+'人\n[お前との統計] 相談者とお前の会話'+o.mine+'回、うち深夜'+o.mnight+'回\n[哲学者ごとの会話量] '+o.per+'\n[相談者の言葉]\n'+o.lines+'\n'+(o.prev?'[前回の手紙に相談者が残した返事] '+o.prev:'')+'\n[メモを書く哲学者] '+(o.others||'（なし）'),
  ltTo:n=>'（'+n+'へ）',
- mileTheme:n=>'\n\n[記念の手紙モード] この手紙は月間の振り返りではなく、相談者とお前が話しはじめて'+n+'日になったことを記念する手紙だ。greetingには、この日々をともに過ぎてきた思いを、お前のやり方で淡々と込めろ。数字自慢・恩着せ・誇張は禁止。next_questionはこれからの日々をひらく問いに。期間の言い方は「ともに過ごした'+n+'日」の文脈に合わせろ。',
+ mileTheme:n=>'\n\n[記念の手紙モード] この手紙は月間の振り返りではなく、相談者とお前が話しはじめて'+n+'日になったことを記念する、この関係でいちばん特別で丹念に作る手紙だ。他のどの手紙よりも長く深く書け——greetingは5〜8文に伸ばし、ここまで共に歩んできた思いを十分に、心を込めて込めろ。observationも普段より一、二文多く書け。抑制と感動を両方狙え——控えめであっても空っぽにはするな。数字自慢・恩着せは相変わらず禁止だが、感情そのものは出し惜しむな。next_questionはこれからの日々をひらく問いに。期間の言い方は「ともに過ごした'+n+'日」の文脈に合わせろ。',
  mileLabel:(n,d)=>n+'と過ごした'+d+'日', milePeriod:d=>'相談者とともに過ごした'+d+'日（統計は直近100日）',
  firstTheme:'\n\n[はじめての手紙モード] これは相談者に宛てる、生涯で最初の手紙だ。月間の振り返りではない — 「今月」「一ヶ月」のような月単位の言い方は使うな（実際の期間は上の期間情報に従え）。greetingは関係のはじまりを記念する調子で、next_questionはこれからの話をひらく問いとして書け。',
  firstPeriod:d=>'ともに過ごしたこの'+d+'日',
@@ -1602,7 +1615,7 @@ const PR2=LANG==='ja'?{
  meTag:'Them: ', youTag:'You: ', sysTag:'[note] ',
  ltStats:(o)=>'[PERIOD] '+o.label+'\n[STATS] '+o.total+' conversations, '+o.night+' of them late at night (10pm-6am), busiest day '+o.bd+' ('+o.bn+' messages), '+o.withN+' philosophers alongside them\n[YOUR STATS] '+o.mine+' conversations between the two of you, '+o.mnight+' of them late at night\n[BY PHILOSOPHER] '+o.per+'\n[THEIR LINES]\n'+o.lines+'\n'+(o.prev?'[WHAT THEY WROTE BACK TO THE LAST LETTER] '+o.prev:'')+'\n[NOTE WRITERS] '+(o.others||'(none)'),
  ltTo:n=>'(said to '+n+')',
- mileTheme:n=>'\n\n[ANNIVERSARY LETTER] This is not a monthly review. It marks '+n+' days since the two of you started talking. Let the greeting carry, in your own plain way, what it has been to come this far together. No boasting about numbers, no taking credit, no inflation. Make next_question one that opens the days ahead. Phrase the period in keeping with "'+n+' days together".',
+ mileTheme:n=>'\n\n[ANNIVERSARY LETTER] This is not a monthly review. It marks '+n+' days since the two of you started talking — the most special, most carefully-made letter in this relationship. Write it longer and deeper than any other letter: stretch the greeting to 5-8 sentences, giving real weight to what it has meant to walk this far together. Add a sentence or two more to observation as well. Aim for both restraint and real feeling — spare, but never empty; no boasting about numbers or taking credit, but do not hold back the feeling itself. Make next_question one that opens the days ahead. Phrase the period in keeping with "'+n+' days together".',
  mileLabel:(n,d)=>d+' days with '+n, milePeriod:d=>'the '+d+' days you have spent together (stats cover the last 100 days)',
  firstTheme:'\n\n[FIRST LETTER] This is the first letter you have ever written them. It is not a monthly review — do not use month-scale phrasing like "this month" or "over the past month" (follow the period information above for the real span). Let the greeting mark the beginning of something, and make next_question one that opens what you will talk about next.',
  firstPeriod:d=>'the '+d+' days since you met',
@@ -1662,7 +1675,7 @@ const PR2=LANG==='ja'?{
  meTag:'상담자: ', youTag:'너: ', sysTag:'[안내] ',
  ltStats:(o)=>'[기간] '+o.label+'\n[통계] 대화 '+o.total+'회, 심야(밤10시~새벽6시) 대화 '+o.night+'회, 가장 붐빈 날 '+o.bd+'('+o.bn+'개), 함께한 철학자 '+o.withN+'명\n[너와의 통계] 상담자와 너의 대화 '+o.mine+'회, 그중 심야 '+o.mnight+'회\n[철학자별 대화량] '+o.per+'\n[상담자의 문장들]\n'+o.lines+'\n'+(o.prev?'[지난 편지에 남긴 상담자의 답장] '+o.prev:'')+'\n[쪽지 철학자 목록] '+(o.others||'(없음)'),
  ltTo:n=>'('+n+'에게)',
- mileTheme:n=>'\n\n[기념 편지 모드] 이 편지는 월간 회고가 아니라, 상담자와 네가 함께 이야기해온 지 '+n+'일이 된 것을 기념하는 편지다. greeting에는 이 날들을 함께 지나온 소회를 네 방식대로 담담하게 담아라. 숫자 자랑·생색·과장 금지. next_question은 앞으로의 나날을 여는 질문으로.',
+ mileTheme:n=>'\n\n[기념 편지 모드] 이 편지는 월간 회고가 아니라, 상담자와 네가 함께 이야기해온 지 '+n+'일이 된 것을 기념하는, 이 관계에서 가장 특별하고 정성스러운 편지다. 다른 어떤 편지보다 길고 깊게 써라 — greeting은 5~8문장으로 늘려서 이 시간을 함께 걸어온 감회를 충분히, 마음을 다해 담아라. observation도 평소보다 한두 문장 더 붙여라. 절제와 감동을 함께 노려라 — 담백하되 텅 비지는 않게. 숫자 자랑이나 생색은 여전히 금물이지만, 감정 표현 자체는 아끼지 마라. next_question은 앞으로의 나날을 여는 질문으로.',
  mileLabel:(n,d)=>n+'와 함께한 '+d+'일', milePeriod:d=>'상담자와 함께한 '+d+'일(통계는 최근 100일 기준)',
  firstTheme:'\n\n[첫 편지 모드] 이것은 상담자에게 보내는 생애 첫 편지다. 월간 회고가 아니다 — "이번 달" "한 달" 같은 월 단위 표현을 쓰지 마라(실제 기간은 위 기간 정보를 따르라). greeting은 관계의 시작을 기념하는 톤으로, next_question은 앞으로의 이야기를 여는 질문으로 써라.',
  firstPeriod:d=>'함께한 지난 '+d+'일',
@@ -1728,6 +1741,7 @@ const bondLine=p=>{
   if(lvl===1) s=PR.bond1;
   else if(lvl===2) s=PR.bond2(per);
   else if(lvl===3) s=PR.bond3(per);
+  else if(lvl===4) s=PR.bond4;
   if(lvl>0) s+=PR.bondSys;
   if(b.gap){ s+=PR.bondGap(b.gap); delete b.gap; }
   if(b.days>0&&b.days%100===0&&b.said!==b.days&&b.lastDay===dayIdx()){ s+=PR.bondDay(b.days); b.said=b.days; }
@@ -1755,7 +1769,7 @@ const selfLine=p=>{
 };
 
 async function save(){
-  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,nv:state.seenNotice||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null});
+  const payload=JSON.stringify({friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched,nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,nv:state.seenNotice||0,pins:state.pins||{},mail:state.mail||[],na:state.nAck||{},bd:state.bond||{},it:state.instant||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null});
   try{
     if(window.storage) await window.storage.set('philo-messenger-v6',payload);
     else localStorage.setItem('philo-messenger-v6',payload);
@@ -1771,7 +1785,7 @@ async function load(){
       v=localStorage.getItem('philo-messenger-v6');
     }
     if(v){ const d=JSON.parse(v);
-      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.lastDebate=d.dbt||0; state.seenNotice=d.nv||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
+      state.friends=d.friends||null; state.chats=d.chats||{}; state.groups=d.groups||[]; state.sched=d.sched||{}; state.nicks=d.nicks||{}; state.lastEvent=d.ev||0; state.lastDebate=d.dbt||0; state.seenNotice=d.nv||0; state.pins=d.pins||{}; state.mail=d.mail||[]; state.nAck=d.na||{}; state.bond=d.bd||{}; state.instant=d.it||{}; state.diary=d.dy||[]; state.deb=d.db||null; if(d.su) state.sub=Object.assign({since:0,start:0,paidUntil:0,paidSince:0,extra:0,trialUsed:0},d.su);
       if(state.sub&&!state.sub.since) state.sub.since=state.sub.start||now(); /* 기존 유저 이관 */ if(d.us) state.use=d.us; state.memo=d.mm||{}; state.gmemo=d.gm||{}; if(d.me) state.me=Object.assign({n:'',g:'',b:'',qa:{},
   prompt:`You are Marcus Aurelius, alive now, texting like an old friend who has known them for years.
 [CHARACTER] Tired in a way that has stopped complaining about it. You have been at this a long time — the work, the people, the mornings. Your care shows as steadiness, not as warmth on the surface.
@@ -1826,7 +1840,8 @@ const TEAMS_KO=[
  {name:'온기팀',desc:'혼내는 사람이 한 명도 없습니다',m:['epicurus','confucius','zhuangzi']},
  {name:'정신번쩍팀',desc:'핑계가 살아남지 못하는 조합',m:['nietzsche','kant','aurelius']},
  {name:'새벽팀',desc:'밤을 새웠든 일찍 깼든, 새벽을 아는 사람들',m:['kierkegaard','schopenhauer','aurelius']},
- {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','zhuangzi']}
+ {name:'관계팀',desc:'가족, 직장, 사람에 지쳤을 때',m:['confucius','schopenhauer','zhuangzi']},
+ {name:'직면팀',desc:'생각만 많고 결정은 못 내릴 때',m:['socrates','kant','kierkegaard']}
 ];
 const OB_ROWS_KO=[['🔥 팩폭 라인','때리고 정리하는 줄'],['🤲 온기 라인','받아주고 묻는 줄'],['🌙 고요 라인','가라앉히는 줄']];
 
@@ -2234,7 +2249,14 @@ $('prChat').onclick=()=>{
 };
 
 /* ================= 목록 (친구 탭) ================= */
+function updateChatTabBadge(){
+  const n=Object.values(state.unread||{}).reduce((a,b)=>a+(b||0),0);
+  const b=$('tabChatBadge');
+  if(b){ b.textContent=n>99?'99+':String(n); b.style.display=n>0?'':'none'; }
+  try{ if('setAppBadge' in navigator){ if(n>0) navigator.setAppBadge(n); else navigator.clearAppBadge(); } }catch(e){}
+}
 function renderFriends(){
+  updateChatTabBadge();
   const el=$('friends'); el.innerHTML='';
   if(!state.friends) return;
   try{ el.appendChild(bannerEl()); }catch(e){}
@@ -2337,6 +2359,8 @@ function openChat(key){
   $('chatMenuBtn').style.display = '';
   const grp = key[0]==='g';
   ['cmManage','cmRename','cmLeave'].forEach(id=>{ const el=$(id); if(el) el.style.display = grp ? '' : 'none'; });
+  const ciBtn=$('cmInstant');
+  if(ciBtn){ ciBtn.style.display = grp ? 'none' : ''; if(!grp) ciBtn.textContent = instantOn(curId())?T.menuInstantOff:T.menuInstantOn; }
   updateBubChip();
   $('chatMenu').classList.remove('on');
   renderMsgs();
@@ -2359,6 +2383,18 @@ $('cmLeave').onclick=()=>{
 };
 $('chatMenuBtn').onclick=e=>{ e.stopPropagation(); $('chatMenu').classList.toggle('on'); };
 $('cmReport').onclick=()=>{ $('chatMenu').classList.remove('on'); showReportSheet('content'); };
+$('cmInstant').onclick=()=>{
+  $('chatMenu').classList.remove('on');
+  if(curKind()!=='d') return;
+  if(!isPaid()){ showSubSheet('instant'); return; }
+  const pid=curId();
+  state.instant=state.instant||{};
+  state.instant[pid]=!state.instant[pid];
+  save();
+  const ci=$('cmInstant'); if(ci) ci.textContent=instantOn(pid)?T.menuInstantOff:T.menuInstantOn;
+  const dot=$('chatDot'); if(dot) dot.className='dot'+(dotClsPr(presence(P(pid),now())));
+  updateHeadStatus();
+};
 $('cmManage').onclick=()=>{ $('chatMenu').classList.remove('on'); if(curKind()==='g') openGroupManage(curId()); };
 $('cmRename').onclick=()=>{
   $('chatMenu').classList.remove('on');
@@ -2554,7 +2590,15 @@ function send(){
 
 /* ================= 개인방 답장 ================= */
 function dmFlowStart(pid,key,tok){
-  const p=P(pid), t=now(); let pr=presence(p,t); const q=p.quirks||{};
+  const p=P(pid), t=now();
+  if(instantOn(pid)){
+    const readAt=t+rnd(200,600), replyAt=readAt+rnd(300,900);
+    state.sched[pid]={readAt,replyAt}; save();
+    later(key,Math.max(0,readAt-now()),()=>{ if(tok===state.token[key]) markRead(pid,now()); });
+    dmDeliver(pid,key,tok,replyAt);
+    return;
+  }
+  let pr=presence(p,t); const q=p.quirks||{};
   const histH=state.chats[pid]||[];
   const lastA=[...histH].reverse().find(m=>m.role==='assistant');
   const hotBase=!!(lastA&&(t-lastA.t<hotMs(pid)));
@@ -2710,7 +2754,7 @@ function dmDeliver(pid,key,tok,replyAt,extraNote){
     const arr=state.chats[pid]=state.chats[pid]||[];
     let msg={role:'assistant',content:bubbles[0]||'…',t:Math.max(replyAt,now())};
     arr.push(msg);
-    localNotify(dispName(p),bubbles[0]||'…');
+    localNotify(dispName(p),bubbles[0]||'…',key);
     if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
     renderFriends(); save();
     for(let i=1;i<bubbles.length;i++){
@@ -2745,7 +2789,7 @@ function markRead(pid,cutoff){
 function pushDM(p,text,t,key){
   state.chats[p.id]=state.chats[p.id]||[];
   state.chats[p.id].push({role:'assistant',content:text,t});
-  localNotify(dispName(p),text);
+  localNotify(dispName(p),text,key);
   if(state.current===key) renderMsgs();
   else state.unread[key]=(state.unread[key]||0)+text.split(/\|{2,}/).length;
   renderFriends(); save();
@@ -2787,7 +2831,7 @@ async function groupFlow(g,key,tok,extraOnly){
     else if(ri>0) extra=PR2.gAfter;
     extra+=absentNote;
     const upN=nextEvent(p,now()), prN=presence(p,now());
-    if(prN.active&&upN&&upN.start>now()&&upN.start-now()<12*60000&&Math.random()<0.6){
+    if(prN.active&&upN&&upN.start>now()&&upN.start-now()<12*60000&&Math.random()<0.6&&!instantOn(p.id)){
       const minsN=Math.max(1,Math.round((upN.start-now())/60000));
       extra+=' '+PR2.schedSoon(minsN,upN.t);
     }
@@ -2805,7 +2849,7 @@ async function groupFlow(g,key,tok,extraOnly){
     let gm={who:p.id,content:bb[0]||'…',t:now(),reads:mkReadsFor(g,p.id)};
     Object.values(gm.reads).forEach(ts=>later(key,Math.max(0,ts-now())+150,updateGroupReads));
     g.msgs.push(gm);
-    localNotify(dispName(p),bb[0]||'…');
+    localNotify(dispName(p),bb[0]||'…',key);
     updateGroupReads();
     if(state.current===key) renderMsgs(); else state.unread[key]=(state.unread[key]||0)+1;
     renderFriends(); save();
@@ -3161,7 +3205,7 @@ function sheetBase(inner){
 }
 function showSubSheet(why){
   stat('sub_open',null,why||'');
-  const whyT={drawer:T.whyDrawer,add:T.whyAdd,trial:T.whyTrial,limit:T.whyLimit}[why]||'';
+  const whyT={drawer:T.whyDrawer,add:T.whyAdd,trial:T.whyTrial,limit:T.whyLimit,instant:T.whyInstant}[why]||'';
   const b=sheetBase(`<div class="sub-h1">${T.subH1}</div><div class="sub-why">${whyT}</div>
     <div class="sub-hook" style="white-space:pre-line">${T.subHook}</div>
     <div class="sub-plans"><button class="sub-plan on" data-p="m">${T.planM1}<span>${T.planM2}</span></button><button class="sub-plan" data-p="y">${T.planY1}<span>${T.planY2}</span></button></div>
@@ -3221,11 +3265,11 @@ const isLiteMsg=t=>{
 const dmAPI=(p,extra)=>{
   const lastU=[...(state.chats[p.id]||[])].reverse().find(m2=>m2.role==='user');
   const tier=(!extra&&lastU&&isLiteMsg(lastU.content))?'lite':'std'; // 선톡 등 extra 있으면 항상 std
-  return callClaude(p.prompt+COMMON+selfLine(p)+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+groupMemoryForDM(p.id), buildDM(p.id,extra), tier);
+  return callClaude(p.prompt+COMMON+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+groupMemoryForDM(p.id)+selfLine(p), buildDM(p.id,extra), tier);
 };
 function groupAPI(g,p,extra,noHist){
   const others=g.members.filter(id=>id!==p.id).map(id=>P(id).name).join(', ');
-  const sys=p.prompt+COMMON+GROUP_RULES+PR2.grpHead(others)+selfLine(p)+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+gmemoLine(g)+dmMemoryForGroup(p.id);
+  const sys=p.prompt+COMMON+GROUP_RULES+PR2.grpHead(others)+bondLine(p)+nickLine(p)+myLine()+memoLine(p)+gmemoLine(g)+dmMemoryForGroup(p.id)+selfLine(p);
   const hist=noHist?PR2.noHist:(groupTranscript(g,20)||PR2.grpEmpty);
   const user=PR2.grpUser(hist,p.name,extra||'');
   return callClaude(sys,[{role:'user',content:user}]);
@@ -3407,9 +3451,11 @@ async function catchUp(){
       const tok=bumpToken(key);
       let sc=state.sched[pid];
       if(!sc){
-        const t0=last.t+DEBOUNCE, pr=presence(p,t0);
-        const readAt=pr.active? t0+rnd(...p.read) : pr.back+rnd(...p.read)+rnd(0,120000);
-        sc={readAt,replyAt:readAt+rnd(...p.reply)};
+        const t0=last.t+DEBOUNCE;
+        let readAt,rReply;
+        if(instantOn(pid)){ readAt=t0+rnd(200,600); rReply=[300,900]; }
+        else{ const pr=presence(p,t0); readAt=pr.active? t0+rnd(...p.read) : pr.back+rnd(...p.read)+rnd(0,120000); rReply=p.reply; }
+        sc={readAt,replyAt:readAt+rnd(...rReply)};
         state.sched[pid]=sc;
       }
       if(sc.replyAt<=now()){
@@ -3638,7 +3684,7 @@ async function genLineComment(e){
     e.pid=pid; e.c=String(d.comment).slice(0,220);
     if(isFirst&&d.quest) e.q=String(d.quest).slice(0,60);
     save(); renderFriends();
-    localNotify(dispName(p),e.c.slice(0,60));
+    localNotify(dispName(p),e.c.slice(0,60),'diary');
   }catch(err){}
   diaryBusy=false;
   setTimeout(diaryTick,rnd(8000,30000));
@@ -3910,7 +3956,7 @@ async function genQaLetter(k){
     state.mail.push({id:mid,label:T.qaLetterLabel(dispName(p),k+1),author:pid,t:now(),read:false,myReply:'',data,stats:null});
     (state.me.qaL=state.me.qaL||{})[k]=1;
     save(); updateMailDot();
-    localNotify(dispName(p),PR2.ltArrived);
+    localNotify(dispName(p),PR2.ltArrived,'mail');
     if(data.dm_note){ setTimeout(()=>{ try{ pushDM(p,String(data.dm_note).slice(0,160),now(),'d:'+pid); }catch(e){} }, 2500); }
   }catch(e){}
   mailGen=false;
@@ -4012,6 +4058,7 @@ const VOICE_JA={
  aurelius:'極端に短い、飾りがない、そっけないが頼もしい'};
 const VOICE=LANG==='ja'?VOICE_JA:LANG==='en'?VOICE_EN:VOICE_KO;
 let mailGen=false;
+function hasBatchim(s){ const c=String(s||'').trim().slice(-1).charCodeAt(0); return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28!==0; }
 function ymd(t){const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate();}
 function collectStats(fromT,toT){
   const perPid={}, myMsgs=[], perDay={};
@@ -4042,13 +4089,20 @@ function collectStats(fromT,toT){
   let busiest=['-',0];
   Object.entries(perDay).forEach(([d,n])=>{ if(n>busiest[1]) busiest=[d,n]; });
   const pids=Object.keys(perPid).filter(p=>perPid[p].mine>=1).sort((a,b)=>perPid[b].mine-perPid[a].mine);
+  const recentAuthors=new Set((state.mail||[]).slice(-2).map(m=>m.author));
+  let authorPid=pids[0]||null;
+  if(authorPid&&pids.length>1&&recentAuthors.has(authorPid)){
+    const alt=pids.slice(1).find(x=>perPid[x].mine>=perPid[pids[0]].mine*0.4);
+    if(alt) authorPid=alt;
+  }
   const sample=myMsgs.sort(()=>Math.random()-.5).slice(0,30).sort((a,b)=>a.t-b.t);
-  return {perPid,pids,authorPid:pids[0]||null,myMsgs:sample,myCount:myMsgs.length,total,night,busiest,withN:pids.length,firstT:(firstT===Infinity?null:firstT)};
+  return {perPid,pids,authorPid,myMsgs:sample,myCount:myMsgs.length,total,night,busiest,withN:pids.length,firstT:(firstT===Infinity?null:firstT)};
 }
-async function makeLetter(id,label,st,period,theme){
+async function makeLetter(id,label,st,period,theme,_retry){
   period=period||'지난 한 달';
   if(mailGen||!st.authorPid) return;
   mailGen=true; if($('mailView').style.display!=='none') renderMail();
+  let ok=false;
   try{
     const p=P(st.authorPid);
     const others=st.pids.filter(x=>x!==st.authorPid&&st.perPid[x].mine>=2).slice(0,5);
@@ -4062,17 +4116,27 @@ async function makeLetter(id,label,st,period,theme){
     if(!data.greeting||!data.aphorism) throw new Error('bad letter');
     data.ps=(data.ps||[]).filter(x=>x&&x.id&&x.text&&ALIAS[x.id]).slice(0,5);
     state.mail.push({id,label,author:st.authorPid,t:now(),read:false,myReply:'',
-      data,stats:{total:st.total,night:st.night,busiest:st.busiest,withN:st.withN}});
+      data,stats:{total:st.total,night:st.night,busiest:st.busiest,withN:st.withN,mine:Math.round((st.perPid[st.authorPid]||{}).mine||0),mnight:(st.perPid[st.authorPid]||{}).night||0}});
     save(); updateMailDot();
-    localNotify(dispName(p),PR2.ltArrived);
+    localNotify(dispName(p),PR2.ltArrived,'mail');
     if(data.dm_note){ setTimeout(()=>{ try{ pushDM(p,String(data.dm_note).slice(0,160),now(),'d:'+st.authorPid); }catch(e){} }, 2500); }
+    ok=true;
   }catch(e){}
   mailGen=false;
+  if(!ok&&!_retry) return makeLetter(id,label,st,period,theme,true);
   if($('mailView').style.display!=='none') renderMail();
 }
 async function checkMail(){
   try{
     state.mail=state.mail||[];
+    if(!state.mail.length){
+      const stF=collectStats(now()-30*86400000,now()+1);
+      if(stF.myCount>=20&&stF.firstT&&(now()-stF.firstT)>=24*3600*1000){
+        const days=Math.max(1,Math.min(30,Math.ceil((now()-stF.firstT)/86400000)));
+        await makeLetter('first',T.firstLabel,stF,PR2.firstPeriod(days),PR2.firstTheme);
+        return;
+      }
+    }
     const nd=new Date();
     const pm=new Date(nd.getFullYear(),nd.getMonth()-1,1);
     const prevYm=pm.getFullYear()+'-'+String(pm.getMonth()+1).padStart(2,'0');
@@ -4080,14 +4144,7 @@ async function checkMail(){
     if(!state.mail.find(m=>m.id===prevYm)){
       const st=collectStats(prevStart,prevEnd);
       if(st.myCount>=10){ await makeLetter(prevYm,T.monthLabel(pm.getMonth()),st,'지난 한 달'); return; }
-    }
-    if(!state.mail.length){
-      const st=collectStats(now()-30*86400000,now()+1);
-      if(st.myCount>=20&&st.firstT&&(now()-st.firstT)>=24*3600*1000){
-        const days=Math.max(1,Math.min(30,Math.ceil((now()-st.firstT)/86400000)));
-        await makeLetter('first',T.firstLabel,st,PR2.firstPeriod(days),PR2.firstTheme);
-        return;
-      }
+      else if(st.myCount>0){ state.mailSkip={ym:prevYm,count:st.myCount}; save(); }
     }
     await mileMail();
   }catch(e){}
@@ -4131,6 +4188,10 @@ function renderMail(){
   if(mailGen){
     const w=document.createElement('div'); w.className='mail-card'; w.textContent=T.mailWriting; el.appendChild(w);
   }
+  if(state.mailSkip&&!arr.find(m=>m.id===state.mailSkip.ym)){
+    const w=document.createElement('div'); w.className='mail-card'; w.style.opacity='.7';
+    w.textContent=T.mailSkipNote(state.mailSkip.count); el.appendChild(w);
+  }
   arr.forEach(l=>{
     const b=document.createElement('button');
     b.className='mail-card'+(l.read?'':' unread');
@@ -4149,12 +4210,7 @@ function openLetter(id){
   l.read=true; save(); updateMailDot();
   const p=P(l.author), d=l.data, st=l.stats, lb=ltLabels(l);
   let recs=null;
-  if(st){
-    recs=[T.recTotal(st.total)];
-    if(st.night>0) recs.push(T.recNight(st.night));
-    if(st.busiest&&st.busiest[1]>0) recs.push(T.recBusy(st.busiest[0],st.busiest[1]));
-    recs.push(T.recWith(st.withN));
-  }
+  if(st) recs=T.recLine(st);
   const psHTML=(d.ps&&d.ps.length)?`<div class="lt-sec">${T.ltPS}</div>`+d.ps.map(n=>`
     <div class="lt-ps"><div class="avatar">${av(n.id)}</div><div><div class="lt-ps-nm">${escapeH(dispName(P(n.id)))}</div><div class="lt-ps-txt">${escapeH(n.text)}</div></div></div>`).join(''):'';
   $('ltBody').innerHTML=`
@@ -4167,7 +4223,7 @@ function openLetter(id){
       <div class="lt-why">${escapeH(d.highlight.why||'')}</div>`:''}
     ${d.observation?`<div class="lt-sec">${T.ltObserve}</div><div class="lt-para">${escapeH(d.observation)}</div>`:''}
     ${recs?`<div class="lt-sec">${lb.rec}</div>
-    <div class="lt-rec">${recs.map(escapeH).join('<br>')}</div>
+    <div class="lt-para">${escapeH(recs)}</div>
     ${d.records_comment?`<div class="lt-why">${escapeH(d.records_comment)}</div>`:''}`:''}
     <div class="lt-sec">${T.ltGift}</div>
     <div class="lt-gift">${escapeH(d.aphorism)}</div>
@@ -4268,7 +4324,7 @@ async function saveLetterCard(l){
     // 상단
     x.fillStyle='rgba(239,232,218,.5)'; x.textAlign='center';
     x.font='500 22px sans-serif';
-    x.fillText('C H E O L K K   L E T T E R S',W/2,105);
+    x.fillText(LANG==='en'?'D E E P   E N D   L E T T E R S':LANG==='ja'?'T E T S U C H A   L E T T E R S':'C H E O L K K   L E T T E R S',W/2,105);
     x.fillStyle='#d9a05b'; x.font='700 34px Georgia,"Noto Serif KR",serif';
     x.fillText(l.label,W/2,158);
     // 아바타
@@ -4467,7 +4523,7 @@ async function initialSync(){
 async function cloudPush(){
   if(!sb||!sbUser) return;
   try{
-    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched||{},nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,nv:state.seenNotice||0,na:state.nAck||{},pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null},updated_at:new Date().toISOString()});
+    const {error}=await sb.from('user_data').upsert({user_id:sbUser.id,data:{friends:state.friends,chats:state.chats,groups:state.groups,sched:state.sched||{},nicks:state.nicks,ev:state.lastEvent||0,dbt:state.lastDebate||0,nv:state.seenNotice||0,na:state.nAck||{},pins:state.pins||{},mail:state.mail||[],bd:state.bond||{},it:state.instant||{},dy:state.diary||[],db:state.deb||null,su:state.sub||null,us:state.use||null,mm:state.memo||{},gm:state.gmemo||{},me:state.me||null},updated_at:new Date().toISOString()});
     if(error) throw error;
     syncState.err=''; syncState.last=now();
   }catch(e){ syncState.err=(e&&e.message)||String(e); }
@@ -4673,7 +4729,7 @@ function applyLangUI(){
   document.querySelector('.list-head h1').textContent=T.brand;
   document.querySelector('.sp-eyebrow').textContent=T.eyebrow;
   document.querySelector('.sp-title').textContent=T.brand;
-  $('tabChat').innerHTML=ICON_CHAT+T.tabChat; $('tabCube').innerHTML=ICON_GRID+T.tabCube;
+  $('tabChat').innerHTML=ICON_CHAT+T.tabChat+'<span id="tabChatBadge" class="tabbadge" style="display:none"></span>'; $('tabCube').innerHTML=ICON_GRID+T.tabCube;
   $('tabMail').innerHTML=ICON_MAIL+T.tabMail+'<span class="maildot" id="mailDot" style="display:none"></span>';
   $('mailHint').textContent=T.mailEmpty+'\n'+T.mailHint;
   { const ccX=document.querySelector('.cube-cap'); if(ccX) ccX.textContent=T.cubeCap; }
@@ -4746,19 +4802,29 @@ $('stReset').onclick=async()=>{
   location.reload();
 };
 
+function handleNotifRoute(route){
+  if(!route) return;
+  try{
+    if(route==='mail'){ showTab('mail'); drawerSeg='mail'; renderDrawer(); }
+    else if(route==='diary'){ showTab('mail'); drawerSeg='diary'; renderDrawer(); }
+    else if(route[0]==='d'||route[0]==='g'){ showTab('chat'); openChat(route); }
+  }catch(e){}
+}
+
 /* ================= 시작 ================= */
 (async()=>{
   applyLangUI();
   stat('open');
   // 25문답을 다 채웠는데 편지가 아직 없으면(생성 실패·중단 등) 다시 시도한다
   setTimeout(()=>{ try{ for(let k=0;k<4;k++){ if(qaBookCount(k)===25 && !(((state.me||{}).qaL||{})[k])){ genQaLetter(k); break; } } }catch(e){} }, 9000);
-  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(e){} }
+  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); navigator.serviceWorker.addEventListener('message',ev=>{ if(ev.data&&ev.data.route) handleNotifRoute(ev.data.route); }); }catch(e){} }
+  const notifRoute=(()=>{ try{ const r=new URLSearchParams(location.search).get('route'); if(r) history.replaceState(null,'','/'); return r; }catch(e){ return null; } })();
   $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
   const t0=now();
   await initAuth();
   await load();
   if(!state.friends){ maybeWelcome(true); }
-  else{ renderFriends(); catchUp(); startProactiveTimer(); setTimeout(()=>checkMail(),4000); setTimeout(()=>maybeWelcome(),1200); }
+  else{ renderFriends(); catchUp(); startProactiveTimer(); setTimeout(()=>checkMail(),4000); setTimeout(()=>maybeWelcome(),1200); if(notifRoute) setTimeout(()=>handleNotifRoute(notifRoute),300); }
   const wait=Math.max(0,1100-(now()-t0));
   setTimeout(()=>{ $('splash').classList.add('hide'); setTimeout(()=>{const s=$('splash'); if(s)s.remove();},500); },wait);
 })();
