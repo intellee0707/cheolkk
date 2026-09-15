@@ -1,0 +1,13 @@
+{
+  "name": "Deep End — chat with nine dead philosophers",
+  "short_name": "Deep End",
+  "description": "Chat with nine dead philosophers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#12141d",
+  "theme_color": "#12141d",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "哲チャ — 2,500年を渡ってきた九人の哲学者",
+  "short_name": "哲チャ",
+  "description": "2,500年を渡ってきた九人の哲学者との対話",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#12141d",
+  "theme_color": "#12141d",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
