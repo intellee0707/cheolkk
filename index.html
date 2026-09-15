@@ -9,7 +9,7 @@
 <meta property="og:description" content="Chat with nine dead philosophers">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#12141d">
-<link rel="manifest" href="/manifest.json">
+<link id="manifestLink" rel="manifest" href="/manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -587,6 +587,7 @@ const LANG=(()=>{
   }catch(e){}
   return 'en';   // 해외 주력 — 기본값은 영어
 })();
+try{ if(LANG==='en') document.getElementById('manifestLink').href='/manifest-en.json'; else if(LANG==='ja') document.getElementById('manifestLink').href='/manifest-ja.json'; }catch(e){}
 const LANG_RULE=LANG==='en'
  ?'Write every reply in natural, contemporary English — the English of someone texting a friend, not of a translated book. Contractions always. No Korean characters, ever.'
  :LANG==='ja'
@@ -1349,7 +1350,7 @@ async function localNotify(name,body,route){ // 앱이 백그라운드일 때 �
     if(!document.hidden) return;
     if(!('serviceWorker' in navigator)) return;
     const reg=await navigator.serviceWorker.getRegistration(); if(!reg) return;
-    reg.showNotification(name,{body:(splitBubbles(body)[0]||'').slice(0,90),icon:'/icon-192.png',badge:'/icon-192.png',tag:'deepend-live',data:{route:route||''}});
+    reg.showNotification(name,{body:(splitBubbles(body)[0]||'').slice(0,90),icon:'/icon-192.png',badge:'/icon-192.png',tag:'deepend-live',data:{url:route?('/?route='+encodeURIComponent(route)):'/'}});
   }catch(e){}
 }
 try{document.documentElement.lang=LANG;}catch(e){}
@@ -4817,7 +4818,7 @@ function handleNotifRoute(route){
   stat('open');
   // 25문답을 다 채웠는데 편지가 아직 없으면(생성 실패·중단 등) 다시 시도한다
   setTimeout(()=>{ try{ for(let k=0;k<4;k++){ if(qaBookCount(k)===25 && !(((state.me||{}).qaL||{})[k])){ genQaLetter(k); break; } } }catch(e){} }, 9000);
-  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); navigator.serviceWorker.addEventListener('message',ev=>{ if(ev.data&&ev.data.route) handleNotifRoute(ev.data.route); }); }catch(e){} }
+  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); navigator.serviceWorker.addEventListener('message',ev=>{ try{ const u=ev.data&&ev.data.url; if(!u) return; const r=new URL(u,location.origin).searchParams.get('route'); if(r) handleNotifRoute(r); }catch(e){} }); }catch(e){} }
   const notifRoute=(()=>{ try{ const r=new URLSearchParams(location.search).get('route'); if(r) history.replaceState(null,'','/'); return r; }catch(e){ return null; } })();
   $('spGrid').innerHTML=PHILOSOPHERS.map(p=>`<div class="avatar">${av(p.id)}</div>`).join('');
   const t0=now();
